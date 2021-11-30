@@ -11,7 +11,16 @@
                 <div class="login-form card-body">
                     <form [formGroup]="signUpForm" (ngSubmit)="onSignUp()">
                         <div class="form-group">
+                            <!--The "for" attribute of the label should be pointing to an input with that ID
+                              i.e.
+                              <label for="email">Email</label>
+                              <input id="email" class="form-control"  type="text" formControlName="email" name="email" placeholder="Enter your Username">
+                             -->
                             <label for="username">Email</label>
+                            <!--
+                            Here i tend to, instead of formControlName, to use the formControl directly, so it can be
+                            easily accessed from the template.
+                            -->
                             <input class="form-control"  type="text" formControlName="email" name="email" placeholder="Enter your Username">
                         </div>
                         <div class="alert alert-danger" role="alert" *ngIf="email.invalid && email.touched">
@@ -20,6 +29,11 @@
                             <span *ngIf="email.errors?.['emailExist']" >Email already exist</span>
                         </div>
                         <div class="form-group">
+                            <!--The "for" attribute of the label should be pointing to an input with that ID
+                              i.e.
+                              <label for="password">Email</label>
+                              <input id="password" class="form-control" type="password" formControlName="password" name="password" placeholder="Enter your Password">
+                             -->
                             <label for="password">Password</label>
                             <input class="form-control" type="password" formControlName="password" name="password" placeholder="Enter your Password">
                         </div>
@@ -27,6 +41,11 @@
                             <span *ngIf="password.errors?.['required']" >Password is required</span>
                         </div>
                         <div class="form-group">
+                          <!--The "for" attribute of the label should be pointing to an input with that ID
+                              i.e.
+                              <label for="password">Email</label>
+                              <input class="form-control" type="password" formControlName="passwordConfirm" name="password" placeholder="Enter your Password">
+                             -->
                             <label for="password">Confirm Password</label>
                             <input class="form-control" type="password" formControlName="passwordConfirm" name="password" placeholder="Enter your Password">
                         </div>

@@ -24,6 +24,7 @@ import { provideFirestore,getFirestore } from '@angular/fire/firestore';
     NgxPopper,
     NgbModule,
     FontAwesomeModule,
+    // +10: Using updated version of @angular/fire 👍
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideAuth(() => getAuth()),
     provideDatabase(() => getDatabase()),

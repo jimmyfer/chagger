@@ -6,6 +6,7 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./public-changelogg.component.scss']
 })
 export class PublicChangeloggComponent implements OnInit {
+  // FIXME: Remove this component, as it's not being used anywhere.
 
   constructor() { }
 
