@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import { FormGroup, FormControl, Validators, ValidationErrors, AsyncValidatorFn, AbstractControl } from '@angular/forms';
+import { FormGroup, FormControl, Validators, ValidationErrors, AsyncValidatorFn, AbstractControl, ValidatorFn } from '@angular/forms';
 import { Observable } from 'rxjs/internal/Observable';
 import { AuthService } from 'src/app/services/auth.service';
 
@@ -18,7 +18,8 @@ export class SignupComponent implements OnInit {
           this.checkUserExist()
         ]),
         password: new FormControl('', [
-          Validators.required
+          Validators.required,
+          this.weakPassword(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/i)
         ]),
         passwordConfirm: new FormControl('', [
           Validators.required
@@ -52,7 +53,14 @@ export class SignupComponent implements OnInit {
         return null;
       });
     };
-  } 
+  }
+
+  weakPassword(nameRe: RegExp): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const test = nameRe.test(control.value);
+      return !test ? { weakPassword: {value: control.value}} : null;
+    };
+  }
 
   onSignUp() {
     const { email, password } = this.signUpForm.value;
