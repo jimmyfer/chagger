@@ -1,9 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import { FormGroup, FormControl, Validators, ValidationErrors, AsyncValidatorFn, AbstractControl } from '@angular/forms';
-import { timer } from 'rxjs';
 import { Observable } from 'rxjs/internal/Observable';
-import { switchMap } from 'rxjs/operators';
 import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
