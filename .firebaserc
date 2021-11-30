@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "chagger-ee95c": {
+      "hosting": {
+        "chagger": [
+          "chagger-ee95c"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "chagger-ee95c"
+  }
+}

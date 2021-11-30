@@ -1,0 +1,130 @@
+.console {
+    height: 95vh;
+    background-color: #F6F8FA;
+}
+
+#main-bar {
+    .main-bar-header {
+        .navbar-brand {
+            img {
+                width: 64px;
+                height: 64px;
+            }
+
+            .bar-header-tittle {
+                font-size: 1.6rem;
+            }
+        }
+        .btn-profile {
+            border: 4px solid #DE4C36;
+            border-radius: 50%;
+            overflow: hidden;
+            width: 64px;
+            height: 64x;
+            img {
+                object-fit: cover;
+                width: 100%;
+                height: 100%;
+            }
+        }
+    }
+    .main-bar-body {
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .bar-body-container {
+            .project-title {
+                font-size: 1.2rem;
+                font-weight: 600;
+            }
+        }
+    }
+    .main-bar-footer {
+        .btn-footer {
+            width: 100%;
+        }
+    }
+}
+
+#release-bar {
+    border-left: 1px solid #D0D7DE;
+    border-right: 1px solid #D0D7DE;
+    .release-bar-header {
+        .bar-header-title {
+            font-size: 2rem;
+            font-weight: 600;
+        }
+    }
+    .release-bar-body {
+        ul{
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            .release-title {
+                padding: 5px;
+                font-size: 1.2rem;
+                font-weight: 600;
+            }
+            .release-title-active {
+                background-color: #de4c3694;
+            }
+        }
+    }
+
+    .release-bar-footer {
+        .btn-footer {
+            width: 100%;
+        }
+    }
+}
+
+#console {
+    .console-release {
+        .console-release-title {
+            padding: 5px;
+            font-size: 1.2rem;
+            font-weight: 600;   
+        }
+        .console-release-description {
+            textarea {
+                width: 100%;
+                height: 100px;
+            }
+        }
+        .console-release-embed {
+            .embed-content {
+                width: 100px;
+                height: 100px;
+                background-color: #DE4C36;
+                color: #FFFFFF;
+            }
+        }
+    }
+    .console-commits {
+        .console-commits-title {
+            font-size: 2rem;
+        }
+        .console-commits-container {
+            background-color: #eee4e1;
+            .commits-feature {
+                .commits-feature-title {
+                    font-size: 1.1rem;
+                    font-weight: 600;
+                }
+            }
+            .console-commits-embed {
+                width: 100px;
+                height: 100px;
+                background-color: #DE4C36;
+                .embed-content {
+                    color: #FFFFFF;
+                }
+            }
+        }
+        .btn-commit {
+            height: 50px;
+        }
+    }
+}

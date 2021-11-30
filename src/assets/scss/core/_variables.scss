@@ -1,0 +1,59 @@
+// Colors Brand
+$color-brand-green: #27eea1;
+$color-brand-blue: #009fe3;
+$color-brand-red: #ff4343;
+$color-brand-primary: #DF5641;
+$color-brand-secondary: #150466;
+
+// Color: Space
+$color-space: #27282d;
+
+// Color: Grey
+$color-grey-darkest: #12151a;
+$color-grey-darker: #20232a;
+$color-grey-dark: #3d424c;
+$color-grey: #646a77;
+$color-grey-light: #9094a8;
+$color-grey-lighter: #a6adbb;
+$color-grey-lightest: #cbd0db;
+
+// Color: Milky
+$color-milky: #e2e6ef;
+$color-milkier: #f2f4fb;
+$color-milkiest: #fbfdff;
+
+// Fonts
+$font-default: "Ubuntu";
+$font-alt: sans-serif;
+$font-base-size: 13px;
+$line-height: 1.2;
+
+// Break Points (Sizes)
+$break-xxs: 420px;
+$break-xs: 576px;
+$break-sm: 768px;
+$break-md: 992px;
+$break-lg: 1200px;
+$break-xlg: 1440px;
+
+$gap-xxs: 0.5em;
+$gap-xs: 1em;
+$gap-sm: 2.2em;
+$gap-md: 4em;
+$gap-lg: 6em;
+$gap-xlg: 8.5em;
+
+// Previews
+$slideBaseHeight: 13em;
+
+// Bootstrap
+$theme-colors: (
+  "primary": $color-brand-primary,
+  "secondary": $secondary,
+  "success": $color-brand-green,
+  "info": $info,
+  "warning": $warning,
+  "danger": $color-brand-red,
+  "light": $light,
+  "dark": $dark,
+);

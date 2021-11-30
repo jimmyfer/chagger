@@ -1,0 +1,146 @@
+<div class="console row w-100 pl-5 pt-5">
+    <div id="main-bar" class="col-lg-2 d-flex flex-column">
+        <div class="main-bar-header">
+            <div class="d-flex justify-content-around align-items-center">
+                <div class="navbar-brand d-flex align-items-center">
+                    <img class="m-2" src="../../../../assets/img/git-icon.png" alt="Logo">
+                    <span class="font-weight-bold bar-header-tittle">Chagger</span>
+                </div>
+                <div class="dropdown">
+                    <a class="btn-profile rounded-radius" type="button" id="profile-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <img src="https://icons-for-free.com/iconfiles/png/512/business+casual+corporate+lawyer+insurer+man+person+profile-1320086653571371140.png" alt="">
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="profile-dropdown">
+                        <a class="dropdown-item" href="#">Action</a>
+                        <a class="dropdown-item" href="#">Another action</a>
+                        <a class="dropdown-item" (click)="onLogOut()" href="#" >Sign Out!</a>
+                    </div>
+                </div>
+            </div>
+            <input class="form-control" type="search" placeholder="Search" aria-label="Search">
+        </div>
+        <div class="main-bar-body m-4">
+            <ul class="bar-body-container">
+                <li class="project-title">
+                  <span class="dropdown-toggle">Fixe</span>
+                  <ul class="m-2">
+                      <li>
+                          <fa-icon [icon]="faFolder"></fa-icon>
+                          Releases
+                          <ul class="release-status m-1 ml-4">
+                              <li>Active</li>
+                              <li>archived</li>
+                          </ul>
+                      </li>
+                      <li>
+                          <fa-icon [icon]="faCoffee"></fa-icon>
+                          Tags
+                      </li>
+                      <li>
+                          <fa-icon [icon]="faCoffee"></fa-icon>
+                          Users
+                      </li>
+                      <li>
+                          <fa-icon [icon]="faCoffee"></fa-icon>
+                          Integrations
+                      </li>
+                      <li>
+                          <fa-icon [icon]="faCoffee"></fa-icon>
+                          Google Analytics
+                      </li>
+                  </ul>
+                </li>
+            </ul>
+        </div>
+        <div class="main-bar-footer d-flex align-items-end flex-grow-1">
+            <button type="button" class="btn  btn-gradient-primary btn-footer mx-4">Share ChangeLog</button>
+        </div>
+    </div>
+    <div id="release-bar" class="col-lg-2 d-flex flex-column">
+        <div class="release-bar-header text-center p-2 mt-4">
+            <h1 class="bar-header-title">Active Releases</h1>
+        </div>
+        <div class="release-bar-body">
+            <ul class="text-center">
+                <li class="release-title release-title-active">
+                    <fa-icon class="pr-1" [icon]="faRocket"></fa-icon>
+                    0.2.1
+                </li>
+                <li class="release-title">
+                    <fa-icon class="pr-1" [icon]="faRocket"></fa-icon>
+                    0.2.0
+                </li>
+                <li class="release-title">
+                    <fa-icon class="pr-1" [icon]="faRocket"></fa-icon>
+                    0.1.8
+                </li>
+            </ul>
+        </div>
+        <div class="release-bar-footer d-flex align-items-end flex-grow-1">
+            <button type="button" class="btn btn-gradient-primary btn-footer mx-4">New Release</button>
+        </div>
+    </div>
+    <div id="console" class="col-lg-8">
+        <div class="container">
+            <div class="console-release m-5">
+                <div class="console-release-title">
+                    <fa-icon class="pr-3" [icon]="faRocket"></fa-icon>
+                    <span>0.2.1</span>
+                </div>
+                <div class="d-flex align-items-start">
+                    <div class="console-release-description flex-grow-1">
+                        <textarea name="" id="" cols="30" rows="10">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatibus animi sapiente perferendis expedita odio est sunt, quod rem, dolores non quia illo ipsa maiores, eligendi sed accusamus ipsum vel dolorem.
+                        </textarea>
+                        <span>x/x</span>
+                    </div>
+                    <div class="console-release-embed d-flex flex-column justify-content-center align-items-center mx-4">
+                        <div class="embed-content d-flex flex-column justify-content-center align-items-center">
+                            <fa-icon [icon]="faPlay"></fa-icon>
+                            <span>Video</span>
+                        </div>
+                        <span>Change</span>
+                    </div>
+                </div>
+            </div>
+            <div class="console-commits m-5">
+                <h2 class="console-commits-title" >Commits</h2>
+                <div class="console-commits-container d-flex align-items-center mb-4">
+                    <div class="commits-feature flex-grow-1">
+                        <span class="commits-feature-title dropdown-toggle m-4">Feature</span>
+                    </div>
+                    <div class="console-commits-embed d-flex flex-column justify-content-center align-items-center">
+                        <div class="embed-content d-flex flex-column justify-content-center align-items-center">
+                            <fa-icon [icon]="faPlay"></fa-icon>
+                            <span>Add Action</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="console-commits-container d-flex align-items-center mb-4">
+                    <div class="commits-feature flex-grow-1">
+                        <span class="commits-feature-title dropdown-toggle m-4">Feature</span>
+                    </div>
+                    <div class="console-commits-embed d-flex flex-column justify-content-center align-items-center">
+                        <div class="embed-content d-flex flex-column justify-content-center align-items-center">
+                            <fa-icon [icon]="faPlay"></fa-icon>
+                            <span>Add Action</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="console-commits-container d-flex align-items-center mb-4">
+                    <div class="commits-feature flex-grow-1">
+                        <span class="commits-feature-title dropdown-toggle m-4">Feature</span>
+                    </div>
+                    <div class="console-commits-embed d-flex flex-column justify-content-center align-items-center">
+                        <div class="embed-content d-flex flex-column justify-content-center align-items-center">
+                            <fa-icon [icon]="faPlay"></fa-icon>
+                            <span>Add Action</span>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-brand-primary btn-commit rounded-0 d-flex justify-content-center align-items-center w-100">
+                    <fa-icon [icon]="faPlus"></fa-icon>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
