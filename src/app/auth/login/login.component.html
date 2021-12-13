@@ -9,6 +9,9 @@
                     </div>
                 </div>
                 <div class="login-form card-body">
+                    <div class="alert alert-danger" role="alert" *ngIf="signInState">
+                        <span>Email or Password incorrect</span>
+                    </div>
                     <form [formGroup]="logInForm" (ngSubmit)="onLogIn()">
                         <div class="form-group">
                             <label for="username">Email</label>

@@ -33,8 +33,6 @@ export class AuthService {
     try {
       result = await this.af.signInWithEmailAndPassword(email, password);
     } catch (e) {
-      // FIXME: Remove all console.logs before pushing to master, main or develop.
-      console.log(e);
       return false;
     }
     return await this.finishLogin(result);

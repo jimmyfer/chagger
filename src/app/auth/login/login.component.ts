@@ -9,28 +9,23 @@ import { AuthService } from 'src/app/services/auth.service';
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
-
+  email = new FormControl('');
+  password = new FormControl('');
   logInForm = new FormGroup({
-    email: new FormControl(''),
-    password: new FormControl('')
+    email: this.email,
+    password: this.password
   })
+  signInState: boolean = true;
 
   constructor( private authService: AuthService) { }
 
   ngOnInit(): void {
   }
 
-  onLogIn() {
+  async onLogIn() {
+    this.signInState = true;
     const { email, password } = this.logInForm.value;
-    this.authService.signInEmail(email, password);
-  }
-
-  get email() {
-    return this.logInForm.get('email')!;
-  }
-
-  get password() {
-    return this.logInForm.get('password')!;
+    this.signInState = await this.authService.signInEmail(email, password);
   }
 
 }
