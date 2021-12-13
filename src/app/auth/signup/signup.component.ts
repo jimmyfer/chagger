@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 
-import { FormGroup, FormControl, Validators, ValidationErrors, AsyncValidatorFn, AbstractControl, ValidatorFn } from '@angular/forms';
-import { Observable } from 'rxjs/internal/Observable';
-import { AuthService } from 'src/app/services/auth.service';
+import {FormGroup, FormControl, Validators, ValidationErrors, AsyncValidatorFn, AbstractControl} from '@angular/forms';
+import {Observable} from 'rxjs/internal/Observable';
+import {AuthService} from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-signup',
@@ -10,29 +10,26 @@ import { AuthService } from 'src/app/services/auth.service';
   styleUrls: ['./signup.component.scss']
 })
 export class SignupComponent implements OnInit {
+    email = new FormControl('', [ Validators.required, Validators.email ], [ this.checkUserExist() ]);
+    password = new FormControl('', [ Validators.required ]);
+    passwordConfirm = new FormControl('', [ Validators.required ]);
+
     signUpForm = new FormGroup({
-        email: new FormControl('', [
-          Validators.required,
-          Validators.email
-        ], [
-          this.checkUserExist()
-        ]),
-        password: new FormControl('', [
-          Validators.required,
-          this.weakPassword(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/i)
-        ]),
-        passwordConfirm: new FormControl('', [
-          Validators.required
-        ])
+        email: this.email,
+        password: this.password,
+        passwordConfirm: this.passwordConfirm
       }, {
           asyncValidators: this.passwordMatch()
       })
+    signUpState: boolean = true;
 
   constructor( private authService: AuthService ) {}
 
   ngOnInit(): void {
   }
 
+  // this could be just an attribute instead of a function that returns a function
+  // try to only surround it when it requires argument(s)
   passwordMatch(): AsyncValidatorFn {
       return (control: AbstractControl): Observable<ValidationErrors|null> => {
         return new Observable<ValidationErrors>(suscriber => {
@@ -47,6 +44,7 @@ export class SignupComponent implements OnInit {
   checkUserExist(): AsyncValidatorFn {
     return (control: AbstractControl): Promise<ValidationErrors | null> => {
       return this.authService.checkUserExist(this.email.value).then(resp => {
+        console.log(resp)
         if(resp.length) {
           return { emailExist: true}
         }
@@ -55,28 +53,10 @@ export class SignupComponent implements OnInit {
     };
   }
 
-  weakPassword(nameRe: RegExp): ValidatorFn {
-    return (control: AbstractControl): ValidationErrors | null => {
-      const test = nameRe.test(control.value);
-      return !test ? { weakPassword: {value: control.value}} : null;
-    };
-  }
-
-  onSignUp() {
-    const { email, password } = this.signUpForm.value;
-    this.authService.signUpEmail(email, password);
-  }
-
-  get email() {
-    return this.signUpForm.get('email')!;
-  }
-
-  get password() {
-    return this.signUpForm.get('password')!;
-  }
-
-  get passwordConfirm() {
-    return this.signUpForm.get('passwordConfirm')!;
+  async onSignUp(): Promise<void> {
+    this.signUpState = true;
+    const {email, password} = this.signUpForm.value;
+    this.signUpState = await this.authService.signUpEmail(email, password);
   }
 
 }

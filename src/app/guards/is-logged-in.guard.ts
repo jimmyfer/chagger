@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
-import { Observable } from 'rxjs';
+import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
 @Injectable({
@@ -16,7 +15,6 @@ export class IsLoggedInGuard implements CanActivate {
   async canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Promise<boolean> {
-      console.log('hello');
     const isLoggedIn = await this.authService.isLoggedIn();
     if (!isLoggedIn) {
       await this.router.navigate(['auth/login']);
@@ -25,5 +23,5 @@ export class IsLoggedInGuard implements CanActivate {
 
     return true;
   }
-  
+
 }

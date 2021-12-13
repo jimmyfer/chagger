@@ -5,6 +5,10 @@ import { ConsoleComponent } from './views/console/console.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { DashboardRoutingModule } from './dashboard-routing.module';
 
+import { environment } from 'src/environments/environment';
+import { AngularFireModule } from '@angular/fire/compat';
+import { AngularFireAuthModule } from '@angular/fire/compat/auth';
+
 
 @NgModule({
   declarations: [
@@ -14,7 +18,9 @@ import { DashboardRoutingModule } from './dashboard-routing.module';
   imports: [
     CommonModule,
     FontAwesomeModule,
-    DashboardRoutingModule
+    DashboardRoutingModule,
+    AngularFireModule.initializeApp(environment.firebase),
+    AngularFireAuthModule
   ]
 })
 export class DashboardModule { }
