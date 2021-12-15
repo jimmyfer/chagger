@@ -28,17 +28,19 @@
     "bootstrap": "^4.5.0",
     "firebase": "^9.5.0",
     "jquery": "^3.6.0",
+    "luxon": "^2.2.0",
     "popper.js": "^1.16.1",
+    "rxfire": "^6.0.0",
     "rxjs": "~6.6.0",
     "tslib": "^2.3.0",
-    "zone.js": "~0.11.4",
-    "rxfire": "^6.0.0"
+    "zone.js": "~0.11.4"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~12.2.12",
     "@angular/cli": "~12.2.12",
     "@angular/compiler-cli": "~12.2.0",
     "@types/jasmine": "~3.8.0",
+    "@types/luxon": "^2.0.8",
     "@types/node": "^12.11.1",
     "jasmine-core": "~3.8.0",
     "karma": "~6.3.0",
