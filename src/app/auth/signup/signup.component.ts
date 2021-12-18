@@ -44,7 +44,6 @@ export class SignupComponent implements OnInit {
   checkUserExist(): AsyncValidatorFn {
     return (control: AbstractControl): Promise<ValidationErrors | null> => {
       return this.authService.checkUserExist(this.email.value).then(resp => {
-        console.log(resp)
         if(resp.length) {
           return { emailExist: true}
         }

@@ -36,7 +36,7 @@
                         </div>
                         <div class="form-group">
                             <label for="password">Confirm Password</label>
-                            <input id="password" class="form-control" type="password" formControlName="passwordConfirm" name="password" placeholder="Enter your Password">
+                            <input id="passwordConfirm" class="form-control" type="password" formControlName="passwordConfirm" name="password" placeholder="Enter your Password">
                         </div>
                         <div class="alert alert-danger" role="alert" *ngIf="passwordConfirm.invalid && passwordConfirm.touched || signUpForm.errors?.['dontMatch']">
                             <span *ngIf="passwordConfirm.errors?.['required']" >Password is required</span>

@@ -21,15 +21,15 @@
         </div>
         <div class="main-bar-body m-4">
             <ul class="bar-body-container">
-                <li class="project-title">
-                  <span class="dropdown-toggle">Fixe</span>
-                  <ul class="m-2">
+                <li *ngFor="let workspace of consoleWorkspaces; index as i" class="workspace">
+                  <a href="#" class="title" (click)="workspaceClick(i, $event)" ><span class="dropdown-toggle">{{consoleWorkspaces[i].name | titlecase}}</span></a>
+                  <ul *ngIf="consoleWorkspaces[i].toggle" class="m-2">
                       <li>
                           <fa-icon [icon]="faFolder"></fa-icon>
-                          Releases
-                          <ul class="release-status m-1 ml-4">
-                              <li>Active</li>
-                              <li>archived</li>
+                          <a href="#releaseMenu" (click)="$event.preventDefault();" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="releaseMenu" class="release-title dropdown-toggle ml-2">Releases</a>
+                          <ul class="collapse release-status m-1 ml-2" id="releaseMenu">
+                              <li class="ml-4">Active</li>
+                              <li class="ml-4">archived</li>
                           </ul>
                       </li>
                       <li>
@@ -49,6 +49,12 @@
                           Google Analytics
                       </li>
                   </ul>
+                </li>
+                <li>
+                    <a href="#" *ngIf="!addWorkspace;else addWorkspaceInputTemp" (click)="newWorkspace( $event )">New Workspace +</a>
+                    <ng-template #addWorkspaceInputTemp>
+                        <input (blur)="newWorkspace($event)" (keyup.enter)="newWorkspace($event)" #addWorkspaceInput type="text" placeholder="Workspace name?">
+                    </ng-template>
                 </li>
             </ul>
         </div>

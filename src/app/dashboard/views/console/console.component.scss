@@ -35,9 +35,24 @@
             margin: 0;
         }
         .bar-body-container {
-            .project-title {
-                font-size: 1.2rem;
-                font-weight: 600;
+            .workspace {
+                .title {
+                    font-size: 1.1rem;
+                    font-weight: 600;
+                    text-decoration: none;
+                    color: #414141;
+                }
+                .title:hover {
+                    text-decoration: underline;
+                }
+                .release-title {
+                    font-size: 1rem;
+                    text-decoration: none;
+                    color: #414141;
+                }
+                .release-title:hover {
+                    text-decoration: underline;
+                }
             }
         }
     }

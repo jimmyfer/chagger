@@ -1,26 +1,12 @@
 import { Injectable } from '@angular/core';
-import { Timestamp } from 'firebase/firestore';
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument, QueryFn } from '@angular/fire/compat/firestore';
 import firebase from 'firebase/compat/app';
 import FieldValue = firebase.firestore.FieldValue;
 import firestore = firebase.firestore;
 import { Observable } from 'rxjs';
-import {catchError, finalize, map, shareReplay} from 'rxjs/operators';
+import {finalize, map, shareReplay} from 'rxjs/operators';
 import { DateTime } from "luxon";
-
-interface ModelId {
-  _docId: string;
-};
-
-interface ModelMetadata {
-  _creationTime: FieldValue | Timestamp;
-  _lastUpdate: FieldValue | Timestamp;
-  _databaseVersion: number;
-};
-
-declare type Uploaded<T> = T & ModelMetadata;
-declare type Modeled<T> = T & ModelMetadata & ModelId;
-declare type MaybeModeled<T> = T & Partial<ModelMetadata> & Partial<ModelId>;
+import { MaybeModeled, Modeled, Uploaded } from '../models/models';
 
 const REST_TIME = 2000;
 const REST_GRACE_TIME = 1000;
@@ -34,7 +20,7 @@ interface CachedConnection<T> {
   providedIn: 'root'
 })
 
-export class FirestoreGenericService<T> {
+export abstract class FirestoreGenericService<T> {
 
   constructor(
     protected af: AngularFirestore
@@ -111,7 +97,7 @@ export class FirestoreGenericService<T> {
 }
 
   createDocument(data: MaybeModeled<T>, id: string, ...collectionPath: string[]) {
-    console.log('DB', 'CreatE', [...collectionPath, id], data);
+    console.log('DB', 'Create', [...collectionPath, id], data);
     const ready = this.prepareDocForUpload(data);
     delete data._docId;
     if (id) {
