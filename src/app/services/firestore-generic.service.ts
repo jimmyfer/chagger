@@ -38,7 +38,6 @@ export abstract class FirestoreGenericService<T> {
     getFirestoreDocument(
         ...paths: string[]
     ): AngularFirestoreDocument<Uploaded<T>> {
-        console.log(...paths, 'paths!!!');
         if (paths.length % 2 === 1) {
             throw 'Document reference must have an even number of paths';
         }
@@ -133,7 +132,7 @@ export abstract class FirestoreGenericService<T> {
                 });
         }
     }
-    createDocument(
+    protected createDocument(
         data: MaybeModeled<T>,
         id: string,
         ...collectionPath: string[]
@@ -159,6 +158,16 @@ export abstract class FirestoreGenericService<T> {
                     throw e;
                 });
         }
+    }
+
+    protected deleteDocument(...paths: string[]): Promise<void> {
+        console.log('DB', 'delete', paths);
+        return this.getFirestoreDocument(...paths)
+            .delete()
+            .catch((e) => {
+                console.log('DB', 'delete', paths.join('/'));
+                throw e;
+            });
     }
 
     protected getDocument(...paths: string[]): Observable<Modeled<T>> {

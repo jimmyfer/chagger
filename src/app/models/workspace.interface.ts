@@ -7,10 +7,6 @@ export interface Workspace {
     releases?: {version: string; id: DocumentReference}[]
 }
 
-interface version {
-    version?: string
-}
-
 export interface userWorkspaces {
     id: DocumentReference;
     name: string;

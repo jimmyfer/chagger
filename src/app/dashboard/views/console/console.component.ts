@@ -29,21 +29,12 @@ export class ConsoleComponent implements OnInit {
     @ViewChild('editReleaseVersionInput', {static: false})
     editReleaseVersionInput: ElementRef<HTMLInputElement> = {} as ElementRef;
 
-    // FIXME: Should be removed
-    public isLogged = false;
 
-    // FIXME: Should be removed (and "any" types should be avoided at all costs)
-    user: any;
-
-    // For the icons, the variables could be named by
-    // their usage in the logic, and not what their "shape" is. This way,
-    // we split the "logic" of the icons from the "visual" part.
-    faCoffee = faCoffee;
-    faUser = faUser;
-    faFolder = faFolder;
-    faPlay = faPlay;
-    faRocket = faRocket;
-    faPlus = faPlus;
+    testIcon = faCoffee;
+    releaseFolder = faFolder;
+    actionPlay = faPlay;
+    releasesVersion = faRocket;
+    addCommit = faPlus;
 
     consoleWorkspaces: {
         name: string;
@@ -188,32 +179,37 @@ export class ConsoleComponent implements OnInit {
             });
     }
 
-    editReleaseVersion(e: Event, i: number): void {
+    editReleaseVersion(e: Event, releaseIndex: number): void {
         e.preventDefault();
         switch (e.type) {
             case 'click':
-                this.editRelease[i] = true;
+                this.editRelease[releaseIndex] = true;
                 setTimeout(() => {
                     this.editReleaseVersionInput.nativeElement.focus();
                 });
                 break;
             case 'blur':
                 if (!this.editReleaseWorking) {
-                    this.editRelease[i] = false;
+                    this.editRelease[releaseIndex] = false;
                     this.updateReleaseVersion(
                         this.editReleaseVersionInput.nativeElement.value,
-                        this.consoleReleases[i].id,
-                        this.consoleReleases[i].version
+                        this.consoleReleases[releaseIndex].id,
+                        this.consoleReleases[releaseIndex].version
                     );
                 }
                 this.editReleaseWorking = false;
                 break;
             case 'keyup':
-                this.editRelease[i] = false;
+                this.editRelease[releaseIndex] = false;
                 this.editReleaseWorking = true;
-                this.updateReleaseVersion(this.editReleaseVersionInput.nativeElement.value, this.consoleReleases[i].id, this.consoleReleases[i].version);
+                this.updateReleaseVersion(this.editReleaseVersionInput.nativeElement.value, this.consoleReleases[releaseIndex].id, this.consoleReleases[releaseIndex].version);
                 break;
         }
+    }
+
+    deleteRelease(e: Event, releaseIndex: number) {
+        e.preventDefault();
+        this.releaseService.deleteRelease(this.consoleReleases[releaseIndex].id.path, this.activeWorkspace.id, this.consoleReleases, this.consoleReleases[releaseIndex].version);
     }
 
     updateReleaseVersion(newVersion: string, releaseId: DocumentReference, actualVersion: string): void {

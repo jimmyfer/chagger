@@ -65,7 +65,7 @@
                         >
                         <ul *ngIf="consoleWorkspaces[i].toggle" class="m-2">
                             <li>
-                                <fa-icon [icon]="faFolder"></fa-icon>
+                                <fa-icon [icon]="releaseFolder"></fa-icon>
                                 <a
                                     href="#releaseMenu"
                                     (click)="$event.preventDefault()"
@@ -89,19 +89,19 @@
                                 </ul>
                             </li>
                             <li>
-                                <fa-icon [icon]="faCoffee"></fa-icon>
+                                <fa-icon [icon]="testIcon"></fa-icon>
                                 Tags
                             </li>
                             <li>
-                                <fa-icon [icon]="faCoffee"></fa-icon>
+                                <fa-icon [icon]="testIcon"></fa-icon>
                                 Users
                             </li>
                             <li>
-                                <fa-icon [icon]="faCoffee"></fa-icon>
+                                <fa-icon [icon]="testIcon"></fa-icon>
                                 Integrations
                             </li>
                             <li>
-                                <fa-icon [icon]="faCoffee"></fa-icon>
+                                <fa-icon [icon]="testIcon"></fa-icon>
                                 Google Analytics
                             </li>
                         </ul>
@@ -153,7 +153,7 @@
                             <div class="release-version-title d-flex">
                                 <fa-icon
                                     class="pr-1"
-                                    [icon]="faRocket"
+                                    [icon]="releasesVersion"
                                 ></fa-icon>
                                 
                                 <span *ngIf="!editRelease[i]; else editReleaseVersionInputTemp">
@@ -192,7 +192,7 @@
                                         (click)="editReleaseVersion($event, i)"
                                         >Edit</a
                                     >
-                                    <a class="dropdown-item" href="#">Delete</a>
+                                    <a class="dropdown-item" href="#" (click)="deleteRelease($event, i)" >Delete</a>
                                 </div>
                             </div>
                         </li>
@@ -236,7 +236,7 @@
             <div class="container">
                 <div class="console-release m-5">
                     <div class="console-release-title">
-                        <fa-icon class="pr-3" [icon]="faRocket"></fa-icon>
+                        <fa-icon class="pr-3" [icon]="releasesVersion"></fa-icon>
                         <span>0.2.1</span>
                     </div>
                     <div class="d-flex align-items-start">
@@ -265,7 +265,7 @@ Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatibus animi sap
                                     align-items-center
                                 "
                             >
-                                <fa-icon [icon]="faPlay"></fa-icon>
+                                <fa-icon [icon]="actionPlay"></fa-icon>
                                 <span>Video</span>
                             </div>
                             <span>Change</span>
@@ -310,7 +310,7 @@ Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatibus animi sap
                                     align-items-center
                                 "
                             >
-                                <fa-icon [icon]="faPlay"></fa-icon>
+                                <fa-icon [icon]="actionPlay"></fa-icon>
                                 <span>Add Action</span>
                             </div>
                         </div>
@@ -351,7 +351,7 @@ Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatibus animi sap
                                     align-items-center
                                 "
                             >
-                                <fa-icon [icon]="faPlay"></fa-icon>
+                                <fa-icon [icon]="actionPlay"></fa-icon>
                                 <span>Add Action</span>
                             </div>
                         </div>
@@ -392,7 +392,7 @@ Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatibus animi sap
                                     align-items-center
                                 "
                             >
-                                <fa-icon [icon]="faPlay"></fa-icon>
+                                <fa-icon [icon]="actionPlay"></fa-icon>
                                 <span>Add Action</span>
                             </div>
                         </div>
@@ -408,7 +408,7 @@ Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatibus animi sap
                             w-100
                         "
                     >
-                        <fa-icon [icon]="faPlus"></fa-icon>
+                        <fa-icon [icon]="addCommit"></fa-icon>
                     </button>
                 </div>
             </div>
