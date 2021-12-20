@@ -9,6 +9,7 @@ import auth = firebase.auth;
 import { WorkspaceService } from './workspace.service';
 import { UserService } from './user.service';
 import { AngularFirestore, DocumentReference } from '@angular/fire/compat/firestore';
+import { ReleasesService } from './releases.service';
 
 @Injectable({
     providedIn: 'root'
@@ -20,7 +21,8 @@ export class AuthService {
         public afAuth: AngularFireAuth,
         private af: AngularFirestore,
         private workspaceService: WorkspaceService,
-        private userService: UserService
+        private userService: UserService,
+        private releasesService: ReleasesService
     ) { }
 
     async signUpEmail(email: string, password: string): Promise<boolean> {
@@ -37,6 +39,14 @@ export class AuthService {
                 workspace = this.workspaceService.create({
                     name: result.user.email as string
                 })
+            } catch (e) {
+                throw console.log(e)
+            }
+            try {
+                this.releasesService.create({
+                    version: '1.0.0',
+                    description: 'This is the default version.'
+                },(await workspace).id)
             } catch (e) {
                 throw console.log(e)
             }
@@ -63,9 +73,9 @@ export class AuthService {
         return await this.finishLogin(result);
     }
 
-    async signOut(): Promise<void> {
+    async signOut(): Promise<boolean> {
         await this.afAuth.signOut();
-        await this.router.navigate(['auth/login']);
+        return await this.router.navigate(['auth/login']);
     }
 
     async finishLogin(credentials: auth.UserCredential): Promise<boolean> {
