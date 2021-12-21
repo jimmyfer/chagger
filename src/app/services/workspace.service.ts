@@ -24,11 +24,12 @@ export class WorkspaceService extends FirestoreGenericService<Workspace> {
     return await this.createDocument(data, '', collectionPath);
   }
 
+  // FIXME
   async addNewWorkspace(data: Workspace, userUid: string): Promise<boolean> {
     let workspace;
     let newdocument;
     workspace = await this.createDocument(data, '', collectionPath);
-    newdocument = this.createDocumentMerge({workspaces: arrayUnion({name: data.name, id: this.af.doc(`workspace/${workspace.id}`).ref})}, userUid, 'users');
+    newdocument = await this.createDocumentMerge({workspaces: arrayUnion({name: data.name, id: this.af.doc(`workspace/${workspace.id}`).ref})}, userUid, 'users');
     return true;
   }
 

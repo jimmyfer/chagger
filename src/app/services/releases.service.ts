@@ -56,7 +56,7 @@ export class ReleasesService extends FirestoreGenericService<Releases> {
         let actualReleaseIndex;
         actualReleaseIndex = releasesContainer.findIndex(release => release.version == actualVersion);
         releasesContainer.splice(actualReleaseIndex, 1);
-        releasesContainer.push({version: newVersion, id: this.af.doc(`workspace/${workspaceId}/releases/${releasePath.split("/")[0]}`).ref as DocumentReference})
+        releasesContainer.push({version: newVersion, id: this.af.doc(`workspace/${workspaceId}/releases/${releasePath.split("/")[3]}`).ref as DocumentReference})
         this.createDocumentMerge(
             {
                 releases: releasesContainer,
