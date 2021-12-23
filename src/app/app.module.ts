@@ -14,23 +14,23 @@ import { provideDatabase,getDatabase } from '@angular/fire/database';
 import { provideFirestore,getFirestore } from '@angular/fire/firestore';
 
 @NgModule({
-  declarations: [
-    AppComponent
-  ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    DashboardModule,
-    NgxPopper,
-    NgbModule,
-    FontAwesomeModule,
-    // +10: Using updated version of @angular/fire 👍
-    provideFirebaseApp(() => initializeApp(environment.firebase)),
-    provideAuth(() => getAuth()),
-    provideDatabase(() => getDatabase()),
-    provideFirestore(() => getFirestore())
-  ],
-  providers: [],
-  bootstrap: [AppComponent]
+    declarations: [
+        AppComponent
+    ],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        DashboardModule,
+        NgxPopper,
+        NgbModule,
+        FontAwesomeModule,
+        // +10: Using updated version of @angular/fire 👍
+        provideFirebaseApp(() => initializeApp(environment.firebase)),
+        provideAuth(() => getAuth()),
+        provideDatabase(() => getDatabase()),
+        provideFirestore(() => getFirestore())
+    ],
+    providers: [],
+    bootstrap: [AppComponent]
 })
 export class AppModule { }

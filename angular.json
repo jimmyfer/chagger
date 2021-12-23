@@ -117,9 +117,21 @@
             "firebaseProject": "chagger-ee95c",
             "firebaseHostingSite": "chagger-ee95c"
           }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
+            ]
+          }
         }
       }
     }
   },
-  "defaultProject": "chagger"
+  "defaultProject": "chagger",
+  "cli": {
+    "defaultCollection": "@angular-eslint/schematics"
+  }
 }

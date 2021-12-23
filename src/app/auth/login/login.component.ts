@@ -4,18 +4,18 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+    selector: 'app-login',
+    templateUrl: './login.component.html',
+    styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
   email = new FormControl('');
   password = new FormControl('');
   logInForm = new FormGroup({
-    email: this.email,
-    password: this.password
+      email: this.email,
+      password: this.password
   })
-  signInState: boolean = true;
+  signInState = true;
 
   constructor( private authService: AuthService) { }
 
@@ -23,9 +23,9 @@ export class LoginComponent implements OnInit {
   }
 
   async onLogIn() {
-    this.signInState = true;
-    const { email, password } = this.logInForm.value;
-    this.signInState = await this.authService.signInEmail(email, password);
+      this.signInState = true;
+      const { email, password } = this.logInForm.value;
+      this.signInState = await this.authService.signInEmail(email, password);
   }
 
 }

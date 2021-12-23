@@ -11,16 +11,16 @@ import { AngularFireAuthModule } from '@angular/fire/compat/auth';
 
 
 @NgModule({
-  declarations: [
-    PublicChangeloggComponent,
-    ConsoleComponent
-  ],
-  imports: [
-    CommonModule,
-    FontAwesomeModule,
-    DashboardRoutingModule,
-    AngularFireModule.initializeApp(environment.firebase),
-    AngularFireAuthModule
-  ]
+    declarations: [
+        PublicChangeloggComponent,
+        ConsoleComponent
+    ],
+    imports: [
+        CommonModule,
+        FontAwesomeModule,
+        DashboardRoutingModule,
+        AngularFireModule.initializeApp(environment.firebase),
+        AngularFireAuthModule
+    ]
 })
 export class DashboardModule { }

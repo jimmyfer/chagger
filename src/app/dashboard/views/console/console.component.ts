@@ -19,6 +19,11 @@ import { WorkspaceService } from 'src/app/services/workspace.service';
     templateUrl: './console.component.html',
     styleUrls: ['./console.component.scss'],
 })
+
+
+/**
+ * Console Component
+ */
 export class ConsoleComponent implements OnInit {
     @ViewChild('addWorkspaceInput', { static: false })
     addWorkspaceInput: ElementRef<HTMLInputElement> = {} as ElementRef;
@@ -45,17 +50,24 @@ export class ConsoleComponent implements OnInit {
     releaseWatcher: Subscription | undefined;
 
     editRelease: boolean[] = [];
-    editReleaseWorking: boolean = false;
+    editReleaseWorking = false;
 
-    addWorkspace: boolean = false;
-    addWorkspaceWorking: boolean = false;
+    addWorkspace = false;
+    addWorkspaceWorking = false;
     workspacesWatcher: Subscription | undefined;
 
-    addRelease: boolean = false;
-    addReleaseWorking: boolean = false;
-    releaseBarActive: boolean = false;
+    addRelease = false;
+    addReleaseWorking = false;
+    releaseBarActive = false;
     activeWorkspace: DocumentReference = {} as DocumentReference;
 
+    /**
+     * 
+     * @param authService Service to handle auth conections.
+     * @param userService Service to handle user collection in database.
+     * @param workspaceService Service to handle user workspaces collection in database.
+     * @param releaseService Service to handle user releases collection in database.
+     */
     constructor(
         private authService: AuthService,
         private userService: UserService,
@@ -63,6 +75,9 @@ export class ConsoleComponent implements OnInit {
         private releaseService: ReleasesService
     ) {}
 
+    /**
+     * ngOnInit that suscripbe to the user workspaces.
+     */
     ngOnInit(): void {
         this.workspacesWatcher = this.userService
             .getUserWorkspaces()
@@ -78,6 +93,9 @@ export class ConsoleComponent implements OnInit {
             });
     }
 
+    /**
+     * Close account session.
+     */
     onLogOut(): void {
         try {
             this.authService.signOut();
@@ -86,6 +104,11 @@ export class ConsoleComponent implements OnInit {
         }
     }
 
+    /**
+     * Workspaces bar toggler
+     * @param workspaceIndex workspace index.
+     * @param e Click event handler.
+     */
     workspaceClick(workspaceIndex: number, e: Event): void {
         e.preventDefault();
         this.releaseBarActive = false;
@@ -97,6 +120,10 @@ export class ConsoleComponent implements OnInit {
         this.activeWorkspace = this.consoleWorkspaces[workspaceIndex].id;
     }
 
+    /**
+     * New workspace interface toggler from link to input and vice versa.
+     * @param e Click, Focus and Enter Key handler.
+     */
     newWorkspace(e: Event): void {
         e.preventDefault();
         switch (e.type) {
@@ -125,6 +152,10 @@ export class ConsoleComponent implements OnInit {
         }
     }
 
+    /**
+     * New release interface toggler from link to input and vice versa.
+     * @param e Click, Focus and Enter Key event handler.
+     */
     newRelease(e: Event): void {
         e.preventDefault();
         switch (e.type) {
@@ -151,20 +182,34 @@ export class ConsoleComponent implements OnInit {
         }
     }
 
+    /**
+     * Add new workspace to Database.
+     * @param workspaceName workspace name.
+     */
     addNewWorkspace(workspaceName: string): void {
         this.workspaceService.addNewWorkspace(
-            { name: workspaceName },
-            this.userService.userUid
+            { name: workspaceName, releases: [] },
+            this.userService.userUid,
+            {workspaces: this.consoleWorkspaces}
         );
     }
 
+    /**
+     * Add new release to Database.
+     * @param releaseVersion relase version.
+     */
     addNewRelease(releaseVersion: string): void {
         this.releaseService.addNewRelease(
-            { version: releaseVersion },
-            this.activeWorkspace.id
+            { version: releaseVersion, description: '' },
+            this.activeWorkspace.id,
+            {releases: this.consoleReleases}
         );
     }
 
+    /**
+     * Active the release bar for the current workspace and suscribe to those relases.
+     * @param e Click event handler.
+     */
     releaseBar(e: Event): void {
         e.preventDefault();
         this.releaseWatcher?.unsubscribe();
@@ -179,6 +224,11 @@ export class ConsoleComponent implements OnInit {
             });
     }
 
+    /**
+     * Release title toggler from text to input and edit the release version.
+     * @param e Click, Focus and Enter Key event handler.
+     * @param releaseIndex Release index.
+     */
     editReleaseVersion(e: Event, releaseIndex: number): void {
         e.preventDefault();
         switch (e.type) {
@@ -207,15 +257,29 @@ export class ConsoleComponent implements OnInit {
         }
     }
 
+    /**
+     * Detele the selected release.
+     * @param e Click event handler.
+     * @param releaseIndex release index.
+     */
     deleteRelease(e: Event, releaseIndex: number) {
         e.preventDefault();
-        this.releaseService.deleteRelease(this.consoleReleases[releaseIndex].id.path, this.activeWorkspace.id, this.consoleReleases, this.consoleReleases[releaseIndex].version);
+        this.releaseService.deleteRelease(this.consoleReleases[releaseIndex].id.path, this.activeWorkspace.id, {releases: this.consoleReleases}, this.consoleReleases[releaseIndex].version);
     }
 
+    /**
+     * Update the selected release.
+     * @param newVersion New release version.
+     * @param releaseId Release document reference in the database.
+     * @param actualVersion Actual release version.
+     */
     updateReleaseVersion(newVersion: string, releaseId: DocumentReference, actualVersion: string): void {
-        this.releaseService.updateRelease(newVersion, releaseId.path, this.activeWorkspace.id, actualVersion, this.consoleReleases);
+        this.releaseService.updateReleaseVersion(newVersion, releaseId.path, this.activeWorkspace.id, actualVersion, {releases: this.consoleReleases});
     }
 
+    /**
+     * ngOnDestroy unsuscribe from currents suscriptions.
+     */
     ngOnDestroy(): void {
         this.workspacesWatcher?.unsubscribe();
         this.releaseWatcher?.unsubscribe();

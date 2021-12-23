@@ -3,25 +3,25 @@ import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from
 import { AuthService } from '../services/auth.service';
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
 export class IsLoggedInGuard implements CanActivate {
-  constructor(
+    constructor(
     private authService: AuthService,
     private router: Router,
-  ) {
-  }
-
-  async canActivate(
-    route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot): Promise<boolean> {
-    const isLoggedIn = await this.authService.isLoggedIn();
-    if (!isLoggedIn) {
-      await this.router.navigate(['auth/login']);
-      return false;
+    ) {
     }
 
-    return true;
-  }
+    async canActivate(
+        route: ActivatedRouteSnapshot,
+        state: RouterStateSnapshot): Promise<boolean> {
+        const isLoggedIn = await this.authService.isLoggedIn();
+        if (!isLoggedIn) {
+            await this.router.navigate(['auth/login']);
+            return false;
+        }
+
+        return true;
+    }
 
 }

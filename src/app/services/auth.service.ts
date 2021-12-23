@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { first } from 'rxjs/operators'
+import { first } from 'rxjs/operators';
 import firebase from 'firebase/compat/app';
 
 import { Router } from '@angular/router';
@@ -13,8 +13,20 @@ import { AngularFirestore, DocumentReference } from '@angular/fire/compat/firest
 @Injectable({
     providedIn: 'root'
 })
+
+/**
+ * This is the service that handle auth conections.
+ */
 export class AuthService {
 
+    /**
+     * Constructor.
+     * @param router Angular Router.
+     * @param afAuth Angular helper of FireAuth.
+     * @param af Angular helper of Firestore.
+     * @param workspaceService Service to handle user workspaces collection in database.
+     * @param userService Service to handle user collection in database.
+     */
     constructor(
         private router: Router,
         public afAuth: AngularFireAuth,
@@ -23,8 +35,14 @@ export class AuthService {
         private userService: UserService
     ) { }
 
+    /**
+     * Create a new user with an email given.
+     * @param email New user email.
+     * @param password  New user password.
+     * @returns Return boolean if singup is sucess or not.
+     */
     async signUpEmail(email: string, password: string): Promise<boolean> {
-        let result
+        let result;
         try {
             result = await this.afAuth.createUserWithEmailAndPassword(email, password);
         } catch (e) {
@@ -35,10 +53,11 @@ export class AuthService {
             let workspace;
             try {
                 workspace = this.workspaceService.create({
-                    name: result.user.email as string
-                })
+                    name: result.user.email as string,
+                    releases: []
+                });
             } catch (e) {
-                throw console.log(e)
+                throw console.log(e);
             }
             try {
                 this.userService.createUser({
@@ -46,13 +65,19 @@ export class AuthService {
                     workspaces: [{ name: 'default', id: this.af.doc(`workspace/${(await workspace).id}`).ref as DocumentReference }]
                 }, result.user.uid);
             } catch (e) {
-                throw console.log(e)
+                throw console.log(e);
             }
         }
 
         return await this.finishLogin(result);
     }
 
+    /**
+     * Login with an email given.
+     * @param email User email account.
+     * @param password User password.
+     * @returns Return boolan if sucess or not.
+     */
     async signInEmail(email: string, password: string): Promise<boolean> {
         let result;
         try {
@@ -63,11 +88,20 @@ export class AuthService {
         return await this.finishLogin(result);
     }
 
+    /**
+     * Signout of the aplication.
+     * @returns Return boolean if sucess or not.
+     */
     async signOut(): Promise<boolean> {
         await this.afAuth.signOut();
         return await this.router.navigate(['auth/login']);
     }
 
+    /**
+     * An function to validate if user signup or signin correctly.
+     * @param credentials User credentials.
+     * @returns Return boolean if sucess or not.
+     */
     async finishLogin(credentials: auth.UserCredential): Promise<boolean> {
 
         if (!credentials.user) {
@@ -78,19 +112,33 @@ export class AuthService {
         return true;
     }
 
+    /**
+     * Redirect the user to dashboard.
+     */
     async goToUserHome(): Promise<void> {
-        // FIXME: The promise returned from navigate must be handled, in case of error and success
-        await this.router.navigate(['/dashboard']);
+        try {
+            await this.router.navigate(['/dashboard']);
+        } catch {
+            throw('No se ha podido alcanzar el dashboard, intentalo de nuevo.');
+        }
     }
 
+    /**
+     * Check if user is logged in.
+     * @returns Return boolean if user is logged in or not.
+     */
     async isLoggedIn(): Promise<boolean> {
-        let isLogged;
-        let authStateResp = await this.afAuth.authState.pipe(first()).toPromise();
+        const authStateResp = await this.afAuth.authState.pipe(first()).toPromise();
         if(authStateResp) this.userService.userUid = authStateResp.uid;
-        isLogged =  authStateResp ? true : false;
+        const isLogged =  authStateResp ? true : false;
         return  isLogged;
     }
 
+    /**
+     * Check if user exist.
+     * @param email User email.
+     * @returns Return an array with text data that validate if user exist.
+     */
     async checkUserExist(email: string): Promise<string[]> {
         return await this.afAuth.fetchSignInMethodsForEmail(email);
     }
