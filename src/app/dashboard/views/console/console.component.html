@@ -1,4 +1,28 @@
 <div class="console">
+    <div *ngIf="webLoading" class="w-100 vh-100 d-flex align-items-center justify-content-center">
+        <div class="loader"></div>
+    </div>
+    <div *ngIf="!workspaceExist && !webLoading;else consoleApp" class="w-100 vh-100 d-flex align-items-center justify-content-center" >
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="alert alert-danger text-center">Workspaces not found!</h3>
+                </div>
+                <div class="card-body">
+                    <p class="text-center" >Please, create a new workspace.</p>
+                    <form [formGroup]="createWorkspace" (ngSubmit)="createNewWorkspace(workspaceName.value)">
+                    <div class="form-group">
+                        <label for="workspace">Workspace Name:</label>
+                        <input class="form-control" type="text" formControlName="workspace" name="workspace" placeholder="Enter your new workspace name.">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Create</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <ng-template #consoleApp >
+        <p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle"></p-confirmDialog>
     <div class="row w-100 pl-5 pt-5">
         <div id="main-bar" class="col-lg-2 d-flex flex-column">
             <div class="main-bar-header">
@@ -414,4 +438,5 @@ Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatibus animi sap
             </div>
         </div>
     </div>
+    </ng-template>
 </div>

@@ -5,7 +5,6 @@ import { User } from '../models/user.interface';
 import { AngularFirestore, DocumentReference } from '@angular/fire/compat/firestore';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { Observable } from 'rxjs';
-import { FieldValue } from 'firebase/firestore';
 
 const collectionPath = 'users';
 
@@ -19,6 +18,7 @@ const collectionPath = 'users';
 export class UserService extends FirestoreGenericService<User>{
 
   userUid = '';
+  email = '';
 
   /**
    * Constructor.
@@ -35,8 +35,8 @@ export class UserService extends FirestoreGenericService<User>{
    * @param id User uid.
    * @returns Return a document reference of the user in users collection.
    */
-  async createUser(data: User, id: string): Promise<DocumentReference<User>> {
-      return await this.createDocument(data, id, collectionPath);
+  async createUser(data: User): Promise<DocumentReference<User>> {
+      return await this.createDocument(data, this.userUid, collectionPath);
   }
 
   /**
@@ -49,13 +49,10 @@ export class UserService extends FirestoreGenericService<User>{
 
   /**
    * Edit a workspace of a user.
-   * @param userUid User uid.
    * @param workspaceData New workspace data to update.
    */
-  editUsersWorkspaces(userUid: string, workspaceData: Partial<User>): void {
-      this.updateDocument(workspaceData, collectionPath, userUid);
+  editUsersWorkspaces(workspaceData: Partial<User>): void {
+      this.updateDocument(workspaceData, collectionPath, this.userUid);
   }
-
-
 
 }

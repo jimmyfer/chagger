@@ -12,6 +12,7 @@ import { environment } from '../environments/environment';
 import { provideAuth,getAuth } from '@angular/fire/auth';
 import { provideDatabase,getDatabase } from '@angular/fire/database';
 import { provideFirestore,getFirestore } from '@angular/fire/firestore';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
     declarations: [
@@ -24,6 +25,7 @@ import { provideFirestore,getFirestore } from '@angular/fire/firestore';
         NgxPopper,
         NgbModule,
         FontAwesomeModule,
+        BrowserAnimationsModule,
         // +10: Using updated version of @angular/fire 👍
         provideFirebaseApp(() => initializeApp(environment.firebase)),
         provideAuth(() => getAuth()),

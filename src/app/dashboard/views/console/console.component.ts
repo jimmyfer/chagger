@@ -5,14 +5,17 @@ import {
     faFolder,
     faPlay,
     faPlus,
-    faRocket,
-    faUser,
+    faRocket
 } from '@fortawesome/free-solid-svg-icons';
 import { Subscription } from 'rxjs';
 import { AuthService } from 'src/app/services/auth.service';
 import { ReleasesService } from 'src/app/services/releases.service';
 import { UserService } from 'src/app/services/user.service';
 import { WorkspaceService } from 'src/app/services/workspace.service';
+
+import { FormGroup, FormControl } from '@angular/forms';
+
+import { ConfirmationService } from 'primeng/api';
 
 @Component({
     selector: 'app-console',
@@ -34,6 +37,14 @@ export class ConsoleComponent implements OnInit {
     @ViewChild('editReleaseVersionInput', {static: false})
     editReleaseVersionInput: ElementRef<HTMLInputElement> = {} as ElementRef;
 
+    workspaceName = new FormControl('');
+
+    createWorkspace = new FormGroup({
+        workspace: this.workspaceName
+    })
+
+    workspaceExist = false;
+    webLoading = true;
 
     testIcon = faCoffee;
     releaseFolder = faFolder;
@@ -44,7 +55,7 @@ export class ConsoleComponent implements OnInit {
     consoleWorkspaces: {
         name: string;
         id: DocumentReference;
-        toggle: boolean;
+        toggle?: boolean;
     }[] = [];
     consoleReleases: { version: string; id: DocumentReference; }[] = [];
     releaseWatcher: Subscription | undefined;
@@ -67,21 +78,32 @@ export class ConsoleComponent implements OnInit {
      * @param userService Service to handle user collection in database.
      * @param workspaceService Service to handle user workspaces collection in database.
      * @param releaseService Service to handle user releases collection in database.
+     * @param confirmationService Service to handle confirmations messages.
      */
     constructor(
         private authService: AuthService,
         private userService: UserService,
         private workspaceService: WorkspaceService,
-        private releaseService: ReleasesService
+        private releaseService: ReleasesService,
+        private confirmationService: ConfirmationService
     ) {}
 
     /**
      * ngOnInit that suscripbe to the user workspaces.
      */
     ngOnInit(): void {
+        this.workspaceWatch();
+    }
+
+    /**
+     * Start watching the workspaces from user collection on database.
+     */
+    workspaceWatch(): void {
         this.workspacesWatcher = this.userService
             .getUserWorkspaces()
             .subscribe((resp) => {
+                this.webLoading = false;
+                this.workspaceExist = true;
                 this.consoleWorkspaces = [];
                 resp.workspaces.forEach((workspace) => {
                     this.consoleWorkspaces.push({
@@ -90,6 +112,17 @@ export class ConsoleComponent implements OnInit {
                         toggle: false,
                     });
                 });
+            },
+            (err) => {
+                switch (err) {
+                    case 'NOT FOUND!':
+                        this.webLoading = false;
+                        this.workspaceExist = false;
+                        break;
+                
+                    default:
+                        throw err;
+                }
             });
     }
 
@@ -183,15 +216,31 @@ export class ConsoleComponent implements OnInit {
     }
 
     /**
-     * Add new workspace to Database.
+     * Add a new workspace in Database.
      * @param workspaceName workspace name.
      */
     addNewWorkspace(workspaceName: string): void {
+        const workspaces = this.consoleWorkspaces.slice();
+        workspaces.forEach(workspace => {
+            delete workspace.toggle;
+        });
         this.workspaceService.addNewWorkspace(
             { name: workspaceName, releases: [] },
-            this.userService.userUid,
-            {workspaces: this.consoleWorkspaces}
+            {workspaces: workspaces}
         );
+    }
+
+    /**
+     * Create a new workspace in Database.
+     * @param workspaceName workspace name.
+     */
+    async createNewWorkspace(workspaceName: string) {
+        if(await this.workspaceService.createNewWorkspace({ name: workspaceName, releases: [] })) {
+            this.workspacesWatcher?.unsubscribe();
+            this.workspaceWatch();
+            this.webLoading = false;
+            this.workspaceExist = true;
+        }
     }
 
     /**
@@ -264,7 +313,12 @@ export class ConsoleComponent implements OnInit {
      */
     deleteRelease(e: Event, releaseIndex: number) {
         e.preventDefault();
-        this.releaseService.deleteRelease(this.consoleReleases[releaseIndex].id.path, this.activeWorkspace.id, {releases: this.consoleReleases}, this.consoleReleases[releaseIndex].version);
+        this.confirmationService.confirm({
+            message: 'Are you sure that you want to delete this release?',
+            accept: () => {
+                this.releaseService.deleteRelease(this.consoleReleases[releaseIndex].id.path, this.activeWorkspace.id, {releases: this.consoleReleases}, this.consoleReleases[releaseIndex].version);
+            }
+        });
     }
 
     /**
@@ -275,6 +329,12 @@ export class ConsoleComponent implements OnInit {
      */
     updateReleaseVersion(newVersion: string, releaseId: DocumentReference, actualVersion: string): void {
         this.releaseService.updateReleaseVersion(newVersion, releaseId.path, this.activeWorkspace.id, actualVersion, {releases: this.consoleReleases});
+    }
+
+    /**
+     * Check if the user logged has any workspace.
+     */
+    checkIfExistUserWorkspace() {
     }
 
     /**
