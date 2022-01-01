@@ -11,18 +11,21 @@ import { AngularFireAuthModule } from '@angular/fire/compat/auth';
 
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AddActionComponent } from './views/add-action/add-action.component';
 
 @NgModule({
     declarations: [
         PublicChangeloggComponent,
-        ConsoleComponent 
+        ConsoleComponent,
+        AddActionComponent 
     ],
     imports: [
         CommonModule,
         FontAwesomeModule,
         DashboardRoutingModule,
         ReactiveFormsModule,
+        FormsModule,
         AngularFireModule.initializeApp(environment.firebase),
         AngularFireAuthModule,
         ConfirmDialogModule

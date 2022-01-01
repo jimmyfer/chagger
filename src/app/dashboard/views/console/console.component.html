@@ -1,3 +1,4 @@
+<app-add-action [isVisible]="addActionIsVisible" (actionTypeObject)="getAction( $event );" ></app-add-action>
 <div class="console">
     <div *ngIf="webLoading" class="w-100 vh-100 d-flex align-items-center justify-content-center">
         <div class="loader"></div>
@@ -324,6 +325,7 @@ Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatibus animi sap
                                 justify-content-center
                                 align-items-center
                             "
+                            (click)="addAction();"
                         >
                             <div
                                 class="

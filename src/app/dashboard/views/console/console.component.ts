@@ -16,6 +16,7 @@ import { WorkspaceService } from 'src/app/services/workspace.service';
 import { FormGroup, FormControl } from '@angular/forms';
 
 import { ConfirmationService } from 'primeng/api';
+import { hasLifecycleHook } from '@angular/compiler/src/lifecycle_reflector';
 
 @Component({
     selector: 'app-console',
@@ -36,6 +37,8 @@ export class ConsoleComponent implements OnInit {
 
     @ViewChild('editReleaseVersionInput', {static: false})
     editReleaseVersionInput: ElementRef<HTMLInputElement> = {} as ElementRef;
+
+    addActionIsVisible = false;
 
     workspaceName = new FormControl('');
 
@@ -335,6 +338,18 @@ export class ConsoleComponent implements OnInit {
      * Check if the user logged has any workspace.
      */
     checkIfExistUserWorkspace() {
+    }
+
+    /**
+     * Open the add-action component.
+     */
+    addAction(): void {
+        this.addActionIsVisible = true;
+    }
+
+    getAction(data: any): void {
+        console.log(data);
+        this.addActionIsVisible = false;
     }
 
     /**
