@@ -1,10 +1,15 @@
 
 export interface ActionVideo {
+    type: string,
     link: string,
     options: {
         autoplay: boolean,
         muted: boolean,
-        start_on: number,
+        start_on: {
+            hour: number,
+            minute: number,
+            second: number
+        },
         thumbnail?: string
     }
 }

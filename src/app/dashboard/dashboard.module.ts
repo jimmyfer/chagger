@@ -13,12 +13,14 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AddActionComponent } from './views/add-action/add-action.component';
+import { ReleasesBoardComponent } from './views/releases-board/releases-board.component';
 
 @NgModule({
     declarations: [
         PublicChangeloggComponent,
         ConsoleComponent,
-        AddActionComponent 
+        AddActionComponent,
+        ReleasesBoardComponent
     ],
     imports: [
         CommonModule,

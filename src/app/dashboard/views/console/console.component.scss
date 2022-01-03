@@ -64,69 +64,6 @@
     }
 }
 
-#release-bar {
-    border-left: 1px solid #d0d7de;
-    border-right: 1px solid #d0d7de;
-    animation-name: releaseBarSlide;
-    animation-duration: 0.5s;
-    .release-bar-header {
-        .bar-header-title {
-            font-size: 2rem;
-            font-weight: 600;
-        }
-    }
-    .release-bar-body {
-        ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            .release-version {
-                .release-version-title,
-                .release-version-menu {
-                    padding: 5px;
-                    font-size: 1.2rem;
-                    font-weight: 600;
-                    color: #414141;
-                }
-
-                .release-version-title {
-                    input {
-                        display: inline;
-                        font-size: 1.2rem;
-                        font-weight: 600;
-                        color: #414141;
-                        background-color: transparent;
-                        width: 100%;
-                        border: 0;
-                    }
-
-                    input:hover,
-                    input:focus {
-                        border: 0;
-                        outline: 0;
-                    }
-                }
-
-                .release-version-menu {
-                    text-decoration: none;
-                }
-                .release-version-menu:hover {
-                    color: #999999;
-                }
-            }
-            .release-version-active {
-                background-color: #de4c3694;
-            }
-        }
-    }
-
-    .release-bar-footer {
-        .btn-footer {
-            width: 100%;
-        }
-    }
-}
-
 #console {
     height: 90vh;
     overflow-y: auto;

@@ -1,5 +1,6 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { Output, EventEmitter } from '@angular/core';
+import { Action } from 'src/app/models/action';
 
 @Component({
     selector: 'app-add-action',
@@ -12,7 +13,7 @@ import { Output, EventEmitter } from '@angular/core';
  */
 export class AddActionComponent implements OnInit {
     @Input() isVisible = false;
-    @Output() actionTypeObject = new EventEmitter<{}>();
+    @Output() actionTypeObject = new EventEmitter<Action>();
     @ViewChild('actionType', {static: false }) actionType: ElementRef = {} as ElementRef;
     actionTypeCheck = 'video';
 
