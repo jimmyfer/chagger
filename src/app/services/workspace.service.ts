@@ -20,6 +20,7 @@ const collectionPath = 'workspace';
  * Service to handle user workspaces collection in database.
  */
 export class WorkspaceService extends FirestoreGenericService<Workspace> {
+
     userUid: string;
 
     /**

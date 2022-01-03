@@ -1,0 +1,54 @@
+:host {
+    height: 90vh;
+    overflow-y: auto;
+}
+
+#console {
+    .console-release {
+        .console-release-title {
+            padding: 5px;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        .console-release-description {
+            textarea {
+                width: 100%;
+                height: 100px;
+            }
+        }
+        .console-release-embed {
+            .embed-content {
+                width: 100px;
+                height: 100px;
+                background-color: #de4c36;
+                color: #ffffff;
+            }
+        }
+    }
+    .console-commits {
+        overflow-y: auto;
+        .console-commits-title {
+            font-size: 2rem;
+        }
+        .console-commits-container {
+            background-color: #eee4e1;
+            .commits-feature {
+                .commits-feature-title {
+                    font-size: 1.1rem;
+                    font-weight: 600;
+                }
+            }
+            .console-commits-embed {
+                width: 100px;
+                height: 100px;
+                background-color: #de4c36;
+                .embed-content {
+                    color: #ffffff;
+                }
+            }
+        }
+        .btn-commit {
+            height: 50px;
+        }
+    }
+}

@@ -15,7 +15,8 @@
                     "
                 >
                     <div class="release-version-title d-flex">
-                        <fa-icon
+                        <a (click)="showFeatureBoard( $event, i );" class="d-flex" href="#">
+                            <fa-icon
                             class="pr-1"
                             [icon]="releasesVersion"
                         ></fa-icon>
@@ -32,6 +33,7 @@
                                 placeholder="{{ release.version }}"
                             />
                         </ng-template>
+                        </a>
                     </div>
                     <div class="dropdown show">
                         <a

@@ -1,0 +1,196 @@
+<div id="console">
+    <div class="container">
+        <div class="console-release m-1">
+            <div class="console-release-title">
+                <fa-icon class="pr-1" [icon]="releasesVersion"></fa-icon>
+                <span
+                    *ngIf="
+                        !checkEditReleaseVersion;
+                        else editReleaseVersionInputTemp
+                    "
+                >
+                    {{ release.version }}
+                </span>
+                <ng-template #editReleaseVersionInputTemp>
+                    <input
+                        (blur)="editReleaseVersion($event)"
+                        (keyup.enter)="editReleaseVersion($event)"
+                        #editReleaseVersionInput
+                        type="text"
+                        placeholder="{{ release.version }}"
+                    />
+                </ng-template>
+                <a href="#" (click)="editReleaseVersion($event)">
+                    <fa-icon
+                        [icon]="editReleaseVersionTitle"
+                        transform="shrink-7 left-8"
+                    ></fa-icon>
+                </a>
+            </div>
+            <div class="d-flex align-items-start">
+                <div class="console-release-description flex-grow-1">
+                    <textarea
+                        [(ngModel)]="textareaCharacter"
+                        name=""
+                        id=""
+                        cols="30"
+                        rows="10"
+                    >
+ {{ release.description }} </textarea
+                    >
+                    <div class="d-flex justify-content-between">
+                        <span
+                            [ngClass]="
+                                textareaCharacter.length > 250
+                                    ? 'text-danger'
+                                    : ''
+                            "
+                        >
+                            {{ textareaCharacter.length }}/250</span
+                        >
+                        <button
+                            type="button"
+                            class="btn btn-gradient-primary btn-footer mx-4"
+                            (click)="updateRelease();"
+                        >
+                            Update
+                        </button>
+                    </div>
+                </div>
+                <div
+                    class="
+                        console-release-embed
+                        d-flex
+                        flex-column
+                        justify-content-center
+                        align-items-center
+                        mx-4
+                    "
+                >
+                    <div
+                        class="
+                            embed-content
+                            d-flex
+                            flex-column
+                            justify-content-center
+                            align-items-center
+                        "
+                    >
+                        <fa-icon [icon]="actionPlay"></fa-icon>
+                        <span>Video</span>
+                    </div>
+                    <span><a href="#" (click)="addAction( $event )">Change</a></span>
+                </div>
+            </div>
+        </div>
+        <div class="console-commits m-1">
+            <h2 class="console-commits-title">Commits</h2>
+            <div
+                class="console-commits-container d-flex align-items-center mb-4"
+            >
+                <div class="commits-feature flex-grow-1">
+                    <span class="commits-feature-title dropdown-toggle m-4"
+                        >Feature</span
+                    >
+                </div>
+                <div
+                    class="
+                        console-commits-embed
+                        d-flex
+                        flex-column
+                        justify-content-center
+                        align-items-center
+                    "
+                >
+                    <div
+                        class="
+                            embed-content
+                            d-flex
+                            flex-column
+                            justify-content-center
+                            align-items-center
+                        "
+                    >
+                        <fa-icon [icon]="actionPlay"></fa-icon>
+                        <span>Add Action</span>
+                    </div>
+                </div>
+            </div>
+            <div
+                class="console-commits-container d-flex align-items-center mb-4"
+            >
+                <div class="commits-feature flex-grow-1">
+                    <span class="commits-feature-title dropdown-toggle m-4"
+                        >Feature</span
+                    >
+                </div>
+                <div
+                    class="
+                        console-commits-embed
+                        d-flex
+                        flex-column
+                        justify-content-center
+                        align-items-center
+                    "
+                >
+                    <div
+                        class="
+                            embed-content
+                            d-flex
+                            flex-column
+                            justify-content-center
+                            align-items-center
+                        "
+                    >
+                        <fa-icon [icon]="actionPlay"></fa-icon>
+                        <span>Add Action</span>
+                    </div>
+                </div>
+            </div>
+            <div
+                class="console-commits-container d-flex align-items-center mb-4"
+            >
+                <div class="commits-feature flex-grow-1">
+                    <span class="commits-feature-title dropdown-toggle m-4"
+                        >Feature</span
+                    >
+                </div>
+                <div
+                    class="
+                        console-commits-embed
+                        d-flex
+                        flex-column
+                        justify-content-center
+                        align-items-center
+                    "
+                >
+                    <div
+                        class="
+                            embed-content
+                            d-flex
+                            flex-column
+                            justify-content-center
+                            align-items-center
+                        "
+                    >
+                        <fa-icon [icon]="actionPlay"></fa-icon>
+                        <span>Add Action</span>
+                    </div>
+                </div>
+            </div>
+            <button
+                type="button"
+                class="
+                    btn btn-brand-primary btn-commit
+                    rounded-0
+                    d-flex
+                    justify-content-center
+                    align-items-center
+                    w-100
+                "
+            >
+                <fa-icon [icon]="addCommit"></fa-icon>
+            </button>
+        </div>
+    </div>
+</div>

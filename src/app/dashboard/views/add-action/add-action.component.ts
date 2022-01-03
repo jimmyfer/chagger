@@ -44,7 +44,7 @@ export class AddActionComponent implements OnInit {
 
     /**
      * 
-     * @param e event
+     * @param e Click event
      */
     returnAction(e: Event): void {
         e.preventDefault();

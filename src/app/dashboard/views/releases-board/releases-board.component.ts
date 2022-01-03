@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { ReleasesService } from 'src/app/services/releases.service';
 import { DocumentReference } from '@angular/fire/compat/firestore';
 import {
@@ -20,7 +20,7 @@ import { WorkspaceService } from 'src/app/services/workspace.service';
  */
 export class ReleasesBoardComponent implements OnInit {
 
-    @Input() activeWorkspace: DocumentReference = {} as DocumentReference;;
+    @Input() activeWorkspace: DocumentReference = {} as DocumentReference;
 
     @ViewChild('addReleaseInput', { static: false })
     addReleaseInput: ElementRef<HTMLInputElement> = {} as ElementRef;
@@ -31,6 +31,8 @@ export class ReleasesBoardComponent implements OnInit {
     releasesVersion = faRocket;
 
     releaseBarActive = false;
+
+    @Output() featureBoard = new EventEmitter<{ doc: DocumentReference, index: number}>();
 
     consoleReleases: { version: string; id: DocumentReference }[] = [];
     releaseWatcher: Subscription | undefined;
@@ -73,6 +75,19 @@ export class ReleasesBoardComponent implements OnInit {
     }
 
     /**
+     * 
+     * @param e Click event.
+     * @param index Release index.
+     */
+    showFeatureBoard( e: Event, index: number): void {
+        e.preventDefault();
+        this.featureBoard.emit({
+            doc: this.consoleReleases[index].id,
+            index
+        });
+    }
+
+    /**
      * New release interface toggler from link to input and vice versa.
      * @param e Click, Focus and Enter Key event handler.
      */
@@ -108,7 +123,7 @@ export class ReleasesBoardComponent implements OnInit {
      */
     addNewRelease(releaseVersion: string): void {
         this.releaseService.addNewRelease(
-            { version: releaseVersion, description: '' },
+            { version: releaseVersion, description: '', action: {} },
             this.activeWorkspace.id,
             { releases: this.consoleReleases }
         );
@@ -182,7 +197,7 @@ export class ReleasesBoardComponent implements OnInit {
         releaseId: DocumentReference,
         actualVersion: string
     ): void {
-        this.releaseService.updateReleaseVersion(
+        this.releaseService.updateRelease(
             newVersion,
             releaseId.path,
             this.activeWorkspace.id,
