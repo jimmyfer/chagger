@@ -52,3 +52,11 @@
         }
     }
 }
+
+.release-updated {
+    transition: opacity 0.5s;
+}
+
+.release-updated-animated {
+    opacity: 0;
+}

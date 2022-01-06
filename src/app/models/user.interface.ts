@@ -3,6 +3,11 @@ import { FieldValue } from 'firebase/firestore';
 
 
 export interface User {
-    email: string
-    workspaces: {name: string, id: DocumentReference}[]
+    email: string;
+    workspaces: UserWorkspaces[];
+}
+
+export interface UserWorkspaces {
+    name: string;
+    ref: DocumentReference;
 }

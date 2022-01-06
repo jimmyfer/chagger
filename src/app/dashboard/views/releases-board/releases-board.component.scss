@@ -1,11 +1,8 @@
-:host {
+#release-bar {
     border-left: 1px solid #d0d7de;
     border-right: 1px solid #d0d7de;
     animation-name: releaseBarSlide;
     animation-duration: 0.5s;
-}
-
-#release-bar {
     .release-bar-header {
         .bar-header-title {
             font-size: 2rem;

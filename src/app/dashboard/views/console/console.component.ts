@@ -1,13 +1,8 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { DocumentReference } from '@angular/fire/compat/firestore';
 import {
-    faCoffee,
     faFolder,
-    faPlay,
-    faPlus,
-    faRocket,
 } from '@fortawesome/free-solid-svg-icons';
-import { Subscription } from 'rxjs';
+import { MessageService } from 'primeng/api';
 import { AuthService } from 'src/app/services/auth.service';
 import { UserService } from 'src/app/services/user.service';
 import { WorkspaceService } from 'src/app/services/workspace.service';
@@ -15,6 +10,8 @@ import { WorkspaceService } from 'src/app/services/workspace.service';
 import { FormGroup, FormControl } from '@angular/forms';
 
 import { Action } from 'src/app/models/action';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-console',
@@ -26,20 +23,20 @@ import { Action } from 'src/app/models/action';
  * Console Component
  */
 export class ConsoleComponent implements OnInit {
-
     addActionIsVisible = false;
-    releaseAction: Partial<Action> = {};
-
-    releaseBarActive = false;
-    featureBoardActive = false;
-
-    activeRelease: { doc: DocumentReference; index: number } = {
-        doc: {} as DocumentReference,
-        index: 0,
-    };
 
     @ViewChild('addWorkspaceInput', { static: false })
     addWorkspaceInput: ElementRef<HTMLInputElement> = {} as ElementRef;
+
+    workspaceExist = false;
+    webLoading = true;
+
+    workspaces$ = this.userService.getUserWorkspaces();
+    activeWorkspaceIndex: number | null = null;
+    activeWorkspace = false;
+
+    addWorkspace = false;
+    addWorkspaceWorking = false;
 
     workspaceName = new FormControl('');
 
@@ -47,99 +44,57 @@ export class ConsoleComponent implements OnInit {
         workspace: this.workspaceName,
     });
 
-    workspaceExist = false;
-    webLoading = true;
+    workspaceExistChecker: Subscription = {} as Subscription;
 
-    testIcon = faCoffee;
     releaseFolder = faFolder;
-    actionPlay = faPlay;
-    releasesVersion = faRocket;
-    addCommit = faPlus;
 
-    consoleWorkspaces: {
-        name: string;
-        id: DocumentReference;
-        toggle?: boolean;
-    }[] = [];
-
-    addWorkspace = false;
-    addWorkspaceWorking = false;
-    workspacesWatcher: Subscription | undefined;
-
-    activeWorkspace: DocumentReference = {} as DocumentReference;
+    /**
+     * Get the actual workspaceId
+     */
+    get workspaceId(): string {
+        if(this.route.firstChild) {
+            const workspaceId = this.route.firstChild.snapshot.paramMap.get('workspaceId');
+            if(workspaceId) {
+                return workspaceId;
+            }
+        }
+        throw 'Cant get the actual workspace ID';
+    }
 
     /**
      *
      * @param authService Service to handle auth conections.
      * @param userService Service to handle user collection in database.
      * @param workspaceService Service to handle user workspaces collection in database.
+     * @param messageService A toast service provided by PrimeNG.
      */
     constructor(
         private authService: AuthService,
         private userService: UserService,
-        private workspaceService: WorkspaceService
+        private workspaceService: WorkspaceService,
+        private messageService: MessageService,
+        private router: Router,
+        private route: ActivatedRoute
     ) {}
 
     /**
-     * ngOnInit that suscripbe to the user workspaces.
+     * ngOnInit - Load the dashboard if there is any workspace.
      */
     ngOnInit(): void {
-        this.workspaceWatch();
-    }
-
-    /**
-     * Show the release bar.
-     * @param e Click event.
-     */
-    showReleaseBar(e: Event): void {
-        e.preventDefault();
-        this.releaseBarActive = true;
-    }
-
-    /**
-     * Show the feature board.
-     * @param activeRelease The active release.
-     */
-    showFeatureBoard(activeRelease: {
-        doc: DocumentReference;
-        index: number;
-    }): void {
-        this.featureBoardActive = false;
-        setTimeout(() => {
-            this.activeRelease = activeRelease;
-            this.featureBoardActive = true;
-        });
-    }
-
-    /**
-     * Start watching the workspaces from user collection on database.
-     */
-    workspaceWatch(): void {
-        this.workspacesWatcher = this.userService.getUserWorkspaces().subscribe(
-            (resp) => {
-                this.webLoading = false;
+        this.workspaceExistChecker = this.workspaces$.subscribe((workspaces) => {
+            if(workspaces) {
                 this.workspaceExist = true;
-                this.consoleWorkspaces = [];
-                resp.workspaces.forEach((workspace) => {
-                    this.consoleWorkspaces.push({
-                        name: workspace.name,
-                        id: workspace.id,
-                        toggle: false,
-                    });
+                this.webLoading = false;
+                workspaces.forEach((workspace, index) => {
+                    if(workspace.ref.id == this.workspaceId) {
+                        this.activeWorkspaceIndex = index;
+                        this.activeWorkspace = true;
+                    }
                 });
-            },
-            (err) => {
-                switch (err) {
-                    case 'NOT FOUND!':
-                        this.webLoading = false;
-                        this.workspaceExist = false;
-                        break;
-
-                    default:
-                        throw err;
-                }
+            } else {
+                this.webLoading = false;
             }
-        );
+        });
     }
 
     /**
@@ -155,19 +110,22 @@ export class ConsoleComponent implements OnInit {
 
     /**
      * Workspaces bar toggler
-     * @param workspaceIndex workspace index.
+     * @param workspaceIndex Workspace index.
      * @param e Click event handler.
      */
     workspaceClick(workspaceIndex: number, e: Event): void {
-        this.releaseBarActive = false;
-        this.featureBoardActive = false;
         e.preventDefault();
-        this.consoleWorkspaces.forEach((workspaces, index) => {
-            if (index != workspaceIndex) workspaces.toggle = false;
-        });
-        this.consoleWorkspaces[workspaceIndex].toggle =
-            !this.consoleWorkspaces[workspaceIndex].toggle;
-        this.activeWorkspace = this.consoleWorkspaces[workspaceIndex].id;
+        if (this.activeWorkspaceIndex == workspaceIndex) {
+            this.activeWorkspaceIndex = null;
+            this.activeWorkspace = false;
+            this.router.navigate(['/workspaces']);
+        } else {
+            if(this.activeWorkspace) {
+                this.router.navigate(['/workspaces']);
+            }
+            this.activeWorkspaceIndex = workspaceIndex;
+            this.activeWorkspace = true;
+        }
     }
 
     /**
@@ -204,34 +162,36 @@ export class ConsoleComponent implements OnInit {
 
     /**
      * Add a new workspace in Database.
-     * @param workspaceName workspace name.
+     * @param workspaceName Workspace name.
      */
     addNewWorkspace(workspaceName: string): void {
-        const workspaces = this.consoleWorkspaces.slice();
-        workspaces.forEach((workspace) => {
-            delete workspace.toggle;
+        this.userService.getUserWorkspacesOnce().then((workspaces) => {
+            console.log(workspaces);
+            this.workspaceService.addNewWorkspace(
+                { name: workspaceName, releases: [] },
+                { workspaces: workspaces }
+            );
         });
-        this.workspaceService.addNewWorkspace(
-            { name: workspaceName, releases: [] },
-            { workspaces: workspaces }
-        );
     }
 
     /**
      * Create a new workspace in Database.
-     * @param workspaceName workspace name.
+     * @param workspaceName Workspace name.
      */
     async createNewWorkspace(workspaceName: string) {
-        if (
-            await this.workspaceService.createNewWorkspace({
-                name: workspaceName,
-                releases: [],
-            })
-        ) {
-            this.workspacesWatcher?.unsubscribe();
-            this.workspaceWatch();
+        const workspaceSucess = await this.workspaceService.createNewWorkspace({
+            name: workspaceName,
+            releases: [],
+        });
+        if (workspaceSucess) {
             this.webLoading = false;
             this.workspaceExist = true;
+        } else {
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Error creating the workspace, please try again.',
+            });
         }
     }
 
@@ -240,7 +200,6 @@ export class ConsoleComponent implements OnInit {
      * @param data Action Object
      */
     getAction(data: Action): void {
-        this.releaseAction = data;
         this.addActionIsVisible = false;
     }
 
@@ -252,9 +211,9 @@ export class ConsoleComponent implements OnInit {
     }
 
     /**
-     * ngOnDestroy unsuscribe from currents suscriptions.
+     * ngOnDestroy
      */
     ngOnDestroy(): void {
-        this.workspacesWatcher?.unsubscribe();
+        this.workspaceExistChecker.unsubscribe();
     }
 }

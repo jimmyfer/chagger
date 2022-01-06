@@ -1,41 +1,38 @@
-import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { ReleasesService } from 'src/app/services/releases.service';
 import { DocumentReference } from '@angular/fire/compat/firestore';
-import {
-    faRocket
-} from '@fortawesome/free-solid-svg-icons';
 
 import { ConfirmationService } from 'primeng/api';
-import { Subscription } from 'rxjs';
+import { Observable } from 'rxjs';
 import { WorkspaceService } from 'src/app/services/workspace.service';
+import { WorkspaceRelease } from 'src/app/models/workspace.interface';
+import { ActivatedRoute } from '@angular/router';
+import { filter, map, switchMap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-releases-board',
     templateUrl: './releases-board.component.html',
     styleUrls: ['./releases-board.component.scss'],
+    host: {'class': 'flex-grow-1'}
 })
 
 /**
  *
  */
-export class ReleasesBoardComponent implements OnInit {
-
-    @Input() activeWorkspace: DocumentReference = {} as DocumentReference;
+export class ReleasesBoardComponent {
+    releases$: Observable<WorkspaceRelease[]> = this.route.paramMap.pipe(
+        map((params) => params.get('workspaceId')),
+        filter((workspaceId): workspaceId is string => !!workspaceId),
+        switchMap((workspaceId) =>
+            this.workspaceService.getWorkspaceReleases(workspaceId)
+        )
+    );
 
     @ViewChild('addReleaseInput', { static: false })
     addReleaseInput: ElementRef<HTMLInputElement> = {} as ElementRef;
 
     @ViewChild('editReleaseVersionInput', { static: false })
     editReleaseVersionInput: ElementRef<HTMLInputElement> = {} as ElementRef;
-
-    releasesVersion = faRocket;
-
-    releaseBarActive = false;
-
-    @Output() featureBoard = new EventEmitter<{ doc: DocumentReference, index: number}>();
-
-    consoleReleases: { version: string; id: DocumentReference }[] = [];
-    releaseWatcher: Subscription | undefined;
 
     editRelease: boolean[] = [];
     editReleaseWorking = false;
@@ -44,7 +41,29 @@ export class ReleasesBoardComponent implements OnInit {
     addReleaseWorking = false;
 
     /**
-     * 
+     * Get the actual workspace.
+     */
+    get activeWorkspace(): DocumentReference {
+        const workspaceId = this.route.snapshot.paramMap.get('workspaceId');
+        if (workspaceId) {
+            return this.workspaceService.getReference(workspaceId);
+        }
+        throw 'Workspace ID not exist!';
+    }
+
+    /**
+     * Get the actual workspaceId
+     */
+    get workspaceId(): string {
+        const workspaceId = this.route.snapshot.paramMap.get('workspaceId');
+        if (workspaceId) {
+            return workspaceId;
+        }
+        throw 'Cant get the actual workspace ID';
+    }
+
+    /**
+     *
      * @param releaseService Service to handle user releases collection in database.
      * @param workspaceService Service to handle user workspaces collection in database.
      * @param confirmationService Service to handle confirmations messages.
@@ -52,40 +71,9 @@ export class ReleasesBoardComponent implements OnInit {
     constructor(
         private releaseService: ReleasesService,
         private workspaceService: WorkspaceService,
-        private confirmationService: ConfirmationService
+        private confirmationService: ConfirmationService,
+        private route: ActivatedRoute
     ) {}
-
-    /**
-     * 
-     */
-    ngOnInit(): void {
-        this.releaseWatcher?.unsubscribe();
-        this.releaseBarActive = true;
-        this.releaseWatcher = this.workspaceService
-            .getWorkspaceReleases(this.activeWorkspace.id)
-            .subscribe((releases) => {
-                this.consoleReleases = [];
-                releases.releases?.forEach((release) => {
-                    this.consoleReleases.push({
-                        version: release.version,
-                        id: release.id,
-                    });
-                });
-            });
-    }
-
-    /**
-     * 
-     * @param e Click event.
-     * @param index Release index.
-     */
-    showFeatureBoard( e: Event, index: number): void {
-        e.preventDefault();
-        this.featureBoard.emit({
-            doc: this.consoleReleases[index].id,
-            index
-        });
-    }
 
     /**
      * New release interface toggler from link to input and vice versa.
@@ -122,11 +110,25 @@ export class ReleasesBoardComponent implements OnInit {
      * @param releaseVersion relase version.
      */
     addNewRelease(releaseVersion: string): void {
-        this.releaseService.addNewRelease(
-            { version: releaseVersion, description: '', action: {} },
-            this.activeWorkspace.id,
-            { releases: this.consoleReleases }
-        );
+        const workspace = this.activeWorkspace;
+        if (!workspace) {
+            return;
+        }
+        console.log(this.workspaceId, '<h1>WORKSPACEID!!!</h1>');
+        this.workspaceService
+            .getWorkspaceReleasesOnce(this.workspaceId)
+            .then((releases) => {
+                this.releaseService.addNewRelease(
+                    {
+                        version: releaseVersion,
+                        description: '',
+                        action: {},
+                        emojiId: 'rocket',
+                    },
+                    workspace.id,
+                    { releases: releases }
+                );
+            });
     }
 
     /**
@@ -136,34 +138,41 @@ export class ReleasesBoardComponent implements OnInit {
      */
     editReleaseVersion(e: Event, releaseIndex: number): void {
         e.preventDefault();
-        switch (e.type) {
-            case 'click':
-                this.editRelease[releaseIndex] = true;
-                setTimeout(() => {
-                    this.editReleaseVersionInput.nativeElement.focus();
-                });
-                break;
-            case 'blur':
-                if (!this.editReleaseWorking) {
-                    this.editRelease[releaseIndex] = false;
-                    this.updateReleaseVersion(
-                        this.editReleaseVersionInput.nativeElement.value,
-                        this.consoleReleases[releaseIndex].id,
-                        this.consoleReleases[releaseIndex].version
-                    );
+        this.workspaceService
+            .getWorkspaceReleasesOnce(this.workspaceId)
+            .then((releases) => {
+                switch (e.type) {
+                    case 'click':
+                        this.editRelease[releaseIndex] = true;
+                        setTimeout(() => {
+                            this.editReleaseVersionInput.nativeElement.focus();
+                        });
+                        break;
+                    case 'blur':
+                        if (!this.editReleaseWorking) {
+                            this.editRelease[releaseIndex] = false;
+                            this.updateReleaseVersion(
+                                this.editReleaseVersionInput.nativeElement
+                                    .value,
+                                releases[releaseIndex].ref,
+                                releases[releaseIndex].version,
+                                releases[releaseIndex].emojiId
+                            );
+                        }
+                        this.editReleaseWorking = false;
+                        break;
+                    case 'keyup':
+                        this.editRelease[releaseIndex] = false;
+                        this.editReleaseWorking = true;
+                        this.updateReleaseVersion(
+                            this.editReleaseVersionInput.nativeElement.value,
+                            releases[releaseIndex].ref,
+                            releases[releaseIndex].version,
+                            releases[releaseIndex].emojiId
+                        );
+                        break;
                 }
-                this.editReleaseWorking = false;
-                break;
-            case 'keyup':
-                this.editRelease[releaseIndex] = false;
-                this.editReleaseWorking = true;
-                this.updateReleaseVersion(
-                    this.editReleaseVersionInput.nativeElement.value,
-                    this.consoleReleases[releaseIndex].id,
-                    this.consoleReleases[releaseIndex].version
-                );
-                break;
-        }
+            });
     }
 
     /**
@@ -173,15 +182,23 @@ export class ReleasesBoardComponent implements OnInit {
      */
     deleteRelease(e: Event, releaseIndex: number) {
         e.preventDefault();
+        const workspace = this.activeWorkspace;
+        if (!workspace) {
+            return;
+        }
         this.confirmationService.confirm({
             message: 'Are you sure that you want to delete this release?',
             accept: () => {
-                this.releaseService.deleteRelease(
-                    this.consoleReleases[releaseIndex].id.path,
-                    this.activeWorkspace.id,
-                    { releases: this.consoleReleases },
-                    this.consoleReleases[releaseIndex].version
-                );
+                this.workspaceService
+                    .getWorkspaceReleasesOnce(this.workspaceId)
+                    .then((releases) => {
+                        this.releaseService.deleteRelease(
+                            releases[releaseIndex].ref.path,
+                            workspace.id,
+                            { releases: releases },
+                            releases[releaseIndex].version
+                        );
+                    });
             },
         });
     }
@@ -191,25 +208,32 @@ export class ReleasesBoardComponent implements OnInit {
      * @param newVersion New release version.
      * @param releaseId Release document reference in the database.
      * @param actualVersion Actual release version.
+     * @param actualEmoji Actual release emoji.
      */
     updateReleaseVersion(
         newVersion: string,
         releaseId: DocumentReference,
-        actualVersion: string
+        actualVersion: string,
+        actualEmoji: string
     ): void {
-        this.releaseService.updateRelease(
-            newVersion,
-            releaseId.path,
-            this.activeWorkspace.id,
-            actualVersion,
-            { releases: this.consoleReleases }
-        );
-    }
-
-    /**
-     * ngOnDestroy unsuscribe from currents suscriptions.
-     */
-    ngOnDestroy(): void {
-        this.releaseWatcher?.unsubscribe();
+        const workspace = this.activeWorkspace;
+        if (!workspace) {
+            return;
+        }
+        this.workspaceService
+            .getWorkspaceReleasesOnce(this.workspaceId)
+            .then((releases) => {
+                this.releaseService.updateRelease(
+                    {
+                        version: newVersion,
+                        description: 'I know i am a good release, dont you think?',
+                        emojiId: actualEmoji
+                    },
+                    actualVersion,
+                    workspace.id,
+                    releaseId.id,
+                    { releases: releases }
+                );
+            });
     }
 }

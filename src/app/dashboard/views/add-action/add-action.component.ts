@@ -54,7 +54,7 @@ export class AddActionComponent implements OnInit {
                     type: this.actionType.nativeElement.value,
                     link: this.link,
                     options: {
-                        start_on: {
+                        startOn: {
                             hour: this.hour,
                             minute: this.minute,
                             second: this.second

@@ -9,11 +9,14 @@ import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFireAuthModule } from '@angular/fire/compat/auth';
 
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ConfirmationService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AddActionComponent } from './views/add-action/add-action.component';
 import { ReleasesBoardComponent } from './views/releases-board/releases-board.component';
 import { FeaturesBoardComponent } from './views/features-board/features-board.component';
+import { PickerModule } from '@ctrl/ngx-emoji-mart';
+import { EmojiModule } from '@ctrl/ngx-emoji-mart/ngx-emoji';
+import {ToastModule} from 'primeng/toast';
 
 @NgModule({
     declarations: [
@@ -30,10 +33,14 @@ import { FeaturesBoardComponent } from './views/features-board/features-board.co
         FormsModule,
         AngularFireModule.initializeApp(environment.firebase),
         AngularFireAuthModule,
-        ConfirmDialogModule
+        ConfirmDialogModule,
+        PickerModule,
+        EmojiModule,
+        ToastModule
     ],
     providers: [
-        ConfirmationService
+        ConfirmationService,
+        MessageService
     ]
 })
 export class DashboardModule {}

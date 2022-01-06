@@ -1,166 +1,168 @@
 <app-add-action [isVisible]="addActionIsVisible" (actionTypeObject)="getAction( $event );" ></app-add-action>
 <div class="console">
-    <div *ngIf="webLoading" class="w-100 vh-100 d-flex align-items-center justify-content-center">
+    <div *ngIf="webLoading;else console" class="w-100 vh-100 d-flex align-items-center justify-content-center">
         <div class="loader"></div>
     </div>
-    <div *ngIf="!workspaceExist && !webLoading;else consoleApp" class="w-100 vh-100 d-flex align-items-center justify-content-center" >
-        <div class="col-lg-6">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="alert alert-danger text-center">Workspaces not found!</h3>
-                </div>
-                <div class="card-body">
-                    <p class="text-center" >Please, create a new workspace.</p>
-                    <form [formGroup]="createWorkspace" (ngSubmit)="createNewWorkspace(workspaceName.value)">
-                    <div class="form-group">
-                        <label for="workspace">Workspace Name:</label>
-                        <input class="form-control" type="text" formControlName="workspace" name="workspace" placeholder="Enter your new workspace name.">
+    <ng-template #console >
+        <div *ngIf="!workspaceExist;else consoleApp" class="w-100 vh-100 d-flex align-items-center justify-content-center" >
+            <p-toast position="top-left"></p-toast>
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-body">
+                        <p class="text-center" >Please, create a new workspace.</p>
+                        <form [formGroup]="createWorkspace" (ngSubmit)="createNewWorkspace(workspaceName.value)">
+                        <div class="form-group">
+                            <label for="workspace">Workspace Name:</label>
+                            <input class="form-control" type="text" formControlName="workspace" name="workspace" placeholder="Enter your new workspace name.">
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Create</button>
+                        </form>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-block">Create</button>
-                    </form>
                 </div>
             </div>
         </div>
-    </div>
-    <ng-template #consoleApp >
-        <p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle"></p-confirmDialog>
-    <div class="row w-100 pl-2 pt-4 flex-nowrap">
-        <div id="main-bar" class="col-lg-2 d-flex flex-column">
-            <div class="main-bar-header">
-                <div class="d-flex justify-content-around align-items-center">
-                    <div class="navbar-brand d-flex align-items-center">
-                        <img
-                            class="m-2"
-                            src="../../../../assets/img/git-icon.png"
-                            alt="Logo"
-                        />
-                        <span class="font-weight-bold bar-header-tittle"
-                            >Chagger</span
-                        >
-                    </div>
-                    <div class="dropdown">
-                        <a
-                            class="btn-profile rounded-radius"
-                            type="button"
-                            id="profile-dropdown"
-                            data-toggle="dropdown"
-                            aria-haspopup="true"
-                            aria-expanded="false"
-                        >
+        <ng-template #consoleApp >
+            <p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+        <div class="row w-100 m-0 pt-4 flex-nowrap">
+            <div id="main-bar" class="col-lg-2 d-flex flex-column">
+                <div class="main-bar-header">
+                    <div class="d-flex justify-content-around align-items-center">
+                        <div class="navbar-brand d-flex align-items-center">
                             <img
-                                src="https://icons-for-free.com/iconfiles/png/512/business+casual+corporate+lawyer+insurer+man+person+profile-1320086653571371140.png"
-                                alt=""
+                                class="m-2"
+                                src="../../../../assets/img/git-icon.png"
+                                alt="Logo"
                             />
-                        </a>
-                        <div
-                            class="dropdown-menu"
-                            aria-labelledby="profile-dropdown"
-                        >
-                            <a class="dropdown-item" href="#">Action</a>
-                            <a class="dropdown-item" href="#">Another action</a>
-                            <a
-                                class="dropdown-item"
-                                (click)="onLogOut()"
-                                href="#"
-                                >Sign Out!</a
+                            <span class="font-weight-bold bar-header-tittle"
+                                >Chagger</span
                             >
                         </div>
-                    </div>
-                </div>
-                <input
-                    class="form-control"
-                    type="search"
-                    placeholder="Search"
-                    aria-label="Search"
-                />
-            </div>
-            <div class="main-bar-body m-4">
-                <ul class="bar-body-container">
-                    <li
-                        *ngFor="let workspace of consoleWorkspaces; index as i"
-                        class="workspace"
-                    >
-                        <a
-                            href="#"
-                            class="title"
-                            (click)="workspaceClick(i, $event)"
-                            ><span class="dropdown-toggle">{{
-                                consoleWorkspaces[i].name | titlecase
-                            }}</span></a
-                        >
-                        <ul *ngIf="consoleWorkspaces[i].toggle" class="m-2">
-                            <li>
-                                <fa-icon [icon]="releaseFolder"></fa-icon>
+                        <div class="dropdown">
+                            <a
+                                class="btn-profile rounded-radius"
+                                type="button"
+                                id="profile-dropdown"
+                                data-toggle="dropdown"
+                                aria-haspopup="true"
+                                aria-expanded="false"
+                            >
+                                <img
+                                    src="https://icons-for-free.com/iconfiles/png/512/business+casual+corporate+lawyer+insurer+man+person+profile-1320086653571371140.png"
+                                    alt=""
+                                />
+                            </a>
+                            <div
+                                class="dropdown-menu"
+                                aria-labelledby="profile-dropdown"
+                            >
+                                <a class="dropdown-item" href="#">Action</a>
+                                <a class="dropdown-item" href="#">Another action</a>
                                 <a
-                                    href="#releaseMenu"
-                                    (click)="$event.preventDefault()"
-                                    data-toggle="collapse"
-                                    role="button"
-                                    aria-expanded="false"
-                                    aria-controls="releaseMenu"
-                                    class="release-title dropdown-toggle ml-2"
-                                    >Releases</a
+                                    class="dropdown-item"
+                                    (click)="onLogOut()"
+                                    href="#"
+                                    >Sign Out!</a
                                 >
-                                <ul
-                                    class="collapse release-status m-1 ml-2"
-                                    id="releaseMenu"
-                                >
-                                    <li class="ml-4">
-                                        <a href="#" (click)="showReleaseBar( $event );"
-                                            >Active</a
-                                        >
-                                    </li>
-                                    <li class="ml-4">archived</li>
-                                </ul>
-                            </li>
-                            <li>
-                                <fa-icon [icon]="testIcon"></fa-icon>
-                                Tags
-                            </li>
-                            <li>
-                                <fa-icon [icon]="testIcon"></fa-icon>
-                                Users
-                            </li>
-                            <li>
-                                <fa-icon [icon]="testIcon"></fa-icon>
-                                Integrations
-                            </li>
-                            <li>
-                                <fa-icon [icon]="testIcon"></fa-icon>
-                                Google Analytics
-                            </li>
-                        </ul>
-                    </li>
-                    <li>
-                        <a
-                            href="#"
-                            *ngIf="!addWorkspace; else addWorkspaceInputTemp"
-                            (click)="newWorkspace($event)"
-                            >New Workspace +</a
+                            </div>
+                        </div>
+                    </div>
+                    <input
+                        class="form-control"
+                        type="search"
+                        placeholder="Search"
+                        aria-label="Search"
+                    />
+                </div>
+                <div class="main-bar-body m-4">
+                    <ul *ngIf="workspaces$ | async as workspaces" class="bar-body-container">
+                        <li
+                            *ngFor="let workspace of workspaces; index as i"
+                            class="workspace"
                         >
-                        <ng-template #addWorkspaceInputTemp>
-                            <input
-                                (blur)="newWorkspace($event)"
-                                (keyup.enter)="newWorkspace($event)"
-                                #addWorkspaceInput
-                                type="text"
-                                placeholder="Workspace name?"
-                            />
-                        </ng-template>
-                    </li>
-                </ul>
+                            <a
+                                href="#"
+                                class="title"
+                                (click)="workspaceClick(i, $event)"
+                                ><span class="dropdown-toggle">{{
+                                    workspace.name | titlecase
+                                }}</span></a
+                            >
+                            <ul *ngIf="activeWorkspaceIndex == i && activeWorkspace" class="m-2">
+                                <li>
+                                    <fa-icon [icon]="releaseFolder"></fa-icon>
+                                    <a
+                                        href="#releaseMenu"
+                                        (click)="$event.preventDefault()"
+                                        data-toggle="collapse"
+                                        role="button"
+                                        aria-expanded="false"
+                                        aria-controls="releaseMenu"
+                                        class="release-title dropdown-toggle ml-2"
+                                        >Releases</a
+                                    >
+                                    <ul
+                                        class="collapse release-status m-1 ml-2"
+                                        id="releaseMenu"
+                                    >
+                                        <li class="ml-4">
+                                            <a [routerLink]="[ '/workspaces', workspace.ref.id, 'releases' ]"
+                                                >Active</a
+                                            >
+                                        </li>
+                                        <li class="ml-4">archived</li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <fa-icon [icon]="releaseFolder"></fa-icon>
+                                    Tags
+                                </li>
+                                <li>
+                                    <fa-icon [icon]="releaseFolder"></fa-icon>
+                                    Users
+                                </li>
+                                <li>
+                                    <fa-icon [icon]="releaseFolder"></fa-icon>
+                                    Integrations
+                                </li>
+                                <li>
+                                    <fa-icon [icon]="releaseFolder"></fa-icon>
+                                    Google Analytics
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a
+                                href="#"
+                                *ngIf="!addWorkspace; else addWorkspaceInputTemp"
+                                (click)="newWorkspace($event)"
+                                >New Workspace +</a
+                            >
+                            <ng-template #addWorkspaceInputTemp>
+                                <input
+                                    (blur)="newWorkspace($event)"
+                                    (keyup.enter)="newWorkspace($event)"
+                                    #addWorkspaceInput
+                                    type="text"
+                                    placeholder="Workspace name?"
+                                />
+                            </ng-template>
+                        </li>
+                    </ul>
+                </div>
+                <div class="main-bar-footer d-flex align-items-end flex-grow-1">
+                    <button
+                        type="button"
+                        class="btn btn-gradient-primary btn-footer mx-4"
+                    >
+                        Share ChangeLog
+                    </button>
+                </div>
             </div>
-            <div class="main-bar-footer d-flex align-items-end flex-grow-1">
-                <button
-                    type="button"
-                    class="btn btn-gradient-primary btn-footer mx-4"
-                >
-                    Share ChangeLog
-                </button>
-            </div>
+            <router-outlet></router-outlet>
+            
+            <!-- <app-releases-board class="col-lg-2 p-0" *ngIf="releaseBarActive" (featureBoard)="showFeatureBoard( $event );" [activeWorkspace]="activeWorkspace" ></app-releases-board> -->
+            <!-- <app-features-board class="col-lg-8" *ngIf="featureBoardActive" (callAddAction)="addAction();" [releaseAction]="releaseAction" [activeRelease]="activeRelease" [activeWorkspace]="activeWorkspace" ></app-features-board> -->
         </div>
-        <app-releases-board class="col-lg-2 p-0" *ngIf="releaseBarActive" (featureBoard)="showFeatureBoard( $event );" [activeWorkspace]="activeWorkspace" ></app-releases-board>
-        <app-features-board class="col-lg-8" *ngIf="featureBoardActive" (callAddAction)="addAction();" [releaseAction]="releaseAction" [activeRelease]="activeRelease" [activeWorkspace]="activeWorkspace" ></app-features-board>
-    </div>
+        </ng-template>
     </ng-template>
 </div>

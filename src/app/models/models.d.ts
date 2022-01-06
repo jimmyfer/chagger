@@ -11,6 +11,12 @@ export interface ModelMetadata {
     _creationTime: FieldValue | Timestamp;
     _lastUpdate: FieldValue | Timestamp;
 }
+
+export interface EmojiID {
+    emoji: {
+        id: string
+    }
+}
   
 export declare type Uploaded<T> = T & ModelMetadata;
 export declare type Modeled<T> = T & ModelMetadata & ModelId;

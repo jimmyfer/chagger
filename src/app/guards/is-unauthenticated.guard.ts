@@ -18,7 +18,7 @@ export class IsUnauthenticatedGuard implements CanActivate {
         state: RouterStateSnapshot): Promise<boolean | UrlTree> {
         const isLoggedIn = await this.authService.isLoggedIn();
         if (isLoggedIn) {
-            await this.router.navigate(['dashboard']);
+            await this.router.navigate(['workspaces']);
             return false;
         }
         return true;

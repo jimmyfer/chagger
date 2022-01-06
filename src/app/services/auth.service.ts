@@ -62,7 +62,7 @@ export class AuthService {
             try {
                 this.userService.createUser({
                     email: result.user.email as string,
-                    workspaces: [{ name: 'default', id: this.af.doc(`workspace/${(await workspace).id}`).ref as DocumentReference }]
+                    workspaces: [{ name: 'default', ref: this.af.doc(`workspaces/${(await workspace).id}`).ref as DocumentReference }]
                 });
             } catch (e) {
                 throw console.log(e);

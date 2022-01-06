@@ -5,7 +5,7 @@ import {
 } from '@angular/fire/compat/firestore';
 import { first } from 'rxjs/operators';
 import { Releases } from '../models/releases.interface';
-import { Workspace } from '../models/workspace.interface';
+import { Workspace, WorkspaceRelease } from '../models/workspace.interface';
 import { FirestoreGenericService } from './firestore-generic.service';
 import { WorkspaceService } from './workspace.service';
 
@@ -42,16 +42,18 @@ export class ReleasesService extends FirestoreGenericService<Releases> {
         return await this.createDocument(
             data,
             '',
-            `workspace/${workspaceId}/${collectionPath}`
+            `workspaces/${workspaceId}/${collectionPath}`
         );
     }
 
     /**
      * Get a release.
-     * @param releaseReference Release document reference.
+     * @param workspaceId Workspace ID.
+     * @param releaseId Release ID.
+     * @returns Return a release object.
      */
-    async getRelease(releaseReference: DocumentReference): Promise<Releases> {
-        return this.getDocument(`${releaseReference.path.split('/')[0]}/${releaseReference.path.split('/')[1]}/${releaseReference.path.split('/')[2]}`, releaseReference.path.split('/')[3]).pipe(first()).toPromise();
+    async getRelease(workspaceId: string, releaseId: string): Promise<Releases> {
+        return this.getDocument(`workspaces/${workspaceId}/releases`, releaseId).pipe(first()).toPromise();
     }
 
     /**
@@ -61,43 +63,33 @@ export class ReleasesService extends FirestoreGenericService<Releases> {
      * @param releases The actual releases array in the workspace.
      */
     async addNewRelease(data: Releases, workspaceId: string, releases: Partial<Workspace>): Promise<void> {
-        const release = await this.createDocument(data,'',`workspace/${workspaceId}/${collectionPath}`);
-        releases.releases?.push({version: data.version, id: this.af.doc(`workspace/${workspaceId}/releases/${release.id}`).ref as DocumentReference});
+        const release = await this.createDocument(data,'',`workspaces/${workspaceId}/${collectionPath}`);
+        releases.releases?.push({version: data.version, ref: this.af.doc(`workspaces/${workspaceId}/releases/${release.id}`).ref as DocumentReference, emojiId: 'rocket'});
         this.workspaceService.editWorkspaceRelease(workspaceId, releases);
     }
 
     /**
-     * Edit the selected release version.
-     * @param newVersion The new release version.
-     * @param releasePath Fullpath of the release in the database.
-     * @param workspaceId The actual workspace ID.
-     * @param actualVersion The actual release version.
-     * @param releases The actual releases array in the workspace.
-     * @param description The new release description.
-     * @param action The new release action.
+     * Update a release.
+     * @param data New release data.
+     * @param actualVersion Actual release version.
+     * @param workspaceId Actual workspace ID.
+     * @param releaseId Actual release ID.
+     * @param releases Releases as Partial<Workspace>.
      */
-    updateRelease(newVersion: string, releasePath: string, workspaceId: string, actualVersion: string, releases: Partial<Workspace>, description?: string, action?: {}): void {
-        if(description) {
-            if(action) {
-                this.updateDocument({version: newVersion, description: description, action: action} , `${releasePath.split('/')[0]}/${releasePath.split('/')[1]}/${releasePath.split('/')[2]}`, releasePath.split('/')[3]);
-            }else{
-                this.updateDocument({version: newVersion, description: description} , `${releasePath.split('/')[0]}/${releasePath.split('/')[1]}/${releasePath.split('/')[2]}`, releasePath.split('/')[3]);
-            }
-        } else {
-            if(action) {
-                this.updateDocument({version: newVersion, action: action} , `${releasePath.split('/')[0]}/${releasePath.split('/')[1]}/${releasePath.split('/')[2]}`, releasePath.split('/')[3]);
-            }else {
-                this.updateDocument({version: newVersion} , `${releasePath.split('/')[0]}/${releasePath.split('/')[1]}/${releasePath.split('/')[2]}`, releasePath.split('/')[3]);
-            }
-        }
+    updateRelease(data: Releases, actualVersion: string, workspaceId: string, releaseId: string, releases: Partial<Workspace>): void {
+        
+        this.updateDocument(data, `workspaces/${workspaceId}/releases`, releaseId);
         
         if(releases.releases) {
-            const actualReleaseIndex = releases.releases?.findIndex(release => release.version == actualVersion);
-            releases.releases?.splice(actualReleaseIndex, 1, {version: newVersion, id: this.af.doc(`workspace/${workspaceId}/releases/${releasePath.split('/')[3]}`).ref as DocumentReference});
-        } else {
-            throw 'There is not Releases!';
+            const newReleases = releases.releases.map((release) => {
+                if(release.version == actualVersion) {
+                    release.version = data.version;
+                    return release;
+                }
+                return release;
+            });
+            this.workspaceService.editWorkspaceRelease(releaseId, {releases: newReleases});
         }
-        this.workspaceService.editWorkspaceRelease(releasePath.split('/')[1], releases);
     }
 
     /**

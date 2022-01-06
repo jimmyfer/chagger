@@ -6,11 +6,12 @@ import {
 import { FirestoreGenericService } from './firestore-generic.service';
 
 import { Observable } from 'rxjs';
-import { Workspace } from '../models/workspace.interface';
+import { Workspace, WorkspaceRelease } from '../models/workspace.interface';
 import { UserService } from './user.service';
 import { User } from '../models/user.interface';
+import { map } from 'rxjs/operators';
 
-const collectionPath = 'workspace';
+const collectionPath = 'workspaces';
 
 @Injectable({
     providedIn: 'root',
@@ -54,7 +55,7 @@ export class WorkspaceService extends FirestoreGenericService<Workspace> {
         const workspace = await this.createDocument(data, '', collectionPath);
         workSpaces.workspaces?.push({
             name: data.name,
-            id: this.af.doc(`workspace/${workspace.id}`)
+            ref: this.af.doc(`workspaces/${workspace.id}`)
                 .ref as DocumentReference,
         });
         this.userService.editUsersWorkspaces(workSpaces);
@@ -74,7 +75,7 @@ export class WorkspaceService extends FirestoreGenericService<Workspace> {
             const workspaces = [
                 {
                     name: data.name,
-                    id: this.af.doc(`workspace/${workspace.id}`)
+                    ref: this.af.doc(`workspaces/${workspace.id}`)
                         .ref as DocumentReference,
                 },
             ];
@@ -92,8 +93,29 @@ export class WorkspaceService extends FirestoreGenericService<Workspace> {
      * @param workspaceDocumentId Workspace ID.
      * @returns Return an observable of the workspace releases data.
      */
-    getWorkspaceReleases(workspaceDocumentId: string): Observable<Workspace> {
-        return this.getDocument(collectionPath, workspaceDocumentId);
+    getWorkspaceReleases(workspaceDocumentId: string): Observable<WorkspaceRelease[]> {
+        return this.getDocument(collectionPath, workspaceDocumentId).pipe(
+            map(workspace => workspace.releases));
+    }
+
+    /**
+     * Get the releases of an espesific workspace once.
+     * @param workspaceDocumentId Workspace ID.
+     * @returns Return an observable of the workspace releases data.
+     */
+    async getWorkspaceReleasesOnce(workspaceDocumentId: string): Promise<WorkspaceRelease[]> {
+        return await this.getFirestoreDocument(collectionPath, workspaceDocumentId).get().pipe(
+            map((user) => user.get('releases'))
+        ).toPromise();
+    }
+
+    /**
+     * Get a workspace reference.
+     * @param workspaceId Workspace Id.
+     * @returns The workspace reference.
+     */
+    getReference(workspaceId: string ): DocumentReference {
+        return this.getFirestoreDocument(collectionPath, workspaceId).ref;
     }
 
     /**

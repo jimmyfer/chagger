@@ -2,20 +2,19 @@ import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild }
 import {
     faPlay,
     faPlus,
-    faRocket,
     faEdit,
 } from '@fortawesome/free-solid-svg-icons';
-import { DocumentReference } from '@angular/fire/compat/firestore';
 import { ReleasesService } from 'src/app/services/releases.service';
 import { Releases } from 'src/app/models/releases.interface';
-import { Subscription } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
 import { WorkspaceService } from 'src/app/services/workspace.service';
-import { Action } from 'src/app/models/action';
+import { EmojiID } from 'src/app/models/models';
 
 @Component({
     selector: 'app-features-board',
     templateUrl: './features-board.component.html',
     styleUrls: ['./features-board.component.scss'],
+    host: {'class': 'flex-grow-1'}
 })
 
 /**
@@ -23,69 +22,42 @@ import { Action } from 'src/app/models/action';
  */
 export class FeaturesBoardComponent implements OnInit {
 
-    @Output() callAddAction = new EventEmitter<boolean>();
-
-    @Input() activeWorkspace: DocumentReference = {} as DocumentReference;
-
-    @Input() releaseAction: Partial<Action> = {};
-
+    textareaCharacter = '';
     @ViewChild('editReleaseVersionInput', { static: false })
     editReleaseVersionInput: ElementRef<HTMLInputElement> = {} as ElementRef;
 
     actionPlay = faPlay;
-    releasesVersion = faRocket;
     addCommit = faPlus;
     editReleaseVersionTitle = faEdit;
 
     checkEditReleaseVersion = false;
     editReleaseWorking = false;
 
-    @Input() activeRelease: { doc: DocumentReference; index: number } = {
-        doc: {} as DocumentReference,
-        index: 0,
-    };
-    consoleReleases: { version: string; id: DocumentReference }[] = [];
-    releaseWatcher: Subscription | undefined;
-
-    release: Releases = { version: '', description: '', action: {} };
+    release: Releases = { version: '', description: '', action: {}, emojiId: '' }
     oldReleaseVersion = '';
 
-    textareaCharacter = '';
+    workspaceId = this.route.parent?.parent?.snapshot.paramMap.get('workspaceId');
+    releaseId = this.route.snapshot.paramMap.get('releaseId');
 
     /**
      * Constructor.
      */
     constructor(
         private releaseService: ReleasesService,
-        private workspaceService: WorkspaceService
+        private workspaceService: WorkspaceService,
+        private route: ActivatedRoute
+
     ) {}
 
     /**
-     * Angular NgOnInit.
+     * ngOnInit.
      */
     ngOnInit(): void {
-        this.releaseWatcher?.unsubscribe();
-        this.releaseWatcher = this.workspaceService
-            .getWorkspaceReleases(this.activeWorkspace.id)
-            .subscribe((releases) => {
-                this.consoleReleases = [];
-                releases.releases?.forEach((release) => {
-                    this.consoleReleases.push({
-                        version: release.version,
-                        id: release.id,
-                    });
-                });
+        if(this.workspaceId && this.releaseId) {
+            this.releaseService.getRelease(this.workspaceId, this.releaseId).then((release) => {
+                this.release = release;
             });
-
-        this.release.version =
-            this.consoleReleases[this.activeRelease.index].version;
-
-        this.releaseService
-            .getRelease(this.activeRelease.doc)
-            .then((release) => {
-                this.release.description = release.description;
-                this.textareaCharacter = release.description;
-            });
+        }
     }
 
     /**
@@ -124,23 +96,26 @@ export class FeaturesBoardComponent implements OnInit {
      * Update the release.
      */
     updateRelease(): void {
-        this.releaseService.updateRelease(
-            this.release.version,
-            this.activeRelease.doc.path,
-            this.activeWorkspace.id,
-            this.oldReleaseVersion,
-            { releases: this.consoleReleases },
-            this.textareaCharacter,
-            this.releaseAction
-        );
-    }
-
-    /**
-     * Update the release on the feature board.
-     */
-    updateFeaturesBoard(): void {
-        this.release.version =
-            this.consoleReleases[this.activeRelease.index].version;
+        if(this.workspaceId && this.releaseId) {
+            this.workspaceService.getWorkspaceReleasesOnce(this.workspaceId).then(releases => {
+                this.releaseService.updateRelease(
+                    {
+                        version: this.release.version,
+                        description: this.release.description,
+                        action: this.release.action,
+                        emojiId: this.release.emojiId
+                    },
+                    this.oldReleaseVersion,
+                    this.workspaceId as string,
+                    this.releaseId as string,
+                    {
+                        releases: releases
+                    }
+                );
+            });
+        }else {
+            throw 'Workspace ID or Release ID dont exist!';
+        }
     }
 
     /**
@@ -149,6 +124,13 @@ export class FeaturesBoardComponent implements OnInit {
      */
     addAction( e: Event ): void {
         e.preventDefault();
-        this.callAddAction.emit(true);
+    }
+
+    /**
+     * 
+     * @param data Data of the emoji selected.
+     */
+    addEmoji(data: EmojiID): void {
+        this.release.emojiId = data.emoji.id;
     }
 }

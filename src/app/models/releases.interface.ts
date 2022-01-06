@@ -2,5 +2,6 @@
 export interface Releases {
     version: string;
     description: string;
-    action: {};
+    action?: {};
+    emojiId: string;
 }

@@ -5,7 +5,7 @@ export interface ActionVideo {
     options: {
         autoplay: boolean,
         muted: boolean,
-        start_on: {
+        startOn: {
             hour: number,
             minute: number,
             second: number

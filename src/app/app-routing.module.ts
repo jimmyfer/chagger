@@ -15,7 +15,7 @@ const routes: Routes = [
         canActivate: [ IsUnauthenticatedGuard ]
     },
     {
-        path: 'dashboard',
+        path: 'workspaces',
         loadChildren: () => import('./dashboard/dashboard.module').then( m => m.DashboardModule),
         canActivate: [ IsLoggedInGuard ]
     },
@@ -27,10 +27,14 @@ const routes: Routes = [
 
 @NgModule({
     imports: [
-        RouterModule.forRoot( routes )
+        RouterModule.forRoot( routes, { paramsInheritanceStrategy: 'always' } )
     ],
     exports: [
         RouterModule
     ]
 })
+
+/**
+ * Routing module for App.
+ */
 export class AppRoutingModule { }

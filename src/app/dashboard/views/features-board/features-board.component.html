@@ -2,13 +2,13 @@
     <div class="container">
         <div class="console-release m-1">
             <div class="console-release-title">
-                <fa-icon class="pr-1" [icon]="releasesVersion"></fa-icon>
-                <span
-                    *ngIf="
-                        !checkEditReleaseVersion;
-                        else editReleaseVersionInputTemp
-                    "
-                >
+                <a id="emojiSearchToggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" href="#">
+                    <ngx-emoji class="pr-1" [emoji]="release.emojiId" set="apple"></ngx-emoji>
+                </a>
+                <div class="dropdown-menu" aria-labelledby="emojiSearchToggle">
+                    <emoji-mart (emojiClick)="addEmoji($event)"></emoji-mart>
+                </div>
+                <span *ngIf="!checkEditReleaseVersion;else editReleaseVersionInputTemp">
                     {{ release.version }}
                 </span>
                 <ng-template #editReleaseVersionInputTemp>
@@ -26,6 +26,9 @@
                         transform="shrink-7 left-8"
                     ></fa-icon>
                 </a>
+                <span  class="alert-success" >
+                    Updated!
+                </span>
             </div>
             <div class="d-flex align-items-start">
                 <div class="console-release-description flex-grow-1">

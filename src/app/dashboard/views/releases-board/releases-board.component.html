@@ -1,100 +1,100 @@
-<div *ngIf="releaseBarActive" id="release-bar">
-    <div class="d-flex flex-column h-100">
-        <div class="release-bar-header text-center p-2 mt-4">
-            <h1 class="bar-header-title">Active Releases</h1>
-        </div>
-        <div class="release-bar-body">
-            <ul class="text-center">
-                <li
-                    *ngFor="let release of consoleReleases, index as i"
-                    class="
-                        release-version release-version-active
-                        d-flex
-                        justify-content-between
-                        px-2
-                    "
-                >
-                    <div class="release-version-title d-flex">
-                        <a (click)="showFeatureBoard( $event, i );" class="d-flex" href="#">
-                            <fa-icon
-                            class="pr-1"
-                            [icon]="releasesVersion"
-                        ></fa-icon>
-                        
-                        <span *ngIf="!editRelease[i]; else editReleaseVersionInputTemp">
-                            {{ release.version }}
-                        </span>
-                        <ng-template #editReleaseVersionInputTemp>
-                            <input
-                                (blur)="editReleaseVersion($event, i)"
-                                (keyup.enter)="editReleaseVersion($event, i)"
-                                #editReleaseVersionInput
-                                type="text"
-                                placeholder="{{ release.version }}"
-                            />
-                        </ng-template>
-                        </a>
-                    </div>
-                    <div class="dropdown show">
+<div class="d-flex">
+    <div id="release-bar">
+        <div class="d-flex flex-column h-100">
+            <div class="release-bar-header text-center p-2 mt-4">
+                <h1 class="bar-header-title">Active Releases</h1>
+            </div>
+            <div class="release-bar-body">
+                <ul *ngIf="releases$ | async as releases" class="text-center">
+                    <li
+                        *ngFor="let release of releases, index as i"
+                        class="
+                            release-version release-version-active
+                            d-flex
+                            justify-content-between
+                            px-2
+                        "
+                    >
+                        <div class="release-version-title d-flex">
+                            <a [routerLink]="[ '/workspaces', activeWorkspace.id, 'releases', release.ref.id ]">
+                                <ngx-emoji class="pr-1" [emoji]="release.emojiId" set="apple"></ngx-emoji>
+                            
+                            <span *ngIf="!editRelease[i]; else editReleaseVersionInputTemp">
+                                {{ release.version }}
+                            </span>
+                            <ng-template #editReleaseVersionInputTemp>
+                                <input
+                                    (blur)="editReleaseVersion($event, i)"
+                                    (keyup.enter)="editReleaseVersion($event, i)"
+                                    #editReleaseVersionInput
+                                    type="text"
+                                    placeholder="{{ release.version }}"
+                                />
+                            </ng-template>
+                            </a>
+                        </div>
+                        <div class="dropdown show">
+                            <a
+                                href="#"
+                                role="button"
+                                id="releaseDropdownMenu"
+                                class="release-version-menu"
+                                data-toggle="dropdown"
+                                aria-haspopup="true"
+                                aria-expanded="false"
+                            >
+                                ...
+                            </a>
+    
+                            <div
+                                class="dropdown-menu"
+                                aria-labelledby="releaseDropdownMenu"
+                            >
+                                <a
+                                    class="dropdown-item"
+                                    href="#"
+                                    (click)="editReleaseVersion($event, i)"
+                                    >Edit</a
+                                >
+                                <a class="dropdown-item" href="#" (click)="deleteRelease($event, i)" >Delete</a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="release-title">
                         <a
                             href="#"
-                            role="button"
-                            id="releaseDropdownMenu"
-                            class="release-version-menu"
-                            data-toggle="dropdown"
-                            aria-haspopup="true"
-                            aria-expanded="false"
+                            *ngIf="!addRelease; else addReleaseInputTemp"
+                            (click)="newRelease($event)"
+                            >New Release +</a
                         >
-                            ...
-                        </a>
-
-                        <div
-                            class="dropdown-menu"
-                            aria-labelledby="releaseDropdownMenu"
-                        >
-                            <a
-                                class="dropdown-item"
-                                href="#"
-                                (click)="editReleaseVersion($event, i)"
-                                >Edit</a
-                            >
-                            <a class="dropdown-item" href="#" (click)="deleteRelease($event, i)" >Delete</a>
-                        </div>
-                    </div>
-                </li>
-                <li class="release-title">
-                    <a
-                        href="#"
-                        *ngIf="!addRelease; else addReleaseInputTemp"
-                        (click)="newRelease($event)"
-                        >New Release +</a
-                    >
-                    <ng-template #addReleaseInputTemp>
-                        <input
-                            (blur)="newRelease($event)"
-                            (keyup.enter)="newRelease($event)"
-                            #addReleaseInput
-                            type="text"
-                            placeholder="release name?"
-                        />
-                    </ng-template>
-                </li>
-            </ul>
-        </div>
-        <div
-            class="
-                release-bar-footer
-                d-flex
-                align-items-end
-                flex-grow-1
-            "
-        >
-            <button
-                type="button"
-                class="btn btn-gradient-primary btn-footer mx-4"
+                        <ng-template #addReleaseInputTemp>
+                            <input
+                                (blur)="newRelease($event)"
+                                (keyup.enter)="newRelease($event)"
+                                #addReleaseInput
+                                type="text"
+                                placeholder="release name?"
+                            />
+                        </ng-template>
+                    </li>
+                </ul>
+            </div>
+            <div
+                class="
+                    release-bar-footer
+                    d-flex
+                    align-items-end
+                    flex-grow-1
+                "
             >
-                New Release
-            </button>
+                <button
+                    type="button"
+                    class="btn btn-gradient-primary btn-footer mx-4"
+                >
+                    New Release
+                </button>
+            </div>
         </div>
     </div>
+    <router-outlet></router-outlet>
 </div>
