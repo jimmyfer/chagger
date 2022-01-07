@@ -1,6 +1,7 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { Output, EventEmitter } from '@angular/core';
 import { Action } from 'src/app/models/action';
+import { AddActionService } from 'src/app/services/add-action.service';
 
 @Component({
     selector: 'app-add-action',
@@ -12,8 +13,7 @@ import { Action } from 'src/app/models/action';
  * Add action modal.
  */
 export class AddActionComponent implements OnInit {
-    @Input() isVisible = false;
-    @Output() actionTypeObject = new EventEmitter<Action>();
+    
     @ViewChild('actionType', {static: false }) actionType: ElementRef = {} as ElementRef;
     actionTypeCheck = 'video';
 
@@ -24,14 +24,17 @@ export class AddActionComponent implements OnInit {
     second = 0;
     minute = 0;
     hour = 0;
+    title = '';
     autoPlay = false;
     muted = false;
     link!: string;
 
-    /**
+    /** 
      * Constructor.
      */
-    constructor() {}
+    constructor(
+        private addActionService: AddActionService
+    ) {}
 
     /**
      * Angular OnInit.
@@ -50,10 +53,11 @@ export class AddActionComponent implements OnInit {
         e.preventDefault();
         switch (this.actionTypeCheck) {
             case 'video':
-                this.actionTypeObject.emit({
+                this.addActionService.addActionData = {
                     type: this.actionType.nativeElement.value,
                     link: this.link,
                     options: {
+                        title: this.title,
                         startOn: {
                             hour: this.hour,
                             minute: this.minute,
@@ -62,17 +66,27 @@ export class AddActionComponent implements OnInit {
                         autoplay: this.autoPlay,
                         muted: this.muted
                     }
-                });
+                };
                 break;
         
             case 'link':
-                this.actionTypeObject.emit({
+                this.addActionService.addActionData = {
                     type: 'link',
-                    link: this.link
-                });
+                    link: this.link,
+                    options: {
+                        title: '',
+                        autoplay: false,
+                        muted: false,
+                        startOn: {
+                            hour: 0,
+                            minute: 0,
+                            second: 0
+                        }
+                    }
+                };
                 break;
         }
-        this.isVisible = false;
+        this.addActionService.isAddActionVisible = false;
         this.second = 0;
         this.minute = 0;
         this.hour = 0;

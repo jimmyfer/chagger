@@ -88,7 +88,7 @@ export class ReleasesService extends FirestoreGenericService<Releases> {
                 }
                 return release;
             });
-            this.workspaceService.editWorkspaceRelease(releaseId, {releases: newReleases});
+            this.workspaceService.editWorkspaceRelease(workspaceId, {releases: newReleases});
         }
     }
 

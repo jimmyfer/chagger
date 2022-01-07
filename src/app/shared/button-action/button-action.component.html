@@ -1,0 +1,53 @@
+<ng-container *ngIf="actionData!.type == 'link'; else videoAction">
+    <div>
+        <a
+            [ngClass]="{
+                'buttom-big': type == 'big',
+                'buttom-small': type == 'small'
+            }"
+            class="px-2"
+            href="http://{{ actionData!.link }}"
+            target="_blank"
+        >
+            <fa-icon [icon]="actionLink"></fa-icon>
+            <span class="px-2" >Link</span>
+        </a>
+    </div></ng-container
+>
+
+<ng-template #videoAction>
+    <ng-container *ngIf="actionData!.type == 'video'; else addAction">
+        <div>
+            <a
+                [ngClass]="{
+                    'buttom-big': type == 'big',
+                    'buttom-small': type == 'small'
+                }"
+                class="px-2"
+                href="#"
+                (click)="playVideoAction( $event );"
+            >
+                <fa-icon [icon]="actionPlay"></fa-icon>
+                <span class="px-2" >Video</span>
+            </a>
+        </div>
+    </ng-container>
+</ng-template>
+
+<ng-template #addAction>
+    <div>
+        <a
+            [ngClass]="{
+                'buttom-big': type == 'big',
+                'buttom-small': type == 'small'
+            }"
+            class="px-2"
+            href="#"
+            (click)="callAddAction($event)"
+            target="_blank"
+        >
+            <fa-icon [icon]="addNewAction"></fa-icon>
+            <span>Add Action</span>
+        </a>
+    </div>
+</ng-template>

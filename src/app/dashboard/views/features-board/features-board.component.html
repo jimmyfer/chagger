@@ -26,7 +26,7 @@
                         transform="shrink-7 left-8"
                     ></fa-icon>
                 </a>
-                <span  class="alert-success" >
+                <span [ngClass]="{ 'updated-toast-show': releaseUpdatedToast }" class="alert-success updated-toast" >
                     Updated!
                 </span>
             </div>
@@ -70,19 +70,7 @@
                         mx-4
                     "
                 >
-                    <div
-                        class="
-                            embed-content
-                            d-flex
-                            flex-column
-                            justify-content-center
-                            align-items-center
-                        "
-                    >
-                        <fa-icon [icon]="actionPlay"></fa-icon>
-                        <span>Video</span>
-                    </div>
-                    <span><a href="#" (click)="addAction( $event )">Change</a></span>
+                    <app-button-action [type]="'big'" [actionData]="addActionData" ></app-button-action>
                 </div>
             </div>
         </div>

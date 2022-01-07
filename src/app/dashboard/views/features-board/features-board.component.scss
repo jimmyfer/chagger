@@ -16,14 +16,6 @@
                 height: 100px;
             }
         }
-        .console-release-embed {
-            .embed-content {
-                width: 100px;
-                height: 100px;
-                background-color: #de4c36;
-                color: #ffffff;
-            }
-        }
     }
     .console-commits {
         overflow-y: auto;
@@ -53,10 +45,11 @@
     }
 }
 
-.release-updated {
-    transition: opacity 0.5s;
+.updated-toast {
+    transition: opacity 0.2s ease-in-out;
+    opacity: 0;
 }
 
-.release-updated-animated {
-    opacity: 0;
+.updated-toast-show {
+    opacity: 1;
 }

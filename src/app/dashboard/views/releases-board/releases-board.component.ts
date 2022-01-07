@@ -13,7 +13,7 @@ import { filter, map, switchMap } from 'rxjs/operators';
     selector: 'app-releases-board',
     templateUrl: './releases-board.component.html',
     styleUrls: ['./releases-board.component.scss'],
-    host: {'class': 'flex-grow-1'}
+    host: { class: 'flex-grow-1' },
 })
 
 /**
@@ -122,7 +122,20 @@ export class ReleasesBoardComponent {
                     {
                         version: releaseVersion,
                         description: '',
-                        action: {},
+                        action: {
+                            type: '',
+                            link: '',
+                            options: {
+                                title: '',
+                                autoplay: false,
+                                muted: false,
+                                startOn: {
+                                    hour: 0,
+                                    minute: 0,
+                                    second: 0,
+                                },
+                            },
+                        },
                         emojiId: 'rocket',
                     },
                     workspace.id,
@@ -226,8 +239,9 @@ export class ReleasesBoardComponent {
                 this.releaseService.updateRelease(
                     {
                         version: newVersion,
-                        description: 'I know i am a good release, dont you think?',
-                        emojiId: actualEmoji
+                        description:
+                            'I know i am a good release, dont you think?',
+                        emojiId: actualEmoji,
                     },
                     actualVersion,
                     workspace.id,

@@ -12,6 +12,8 @@ import { FormGroup, FormControl } from '@angular/forms';
 import { Action } from 'src/app/models/action';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { AddActionService } from 'src/app/services/add-action.service';
+import { VideoPlayerService } from 'src/app/services/video-player.service';
 
 @Component({
     selector: 'app-console',
@@ -62,6 +64,20 @@ export class ConsoleComponent implements OnInit {
     }
 
     /**
+     * Get the addActionService state - Visible or Not.
+     */
+    get isAddActionVisible(): boolean {
+        return this.addActionService.isAddActionVisible;
+    }
+
+    /**
+     * Get the addActionService state - Visible or Not.
+     */
+    get isVideoPlayerVisible(): boolean {
+        return this.videoPlayerService.isVideoPlayerVisible;
+    }
+
+    /**
      *
      * @param authService Service to handle auth conections.
      * @param userService Service to handle user collection in database.
@@ -73,6 +89,8 @@ export class ConsoleComponent implements OnInit {
         private userService: UserService,
         private workspaceService: WorkspaceService,
         private messageService: MessageService,
+        private addActionService: AddActionService,
+        private videoPlayerService: VideoPlayerService,
         private router: Router,
         private route: ActivatedRoute
     ) {}

@@ -1,4 +1,5 @@
-<app-add-action [isVisible]="addActionIsVisible" (actionTypeObject)="getAction( $event );" ></app-add-action>
+<app-add-action *ngIf="isAddActionVisible" ></app-add-action>
+<app-video-player *ngIf="isVideoPlayerVisible" ></app-video-player>
 <div class="console">
     <div *ngIf="webLoading;else console" class="w-100 vh-100 d-flex align-items-center justify-content-center">
         <div class="loader"></div>

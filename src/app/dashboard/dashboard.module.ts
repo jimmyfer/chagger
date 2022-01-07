@@ -17,13 +17,17 @@ import { FeaturesBoardComponent } from './views/features-board/features-board.co
 import { PickerModule } from '@ctrl/ngx-emoji-mart';
 import { EmojiModule } from '@ctrl/ngx-emoji-mart/ngx-emoji';
 import {ToastModule} from 'primeng/toast';
+import { ButtonActionComponent } from '../shared/button-action/button-action.component';
+import { VideoPlayerComponent } from '../shared/video-player/video-player.component';
 
 @NgModule({
     declarations: [
         ConsoleComponent,
         AddActionComponent,
         ReleasesBoardComponent,
-        FeaturesBoardComponent
+        FeaturesBoardComponent,
+        ButtonActionComponent,
+        VideoPlayerComponent
     ],
     imports: [
         CommonModule,
@@ -43,4 +47,8 @@ import {ToastModule} from 'primeng/toast';
         MessageService
     ]
 })
+
+/**
+ * DashboardModule.
+ */
 export class DashboardModule {}

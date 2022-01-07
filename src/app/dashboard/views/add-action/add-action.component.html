@@ -1,7 +1,7 @@
-<div *ngIf="isVisible" id="add-action" class="d-flex justify-content-center align-items-center" >
+<div id="add-action" class="d-flex justify-content-center align-items-center" >
     <div class="card">
         <div class="card-body">
-            <h1>Select Action</h1>
+            <h1>Select Action</h1>second
             <div class="form-group">
                 <div class="form-group">
                     <select #actionType [(ngModel)]="actionTypeCheck" class="custom-select">
@@ -10,6 +10,9 @@
                     </select>
                 </div>
                 <ng-container *ngIf="actionTypeCheck == 'video'">
+                    <div class="form-group" >
+                        <input type="text" [(ngModel)]="title" class="form-control" placeholder="Video Title">
+                    </div>
                     <div class="form-group" >
                         <input type="text" [(ngModel)]="link" class="form-control" placeholder="Video Link">
                     </div>

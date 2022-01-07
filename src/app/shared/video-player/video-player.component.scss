@@ -1,0 +1,21 @@
+#chagger-player {
+    width: 100vw;
+    height: 100vh;
+    background-color: #ffffff80;
+    position: absolute;
+    z-index: 1;
+}
+
+.video-controls {
+    a {
+        color: #de4c36;
+        font-size: 2rem;
+    }
+    a:hover {
+        color: #a73827;
+    }
+}
+
+.player-title {
+    font-size: 2rem;
+}

@@ -9,6 +9,10 @@ import { Releases } from 'src/app/models/releases.interface';
 import { ActivatedRoute } from '@angular/router';
 import { WorkspaceService } from 'src/app/services/workspace.service';
 import { EmojiID } from 'src/app/models/models';
+import { AddActionService } from 'src/app/services/add-action.service';
+import { Action } from 'src/app/models/action';
+import { filter, map, switchMap } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-features-board',
@@ -23,6 +27,7 @@ import { EmojiID } from 'src/app/models/models';
 export class FeaturesBoardComponent implements OnInit {
 
     textareaCharacter = '';
+
     @ViewChild('editReleaseVersionInput', { static: false })
     editReleaseVersionInput: ElementRef<HTMLInputElement> = {} as ElementRef;
 
@@ -33,11 +38,23 @@ export class FeaturesBoardComponent implements OnInit {
     checkEditReleaseVersion = false;
     editReleaseWorking = false;
 
-    release: Releases = { version: '', description: '', action: {}, emojiId: '' }
+    release: Releases = { version: '', description: '', emojiId: '' }
     oldReleaseVersion = '';
 
     workspaceId = this.route.parent?.parent?.snapshot.paramMap.get('workspaceId');
-    releaseId = this.route.snapshot.paramMap.get('releaseId');
+    releaseId = '';
+
+    releaseWatcher: Subscription | null = null;
+
+    releaseUpdatedToast = false;
+
+    /**
+     * Return the Action Object from AddActionService.
+     */
+    get addActionData(): Action | null | undefined {
+        return this.addActionService.addActionData;
+    }
+    
 
     /**
      * Constructor.
@@ -45,19 +62,28 @@ export class FeaturesBoardComponent implements OnInit {
     constructor(
         private releaseService: ReleasesService,
         private workspaceService: WorkspaceService,
+        private addActionService: AddActionService,
         private route: ActivatedRoute
 
     ) {}
 
     /**
-     * ngOnInit.
+     * ngOnInit - Watch for parameters change and update the release data on featureBoardComponent.
      */
     ngOnInit(): void {
-        if(this.workspaceId && this.releaseId) {
-            this.releaseService.getRelease(this.workspaceId, this.releaseId).then((release) => {
-                this.release = release;
-            });
-        }
+        this.releaseWatcher = this.route.paramMap.pipe(
+            map(params => params.get('releaseId')),
+            filter((releaseId): releaseId is string => !!releaseId )
+        ).subscribe((releaseId) => {
+            this.releaseId = releaseId;
+            if(this.workspaceId) {
+                this.releaseService.getRelease(this.workspaceId, this.releaseId).then((release) => {
+                    this.release = release;
+                    this.textareaCharacter = release.description;
+                    this.addActionService.addActionData = release.action;
+                });
+            }
+        });
     }
 
     /**
@@ -101,8 +127,8 @@ export class FeaturesBoardComponent implements OnInit {
                 this.releaseService.updateRelease(
                     {
                         version: this.release.version,
-                        description: this.release.description,
-                        action: this.release.action,
+                        description: this.textareaCharacter,
+                        action: this.addActionData ? this.addActionData : { type: '', link: '', options: {title: '', autoplay: false, muted: false, startOn: {hour: 0, minute: 0, second: 0}} },
                         emojiId: this.release.emojiId
                     },
                     this.oldReleaseVersion,
@@ -113,17 +139,13 @@ export class FeaturesBoardComponent implements OnInit {
                     }
                 );
             });
+            this.releaseUpdatedToast = true;
+            setTimeout(() => {
+                this.releaseUpdatedToast = false;
+            }, 1000);
         }else {
             throw 'Workspace ID or Release ID dont exist!';
         }
-    }
-
-    /**
-     * Call add-action component.
-     * @param e Click event.
-     */
-    addAction( e: Event ): void {
-        e.preventDefault();
     }
 
     /**
@@ -132,5 +154,13 @@ export class FeaturesBoardComponent implements OnInit {
      */
     addEmoji(data: EmojiID): void {
         this.release.emojiId = data.emoji.id;
+    }
+
+    /**
+     * When component get destroyed the release will stop watching for parameters change.
+     */
+    ngOnDestroy(): void {
+        this.releaseWatcher?.unsubscribe();
+        this.addActionService.addActionData = null;
     }
 }

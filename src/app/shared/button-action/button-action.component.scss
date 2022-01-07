@@ -1,0 +1,29 @@
+.buttom-big {
+    width: 100px;
+    height: 100px;
+    background-color: #de4c36;
+    color: #ffffff;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.buttom-big:hover {
+    background-color: #c9442f;
+}
+
+.buttom-small {
+    height: 50px;
+    background-color: #de4c36;
+    color: #ffffff;
+    text-decoration: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.buttom-small:hover {
+    background-color: #c9442f;
+}

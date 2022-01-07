@@ -1,21 +1,16 @@
 
-export interface ActionVideo {
-    type: string,
-    link: string,
+export interface Action {
+    type: string;
+    link: string;
     options: {
-        autoplay: boolean,
-        muted: boolean,
+        title: string;
+        autoplay: boolean;
+        muted: boolean;
         startOn: {
-            hour: number,
-            minute: number,
-            second: number
+            hour: number;
+            minute: number;
+            second: number;
         },
         thumbnail?: string
     }
 }
-
-export interface ActionLink {
-    link: string;
-}
-
-export declare type Action = ActionVideo | ActionLink;
