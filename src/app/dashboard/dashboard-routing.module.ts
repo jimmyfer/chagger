@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { ConsoleComponent } from './views/console/console.component';
 import { FeaturesBoardComponent } from './views/features-board/features-board.component';
 import { ReleasesBoardComponent } from './views/releases-board/releases-board.component';
+import { TagsBoardComponent } from './views/tags-board/tags-board.component';
 
 const routes: Routes = [
     {
@@ -21,6 +22,10 @@ const routes: Routes = [
                                 component: FeaturesBoardComponent
                             }
                         ]
+                    },
+                    {
+                        path: 'tags',
+                        component: TagsBoardComponent
                     }
                 ]
             }

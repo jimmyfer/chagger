@@ -6,7 +6,7 @@ import {
 import { FirestoreGenericService } from './firestore-generic.service';
 
 import { Observable } from 'rxjs';
-import { Workspace, WorkspaceRelease } from '../models/workspace.interface';
+import { Workspace, WorkspaceRelease, WorkspaceTags } from '../models/workspace.interface';
 import { UserService } from './user.service';
 import { User } from '../models/user.interface';
 import { map } from 'rxjs/operators';
@@ -99,6 +99,16 @@ export class WorkspaceService extends FirestoreGenericService<Workspace> {
     }
 
     /**
+     * Get the tags of an espesific workspace.
+     * @param workspaceDocumentId Workspace ID.
+     * @returns Return an observable of the workspace tags data.
+     */
+    getWorkspaceTags(workspaceDocumentId: string): Observable<WorkspaceTags[]> {
+        return this.getDocument(collectionPath, workspaceDocumentId).pipe(
+            map(workspace => workspace.tags));
+    }
+
+    /**
      * Get the releases of an espesific workspace once.
      * @param workspaceDocumentId Workspace ID.
      * @returns Return an observable of the workspace releases data.
@@ -106,6 +116,17 @@ export class WorkspaceService extends FirestoreGenericService<Workspace> {
     async getWorkspaceReleasesOnce(workspaceDocumentId: string): Promise<WorkspaceRelease[]> {
         return await this.getFirestoreDocument(collectionPath, workspaceDocumentId).get().pipe(
             map((user) => user.get('releases'))
+        ).toPromise();
+    }
+
+    /**
+     * Get the releases of an espesific workspace once.
+     * @param workspaceDocumentId Workspace ID.
+     * @returns Return an observable of the workspace releases data.
+     */
+    async getWorkspaceTagsOnce(workspaceDocumentId: string): Promise<WorkspaceTags[]> {
+        return await this.getFirestoreDocument(collectionPath, workspaceDocumentId).get().pipe(
+            map((user) => user.get('tags'))
         ).toPromise();
     }
 
@@ -119,14 +140,40 @@ export class WorkspaceService extends FirestoreGenericService<Workspace> {
     }
 
     /**
-     * Edit the array releases in workspace.
-     * @param releaseId FIXME
-     * @param releaseData FIXME
+     * Edit the releases array in a worksapce document.
+     * @param workspaceId Workspace document ID.
+     * @param releaseData Workspace feature data.
      */
     editWorkspaceRelease(
-        releaseId: string,
+        workspaceId: string,
         releaseData: Partial<Workspace>
     ): void {
-        this.updateDocument(releaseData, collectionPath, releaseId);
+        console.log(releaseData);
+        this.updateDocument(releaseData, collectionPath, workspaceId);
+    }
+
+    /**
+     * Edit the features array in a workspace document.
+     * @param workspaceId Workspace document ID.
+     * @param featureData Workspace feature data.
+     */
+    editWorkspaceFeature(
+        workspaceId: string,
+        featureData: Partial<Workspace>
+    ): void {
+        console.log(featureData);
+        this.updateDocument(featureData, collectionPath, workspaceId);
+    }
+
+    /**
+     * Edit the array releases in workspace.
+     * @param tagId FIXME
+     * @param tagData FIXME
+     */
+    editWorkspaceTag(
+        tagId: string,
+        tagData: Partial<Workspace>
+    ): void {
+        this.updateDocument(tagData, collectionPath, tagId);
     }
 }

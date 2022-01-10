@@ -100,6 +100,7 @@ export class ConsoleComponent implements OnInit {
      */
     ngOnInit(): void {
         this.workspaceExistChecker = this.workspaces$.subscribe((workspaces) => {
+            console.log(workspaces);
             if(workspaces) {
                 this.workspaceExist = true;
                 this.webLoading = false;
@@ -110,6 +111,12 @@ export class ConsoleComponent implements OnInit {
                     }
                 });
             } else {
+                this.webLoading = false;
+            }
+        },
+        (err) => {
+            console.warn(err);
+            if(err == 'NOT FOUND!'){
                 this.webLoading = false;
             }
         });
@@ -186,7 +193,7 @@ export class ConsoleComponent implements OnInit {
         this.userService.getUserWorkspacesOnce().then((workspaces) => {
             console.log(workspaces);
             this.workspaceService.addNewWorkspace(
-                { name: workspaceName, releases: [] },
+                { name: workspaceName, releases: [], tags: [] , features: []},
                 { workspaces: workspaces }
             );
         });
@@ -200,6 +207,8 @@ export class ConsoleComponent implements OnInit {
         const workspaceSucess = await this.workspaceService.createNewWorkspace({
             name: workspaceName,
             releases: [],
+            tags: [],
+            features: []
         });
         if (workspaceSucess) {
             this.webLoading = false;

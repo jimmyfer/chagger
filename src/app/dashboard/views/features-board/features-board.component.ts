@@ -12,7 +12,10 @@ import { EmojiID } from 'src/app/models/models';
 import { AddActionService } from 'src/app/services/add-action.service';
 import { Action } from 'src/app/models/action';
 import { filter, map, switchMap } from 'rxjs/operators';
-import { Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
+import { WorkspaceFeatures } from 'src/app/models/workspace.interface';
+import { FeaturesService } from 'src/app/services/features.service';
+import { DocumentReference } from '@angular/fire/compat/firestore';
 
 @Component({
     selector: 'app-features-board',
@@ -26,6 +29,21 @@ import { Subscription } from 'rxjs';
  */
 export class FeaturesBoardComponent implements OnInit {
 
+    features$: Observable<WorkspaceFeatures[]> = this.route.paramMap.pipe(
+        map((params) => params.get('releaseId')),
+        filter((releaseId): releaseId is string => !!releaseId),
+        switchMap((releaseId) => {
+            if(this.workspaceId) {
+                return this.releaseService.getReleaseFeatures(releaseId, this.workspaceId);
+            } else {
+                throw 'Not getting the WorkspaceID';
+            }
+        })
+    );
+
+    features: WorkspaceFeatures[] = [];
+    featureActions: Action[] = [];
+
     textareaCharacter = '';
 
     @ViewChild('editReleaseVersionInput', { static: false })
@@ -38,7 +56,7 @@ export class FeaturesBoardComponent implements OnInit {
     checkEditReleaseVersion = false;
     editReleaseWorking = false;
 
-    release: Releases = { version: '', description: '', emojiId: '' }
+    release: Releases = { version: '', description: '', emojiId: '', features: [] }
     oldReleaseVersion = '';
 
     workspaceId = this.route.parent?.parent?.snapshot.paramMap.get('workspaceId');
@@ -51,8 +69,12 @@ export class FeaturesBoardComponent implements OnInit {
     /**
      * Return the Action Object from AddActionService.
      */
-    get addActionData(): Action | null | undefined {
-        return this.addActionService.addActionData;
+    get addActionData(): Action {
+        if(this.addActionService.addActionData){
+            return this.addActionService.addActionData;
+        }else {
+            throw 'Not action data!';
+        }
     }
     
 
@@ -63,6 +85,7 @@ export class FeaturesBoardComponent implements OnInit {
         private releaseService: ReleasesService,
         private workspaceService: WorkspaceService,
         private addActionService: AddActionService,
+        private featureService: FeaturesService,
         private route: ActivatedRoute
 
     ) {}
@@ -83,6 +106,12 @@ export class FeaturesBoardComponent implements OnInit {
                     this.addActionService.addActionData = release.action;
                 });
             }
+        });
+        this.features$.subscribe((features) => {
+            this.features = features;
+            features.forEach((feature) => {
+                this.featureService.getFeature(feature.ref).then(feature => this.featureActions.push(feature.action));
+            });
         });
     }
 
@@ -129,7 +158,8 @@ export class FeaturesBoardComponent implements OnInit {
                         version: this.release.version,
                         description: this.textareaCharacter,
                         action: this.addActionData ? this.addActionData : { type: '', link: '', options: {title: '', autoplay: false, muted: false, startOn: {hour: 0, minute: 0, second: 0}} },
-                        emojiId: this.release.emojiId
+                        emojiId: this.release.emojiId,
+                        features: this.release.features
                     },
                     this.oldReleaseVersion,
                     this.workspaceId as string,
@@ -154,6 +184,17 @@ export class FeaturesBoardComponent implements OnInit {
      */
     addEmoji(data: EmojiID): void {
         this.release.emojiId = data.emoji.id;
+    }
+
+    /**
+     * Add new feature to Database.
+     */
+    addFeature(): void {
+        const workspaceId = this.workspaceId;
+        if (!workspaceId) {
+            return;
+        }
+        this.featureService.addNewFeature( workspaceId, this.releaseId, { features: this.features } );
     }
 
     /**

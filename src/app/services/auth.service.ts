@@ -54,7 +54,9 @@ export class AuthService {
             try {
                 workspace = this.workspaceService.create({
                     name: result.user.email as string,
-                    releases: []
+                    releases: [],
+                    tags: [],
+                    features: []
                 });
             } catch (e) {
                 throw console.log(e);

@@ -19,6 +19,9 @@ import { EmojiModule } from '@ctrl/ngx-emoji-mart/ngx-emoji';
 import {ToastModule} from 'primeng/toast';
 import { ButtonActionComponent } from '../shared/button-action/button-action.component';
 import { VideoPlayerComponent } from '../shared/video-player/video-player.component';
+import { TagsBoardComponent } from './views/tags-board/tags-board.component';
+import { EmojiPickerComponent } from '../shared/emoji-picker/emoji-picker.component';
+import { NgbDropdownConfig, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
     declarations: [
@@ -27,7 +30,9 @@ import { VideoPlayerComponent } from '../shared/video-player/video-player.compon
         ReleasesBoardComponent,
         FeaturesBoardComponent,
         ButtonActionComponent,
-        VideoPlayerComponent
+        VideoPlayerComponent,
+        TagsBoardComponent,
+        EmojiPickerComponent
     ],
     imports: [
         CommonModule,
@@ -40,7 +45,8 @@ import { VideoPlayerComponent } from '../shared/video-player/video-player.compon
         ConfirmDialogModule,
         PickerModule,
         EmojiModule,
-        ToastModule
+        ToastModule,
+        NgbModule
     ],
     providers: [
         ConfirmationService,

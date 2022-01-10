@@ -1,0 +1,8 @@
+<div ngbDropdown #myDrop="ngbDropdown">
+    <a href="#" (click)="$event.preventDefault();" class="emoji-picker" id="emojiPickerDropdown" ngbDropdownToggle>
+        <ngx-emoji class="pr-1" [emoji]="selectedEmoji" set="apple"></ngx-emoji>
+    </a>
+    <div ngbDropdownMenu aria-labelledby="emojiPickerDropdown">
+        <emoji-mart (emojiClick)="addEmoji($event); myDrop.close();"></emoji-mart>
+    </div>
+</div>

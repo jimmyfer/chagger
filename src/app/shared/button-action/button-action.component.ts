@@ -14,7 +14,7 @@ import { VideoPlayerService } from 'src/app/services/video-player.service';
  * Button that show an action if exist or option to add an action if not.
  */
 export class ButtonActionComponent implements OnInit {
-    @Input() actionData: Action | null | undefined = null;
+    @Input() actionData: Action | null = {type: '', link: '', options: { title: '', autoplay: false, muted: false, startOn: { hour: 0, minute: 0, second: 0 } }};
 
     @Input() type = 'big';
 

@@ -5,7 +5,7 @@ import { DocumentReference } from '@angular/fire/compat/firestore';
 import { ConfirmationService } from 'primeng/api';
 import { Observable } from 'rxjs';
 import { WorkspaceService } from 'src/app/services/workspace.service';
-import { WorkspaceRelease } from 'src/app/models/workspace.interface';
+import { WorkspaceFeatures, WorkspaceRelease } from 'src/app/models/workspace.interface';
 import { ActivatedRoute } from '@angular/router';
 import { filter, map, switchMap } from 'rxjs/operators';
 
@@ -20,6 +20,7 @@ import { filter, map, switchMap } from 'rxjs/operators';
  *
  */
 export class ReleasesBoardComponent {
+    
     releases$: Observable<WorkspaceRelease[]> = this.route.paramMap.pipe(
         map((params) => params.get('workspaceId')),
         filter((workspaceId): workspaceId is string => !!workspaceId),
@@ -114,7 +115,6 @@ export class ReleasesBoardComponent {
         if (!workspace) {
             return;
         }
-        console.log(this.workspaceId, '<h1>WORKSPACEID!!!</h1>');
         this.workspaceService
             .getWorkspaceReleasesOnce(this.workspaceId)
             .then((releases) => {
@@ -137,6 +137,7 @@ export class ReleasesBoardComponent {
                             },
                         },
                         emojiId: 'rocket',
+                        features: []
                     },
                     workspace.id,
                     { releases: releases }
@@ -169,7 +170,8 @@ export class ReleasesBoardComponent {
                                     .value,
                                 releases[releaseIndex].ref,
                                 releases[releaseIndex].version,
-                                releases[releaseIndex].emojiId
+                                releases[releaseIndex].emojiId,
+                                releases[releaseIndex].features
                             );
                         }
                         this.editReleaseWorking = false;
@@ -181,7 +183,8 @@ export class ReleasesBoardComponent {
                             this.editReleaseVersionInput.nativeElement.value,
                             releases[releaseIndex].ref,
                             releases[releaseIndex].version,
-                            releases[releaseIndex].emojiId
+                            releases[releaseIndex].emojiId,
+                            releases[releaseIndex].features
                         );
                         break;
                 }
@@ -222,12 +225,14 @@ export class ReleasesBoardComponent {
      * @param releaseId Release document reference in the database.
      * @param actualVersion Actual release version.
      * @param actualEmoji Actual release emoji.
+     * @param features Actual features.
      */
     updateReleaseVersion(
         newVersion: string,
         releaseId: DocumentReference,
         actualVersion: string,
-        actualEmoji: string
+        actualEmoji: string,
+        features: WorkspaceFeatures[]
     ): void {
         const workspace = this.activeWorkspace;
         if (!workspace) {
@@ -242,6 +247,7 @@ export class ReleasesBoardComponent {
                         description:
                             'I know i am a good release, dont you think?',
                         emojiId: actualEmoji,
+                        features: features
                     },
                     actualVersion,
                     workspace.id,

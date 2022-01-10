@@ -3,9 +3,10 @@ import {
     AngularFirestore,
     DocumentReference,
 } from '@angular/fire/compat/firestore';
-import { first } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { first, map } from 'rxjs/operators';
 import { Releases } from '../models/releases.interface';
-import { Workspace, WorkspaceRelease } from '../models/workspace.interface';
+import { Workspace, WorkspaceFeatures, WorkspaceRelease } from '../models/workspace.interface';
 import { FirestoreGenericService } from './firestore-generic.service';
 import { WorkspaceService } from './workspace.service';
 
@@ -64,8 +65,22 @@ export class ReleasesService extends FirestoreGenericService<Releases> {
      */
     async addNewRelease(data: Releases, workspaceId: string, releases: Partial<Workspace>): Promise<void> {
         const release = await this.createDocument(data,'',`workspaces/${workspaceId}/${collectionPath}`);
-        releases.releases?.push({version: data.version, ref: this.af.doc(`workspaces/${workspaceId}/releases/${release.id}`).ref as DocumentReference, emojiId: 'rocket'});
+        releases.releases?.push({version: data.version, ref: this.af.doc(`workspaces/${workspaceId}/releases/${release.id}`).ref as DocumentReference, emojiId: 'rocket', features: []});
         this.workspaceService.editWorkspaceRelease(workspaceId, releases);
+    }
+
+    /**
+     * Edit the features array in a release document.
+     * @param workspaceId Workspace document ID.
+     * @param releaseId Release document ID.
+     * @param featureData Workspace feature data.
+     */
+    editReleaseFeature(
+        workspaceId: string,
+        releaseId: string,
+        featureData: Partial<Releases>
+    ): void {
+        this.updateDocument(featureData, `workspaces/${workspaceId}/${collectionPath}`, releaseId);
     }
 
     /**
@@ -108,5 +123,16 @@ export class ReleasesService extends FirestoreGenericService<Releases> {
             throw 'There is not Releases!';
         }
         this.workspaceService.editWorkspaceRelease(releasePath.split('/')[1], releases);
+    }
+
+    /**
+     * Get the features of an espesific release.
+     * @param releaseDocumentId Release ID.
+     * @param workspaceDocumentId Workspace ID.
+     * @returns Return an observable of the features array on release document.
+     */
+    getReleaseFeatures(releaseDocumentId: string, workspaceDocumentId: string): Observable<WorkspaceFeatures[]> {
+        return this.getDocument(`workspaces/${workspaceDocumentId}/${collectionPath}`, releaseDocumentId).pipe(
+            map(release => release.features ));
     }
 }

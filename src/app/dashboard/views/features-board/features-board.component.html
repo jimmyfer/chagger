@@ -74,100 +74,26 @@
                 </div>
             </div>
         </div>
-        <div class="console-commits m-1">
+        <div *ngIf="features$ | async as features"  class="console-commits m-1">
             <h2 class="console-commits-title">Commits</h2>
             <div
                 class="console-commits-container d-flex align-items-center mb-4"
+                *ngFor="let feature of features, index as i"
             >
-                <div class="commits-feature flex-grow-1">
+                <div class="commits-feature">
                     <span class="commits-feature-title dropdown-toggle m-4"
-                        >Feature</span
+                        >{{ feature.tag }}</span
                     >
-                </div>
-                <div
-                    class="
-                        console-commits-embed
-                        d-flex
-                        flex-column
-                        justify-content-center
-                        align-items-center
-                    "
-                >
-                    <div
-                        class="
-                            embed-content
-                            d-flex
-                            flex-column
-                            justify-content-center
-                            align-items-center
-                        "
-                    >
-                        <fa-icon [icon]="actionPlay"></fa-icon>
-                        <span>Add Action</span>
+                </div >
+                <div class="commits-description flex-grow-1 card m-2 mt-3">
+                    <div class="card-body">
+                        {{ feature.description }}
                     </div>
                 </div>
-            </div>
-            <div
-                class="console-commits-container d-flex align-items-center mb-4"
-            >
-                <div class="commits-feature flex-grow-1">
-                    <span class="commits-feature-title dropdown-toggle m-4"
-                        >Feature</span
-                    >
+                <div>
+
                 </div>
-                <div
-                    class="
-                        console-commits-embed
-                        d-flex
-                        flex-column
-                        justify-content-center
-                        align-items-center
-                    "
-                >
-                    <div
-                        class="
-                            embed-content
-                            d-flex
-                            flex-column
-                            justify-content-center
-                            align-items-center
-                        "
-                    >
-                        <fa-icon [icon]="actionPlay"></fa-icon>
-                        <span>Add Action</span>
-                    </div>
-                </div>
-            </div>
-            <div
-                class="console-commits-container d-flex align-items-center mb-4"
-            >
-                <div class="commits-feature flex-grow-1">
-                    <span class="commits-feature-title dropdown-toggle m-4"
-                        >Feature</span
-                    >
-                </div>
-                <div
-                    class="
-                        console-commits-embed
-                        d-flex
-                        flex-column
-                        justify-content-center
-                        align-items-center
-                    "
-                >
-                    <div
-                        class="
-                            embed-content
-                            d-flex
-                            flex-column
-                            justify-content-center
-                            align-items-center
-                        "
-                    >
-                        <fa-icon [icon]="actionPlay"></fa-icon>
-                        <span>Add Action</span>
-                    </div>
-                </div>
+                <app-button-action [type]="'big'" [actionData]="featureActions[i]" ></app-button-action>
             </div>
             <button
                 type="button"
@@ -179,6 +105,8 @@
                     align-items-center
                     w-100
                 "
+
+                (click)="addFeature();"
             >
                 <fa-icon [icon]="addCommit"></fa-icon>
             </button>
