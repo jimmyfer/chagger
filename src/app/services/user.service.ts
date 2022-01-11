@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnInit } from '@angular/core';
 import { FirestoreGenericService } from './firestore-generic.service';
 
 import { User, UserWorkspaces } from '../models/user.interface';
@@ -20,8 +20,13 @@ const collectionPath = 'users';
  * This is the serivice that handle users collection.
  */
 export class UserService extends FirestoreGenericService<User> {
-    userUid = '';
+    //This variable is set when the workspaces$ observer is get at the workspace service.
     email = '';
+
+    //This variable is set when the workspaces$ observer is get at the workspace service.
+    userUid = '';
+
+    user$ = this.afAuth.authState;
 
     /**
      * Constructor.
@@ -44,10 +49,11 @@ export class UserService extends FirestoreGenericService<User> {
 
     /**
      * Get user wokrspaces.
+     * @param userUid User UID.
      * @returns Return workspaces of an user in users collection.
      */
-    getUserWorkspaces(): Observable<UserWorkspaces[]> {
-        return this.getDocument(collectionPath, this.userUid).pipe(
+    getUserWorkspaces(userUid: string): Observable<UserWorkspaces[]> {
+        return this.getDocument(collectionPath, userUid).pipe(
             map((user) => user.workspaces)
         );
     }
@@ -57,9 +63,10 @@ export class UserService extends FirestoreGenericService<User> {
      * @returns Return workspaces of an user in users collection.
      */
     async getUserWorkspacesOnce(): Promise<UserWorkspaces[]> {
-        return await this.getFirestoreDocument(collectionPath, this.userUid).get().pipe(
-            map((user) => user.get('workspaces'))
-        ).toPromise();
+        return await this.getFirestoreDocument(collectionPath, this.userUid)
+            .get()
+            .pipe(map((user) => user.get('workspaces')))
+            .toPromise();
     }
 
     /**

@@ -105,11 +105,10 @@
                     </div>
                     <div class="main-bar-body m-4">
                         <ul
-                            *ngIf="workspaces$ | async as workspaces"
                             class="bar-body-container"
                         >
                             <li
-                                *ngFor="let workspace of workspaces; index as i"
+                                *ngFor="let workspace of workspaces | async; index as i"
                                 class="workspace"
                             >
                                 <a

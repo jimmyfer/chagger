@@ -19,6 +19,9 @@ import { AngularFirestore, DocumentReference } from '@angular/fire/compat/firest
  */
 export class AuthService {
 
+
+    user$ = this.afAuth.authState;
+
     /**
      * Constructor.
      * @param router Angular Router.
@@ -131,11 +134,6 @@ export class AuthService {
      */
     async isLoggedIn(): Promise<boolean> {
         const authStateResp = await this.afAuth.authState.pipe(first()).toPromise();
-        if(authStateResp) {
-            this.userService.userUid = authStateResp.uid;
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            this.userService.email = authStateResp.email!;
-        }
         const isLogged =  authStateResp ? true : false;
         return  isLogged;
     }

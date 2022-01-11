@@ -5,7 +5,9 @@ import { Component } from '@angular/core';
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss']
 })
+
+/**
+ * Main app component.
+ */
 export class AppComponent {
-  // FIXME: Remove this
-  title = 'chagger';
 }

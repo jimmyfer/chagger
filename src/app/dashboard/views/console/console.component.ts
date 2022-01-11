@@ -33,7 +33,8 @@ export class ConsoleComponent implements OnInit {
     workspaceExist = false;
     webLoading = true;
 
-    workspaces$ = this.userService.getUserWorkspaces();
+    workspaces = this.workspaceService.workspaces$;
+
     activeWorkspaceIndex: number | null = null;
     activeWorkspace = false;
 
@@ -53,14 +54,14 @@ export class ConsoleComponent implements OnInit {
     /**
      * Get the actual workspaceId
      */
-    get workspaceId(): string {
+    get workspaceId(): string | null {
         if(this.route.firstChild) {
             const workspaceId = this.route.firstChild.snapshot.paramMap.get('workspaceId');
             if(workspaceId) {
                 return workspaceId;
             }
         }
-        throw 'Cant get the actual workspace ID';
+        return null;
     }
 
     /**
@@ -99,8 +100,7 @@ export class ConsoleComponent implements OnInit {
      * ngOnInit - Load the dashboard if there is any workspace.
      */
     ngOnInit(): void {
-        this.workspaceExistChecker = this.workspaces$.subscribe((workspaces) => {
-            console.log(workspaces);
+        this.workspaceExistChecker = this.workspaces.subscribe((workspaces) => {
             if(workspaces) {
                 this.workspaceExist = true;
                 this.webLoading = false;

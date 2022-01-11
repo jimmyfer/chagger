@@ -15,7 +15,6 @@ import { filter, map, switchMap } from 'rxjs/operators';
 import { Observable, Subscription } from 'rxjs';
 import { WorkspaceFeatures } from 'src/app/models/workspace.interface';
 import { FeaturesService } from 'src/app/services/features.service';
-import { DocumentReference } from '@angular/fire/compat/firestore';
 
 @Component({
     selector: 'app-features-board',

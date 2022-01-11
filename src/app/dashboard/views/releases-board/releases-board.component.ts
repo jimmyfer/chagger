@@ -5,7 +5,10 @@ import { DocumentReference } from '@angular/fire/compat/firestore';
 import { ConfirmationService } from 'primeng/api';
 import { Observable } from 'rxjs';
 import { WorkspaceService } from 'src/app/services/workspace.service';
-import { WorkspaceFeatures, WorkspaceRelease } from 'src/app/models/workspace.interface';
+import {
+    WorkspaceFeatures,
+    WorkspaceRelease,
+} from 'src/app/models/workspace.interface';
 import { ActivatedRoute } from '@angular/router';
 import { filter, map, switchMap } from 'rxjs/operators';
 
@@ -20,7 +23,6 @@ import { filter, map, switchMap } from 'rxjs/operators';
  *
  */
 export class ReleasesBoardComponent {
-    
     releases$: Observable<WorkspaceRelease[]> = this.route.paramMap.pipe(
         map((params) => params.get('workspaceId')),
         filter((workspaceId): workspaceId is string => !!workspaceId),
@@ -55,12 +57,12 @@ export class ReleasesBoardComponent {
     /**
      * Get the actual workspaceId
      */
-    get workspaceId(): string {
+    get workspaceId(): string | null {
         const workspaceId = this.route.snapshot.paramMap.get('workspaceId');
         if (workspaceId) {
             return workspaceId;
         }
-        throw 'Cant get the actual workspace ID';
+        return null;
     }
 
     /**
@@ -115,34 +117,38 @@ export class ReleasesBoardComponent {
         if (!workspace) {
             return;
         }
-        this.workspaceService
-            .getWorkspaceReleasesOnce(this.workspaceId)
-            .then((releases) => {
-                this.releaseService.addNewRelease(
-                    {
-                        version: releaseVersion,
-                        description: '',
-                        action: {
-                            type: '',
-                            link: '',
-                            options: {
-                                title: '',
-                                autoplay: false,
-                                muted: false,
-                                startOn: {
-                                    hour: 0,
-                                    minute: 0,
-                                    second: 0,
+        if (this.workspaceId) {
+            this.workspaceService
+                .getWorkspaceReleasesOnce(this.workspaceId)
+                .then((releases) => {
+                    this.releaseService.addNewRelease(
+                        {
+                            version: releaseVersion,
+                            description: '',
+                            action: {
+                                type: '',
+                                link: '',
+                                options: {
+                                    title: '',
+                                    autoplay: false,
+                                    muted: false,
+                                    startOn: {
+                                        hour: 0,
+                                        minute: 0,
+                                        second: 0,
+                                    },
                                 },
                             },
+                            emojiId: 'rocket',
+                            features: [],
                         },
-                        emojiId: 'rocket',
-                        features: []
-                    },
-                    workspace.id,
-                    { releases: releases }
-                );
-            });
+                        workspace.id,
+                        { releases: releases }
+                    );
+                });
+        } else {
+            console.warn('There is not any workspace ID.');
+        }
     }
 
     /**
@@ -152,19 +158,34 @@ export class ReleasesBoardComponent {
      */
     editReleaseVersion(e: Event, releaseIndex: number): void {
         e.preventDefault();
-        this.workspaceService
-            .getWorkspaceReleasesOnce(this.workspaceId)
-            .then((releases) => {
-                switch (e.type) {
-                    case 'click':
-                        this.editRelease[releaseIndex] = true;
-                        setTimeout(() => {
-                            this.editReleaseVersionInput.nativeElement.focus();
-                        });
-                        break;
-                    case 'blur':
-                        if (!this.editReleaseWorking) {
+        if (this.workspaceId) {
+            this.workspaceService
+                .getWorkspaceReleasesOnce(this.workspaceId)
+                .then((releases) => {
+                    switch (e.type) {
+                        case 'click':
+                            this.editRelease[releaseIndex] = true;
+                            setTimeout(() => {
+                                this.editReleaseVersionInput.nativeElement.focus();
+                            });
+                            break;
+                        case 'blur':
+                            if (!this.editReleaseWorking) {
+                                this.editRelease[releaseIndex] = false;
+                                this.updateReleaseVersion(
+                                    this.editReleaseVersionInput.nativeElement
+                                        .value,
+                                    releases[releaseIndex].ref,
+                                    releases[releaseIndex].version,
+                                    releases[releaseIndex].emojiId,
+                                    releases[releaseIndex].features
+                                );
+                            }
+                            this.editReleaseWorking = false;
+                            break;
+                        case 'keyup':
                             this.editRelease[releaseIndex] = false;
+                            this.editReleaseWorking = true;
                             this.updateReleaseVersion(
                                 this.editReleaseVersionInput.nativeElement
                                     .value,
@@ -173,22 +194,12 @@ export class ReleasesBoardComponent {
                                 releases[releaseIndex].emojiId,
                                 releases[releaseIndex].features
                             );
-                        }
-                        this.editReleaseWorking = false;
-                        break;
-                    case 'keyup':
-                        this.editRelease[releaseIndex] = false;
-                        this.editReleaseWorking = true;
-                        this.updateReleaseVersion(
-                            this.editReleaseVersionInput.nativeElement.value,
-                            releases[releaseIndex].ref,
-                            releases[releaseIndex].version,
-                            releases[releaseIndex].emojiId,
-                            releases[releaseIndex].features
-                        );
-                        break;
-                }
-            });
+                            break;
+                    }
+                });
+        } else {
+            console.warn('The is not any workspace ID.');
+        }
     }
 
     /**
@@ -205,16 +216,20 @@ export class ReleasesBoardComponent {
         this.confirmationService.confirm({
             message: 'Are you sure that you want to delete this release?',
             accept: () => {
-                this.workspaceService
-                    .getWorkspaceReleasesOnce(this.workspaceId)
-                    .then((releases) => {
-                        this.releaseService.deleteRelease(
-                            releases[releaseIndex].ref.path,
-                            workspace.id,
-                            { releases: releases },
-                            releases[releaseIndex].version
-                        );
-                    });
+                if (this.workspaceId) {
+                    this.workspaceService
+                        .getWorkspaceReleasesOnce(this.workspaceId)
+                        .then((releases) => {
+                            this.releaseService.deleteRelease(
+                                releases[releaseIndex].ref.path,
+                                workspace.id,
+                                { releases: releases },
+                                releases[releaseIndex].version
+                            );
+                        });
+                } else {
+                    console.warn('There is not any workspace ID.');
+                }
             },
         });
     }
@@ -238,22 +253,26 @@ export class ReleasesBoardComponent {
         if (!workspace) {
             return;
         }
-        this.workspaceService
-            .getWorkspaceReleasesOnce(this.workspaceId)
-            .then((releases) => {
-                this.releaseService.updateRelease(
-                    {
-                        version: newVersion,
-                        description:
-                            'I know i am a good release, dont you think?',
-                        emojiId: actualEmoji,
-                        features: features
-                    },
-                    actualVersion,
-                    workspace.id,
-                    releaseId.id,
-                    { releases: releases }
-                );
-            });
+        if (this.workspaceId) {
+            this.workspaceService
+                .getWorkspaceReleasesOnce(this.workspaceId)
+                .then((releases) => {
+                    this.releaseService.updateRelease(
+                        {
+                            version: newVersion,
+                            description:
+                                'I know i am a good release, dont you think?',
+                            emojiId: actualEmoji,
+                            features: features,
+                        },
+                        actualVersion,
+                        workspace.id,
+                        releaseId.id,
+                        { releases: releases }
+                    );
+                });
+        } else {
+            console.warn('There is not any worksapce ID.');
+        }
     }
 }

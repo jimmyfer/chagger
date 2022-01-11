@@ -5,11 +5,11 @@ import {
 } from '@angular/fire/compat/firestore';
 import { FirestoreGenericService } from './firestore-generic.service';
 
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { Workspace, WorkspaceRelease, WorkspaceTags } from '../models/workspace.interface';
 import { UserService } from './user.service';
 import { User } from '../models/user.interface';
-import { map } from 'rxjs/operators';
+import { map, switchMap } from 'rxjs/operators';
 
 const collectionPath = 'workspaces';
 
@@ -22,7 +22,14 @@ const collectionPath = 'workspaces';
  */
 export class WorkspaceService extends FirestoreGenericService<Workspace> {
 
-    userUid: string;
+    workspaces$ = this.userService.user$.pipe(
+        switchMap(user => {
+            user && user.email ? this.userService.email = user.email : this.userService.email = '';
+            user ? this.userService.userUid = user.uid : this.userService.userUid = '';
+            return user ? this.userService.getUserWorkspaces(user.uid) : of([]) ;
+        })
+    );
+    
 
     /**
      *
@@ -31,7 +38,6 @@ export class WorkspaceService extends FirestoreGenericService<Workspace> {
      */
     constructor(af: AngularFirestore, private userService: UserService) {
         super(af);
-        this.userUid = this.userService.userUid;
     }
 
     /**
@@ -148,7 +154,6 @@ export class WorkspaceService extends FirestoreGenericService<Workspace> {
         workspaceId: string,
         releaseData: Partial<Workspace>
     ): void {
-        console.log(releaseData);
         this.updateDocument(releaseData, collectionPath, workspaceId);
     }
 
