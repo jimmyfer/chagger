@@ -1,14 +1,30 @@
+<p-toast></p-toast>
 <div id="console">
     <div class="container">
         <div class="console-release m-1">
             <div class="console-release-title">
-                <a id="emojiSearchToggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" href="#">
-                    <ngx-emoji class="pr-1" [emoji]="release.emojiId" set="apple"></ngx-emoji>
+                <a
+                    id="emojiSearchToggle"
+                    data-toggle="dropdown"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                    href="#"
+                >
+                    <ngx-emoji
+                        class="pr-1"
+                        [emoji]="release.emojiId"
+                        set="apple"
+                    ></ngx-emoji>
                 </a>
                 <div class="dropdown-menu" aria-labelledby="emojiSearchToggle">
                     <emoji-mart (emojiClick)="addEmoji($event)"></emoji-mart>
                 </div>
-                <span *ngIf="!checkEditReleaseVersion;else editReleaseVersionInputTemp">
+                <span
+                    *ngIf="
+                        !checkEditReleaseVersion;
+                        else editReleaseVersionInputTemp
+                    "
+                >
                     {{ release.version }}
                 </span>
                 <ng-template #editReleaseVersionInputTemp>
@@ -22,11 +38,14 @@
                 </ng-template>
                 <a href="#" (click)="editReleaseVersion($event)">
                     <fa-icon
-                        [icon]="editReleaseVersionTitle"
+                        [icon]="editInput"
                         transform="shrink-7 left-8"
                     ></fa-icon>
                 </a>
-                <span [ngClass]="{ 'updated-toast-show': releaseUpdatedToast }" class="alert-success updated-toast" >
+                <span
+                    [ngClass]="{ 'updated-toast-show': releaseUpdatedToast }"
+                    class="alert-success updated-toast"
+                >
                     Updated!
                 </span>
             </div>
@@ -54,59 +73,144 @@
                         <button
                             type="button"
                             class="btn btn-gradient-primary btn-footer mx-4"
-                            (click)="updateRelease();"
+                            (click)="updateRelease()"
                         >
                             Update
                         </button>
                     </div>
                 </div>
                 <div
-                    class="
-                        console-release-embed
-                        d-flex
-                        flex-column
-                        justify-content-center
-                        align-items-center
-                        mx-4
-                    "
+                    class="console-release-embed d-flex flex-column justify-content-center align-items-center mx-4"
                 >
-                    <app-button-action [type]="'big'" [actionData]="addActionData" ></app-button-action>
+                    <app-button-action
+                        [bigButton]="true"
+                        [actionData]="releaseActionData"
+                        [develop]="true"
+                    ></app-button-action>
                 </div>
             </div>
         </div>
-        <div *ngIf="features$ | async as features"  class="console-commits m-1">
+        <div
+            cdkDropList
+            (cdkDropListDropped)="updateFeaturePosition($event)"
+            class="console-commits m-1"
+        >
             <h2 class="console-commits-title">Commits</h2>
             <div
                 class="console-commits-container d-flex align-items-center mb-4"
-                *ngFor="let feature of features, index as i"
+                *ngFor="let feature of featuresData; index as i"
+                cdkDrag
             >
-                <div class="commits-feature">
-                    <span class="commits-feature-title dropdown-toggle m-4"
-                        >{{ feature.tag }}</span
-                    >
-                </div >
-                <div class="commits-description flex-grow-1 card m-2 mt-3">
-                    <div class="card-body">
-                        {{ feature.description }}
+                <div class="mx-2 draggables-items">
+                    <div class="d-flex">
+                        <fa-icon
+                            [icon]="draggables"
+                            transform="down-4"
+                        ></fa-icon>
+                        <fa-icon
+                            [icon]="draggables"
+                            transform="down-4"
+                        ></fa-icon>
+                    </div>
+                    <div class="d-flex">
+                        <fa-icon [icon]="draggables" transform="up-4"></fa-icon>
+                        <fa-icon [icon]="draggables" transform="up-4"></fa-icon>
                     </div>
                 </div>
-                <div>
-
+                <a
+                                    id="emojiSearchToggle"
+                                    data-toggle="dropdown"
+                                    aria-haspopup="true"
+                                    aria-expanded="false"
+                                    href="#"
+                                >
+                                    <ngx-emoji
+                                        class="pr-1"
+                                        [emoji]="feature.emojiId"
+                                        set="apple"
+                                    ></ngx-emoji>
+                                </a>
+                                <div
+                                    class="dropdown-menu"
+                                    aria-labelledby="emojiSearchToggle"
+                                >
+                                    <emoji-mart
+                                        (emojiClick)="addFeatureEmoji($event, i)"
+                                    ></emoji-mart>
+                                </div>
+                <div class="commits-feature mx-2">
+                    <div ngbDropdown>
+                        <a
+                            href=""
+                            (click)="checkTags($event)"
+                            id="featureTag"
+                            class="commits-feature-selector"
+                            ngbDropdownToggle
+                        >
+                            <span
+                                class="commits-feature-title dropdown-toggle m-4"
+                                >{{
+                                    feature.tag == "" ? "#SetTag" : feature.tag
+                                }}</span
+                            >
+                        </a>
+                        <div
+                            ngbDropdownMenu
+                            aria-labelledby="featureTag"
+                            class="commits-feature-dropdown"
+                        >
+                            <a
+                                href="#"
+                                *ngFor="let tag of tags; index as tagIndex"
+                                (click)="updateTag($event, i, tagIndex)"
+                                ngbDropdownItem
+                                >{{ tag.name }}</a
+                            >
+                        </div>
+                    </div>
                 </div>
-                <app-button-action [type]="'big'" [actionData]="featureActions[i]" ></app-button-action>
+                <div class="commits-description flex-grow-1 d-flex flex-column">
+                    <a
+                        href="#"
+                        (click)="editFeatureDescription($event, i)"
+                        class="mr-2"
+                    >
+                        <fa-icon
+                            [icon]="editInput"
+                            transform="shrink-7 down-2"
+                        ></fa-icon>
+                    </a>
+                    <div
+                        *ngIf="
+                            !checkEditFeatureDescription[i].toggle;
+                            else editFeatureDescriptionTemp
+                        "
+                        class="commits-description-body px-1 py-2"
+                    >
+                        {{ feature.description }}
+                    </div>
+                    <ng-template #editFeatureDescriptionTemp>
+                        <textarea
+                            (blur)="editFeatureDescription($event, i)"
+                            (keyup.enter)="editFeatureDescription($event, i)"
+                            #editFeatureDescriptionTextarea
+                            cols="30"
+                            rows="10"
+                        ></textarea>
+                    </ng-template>
+                </div>
+                <div></div>
+                <app-button-action
+                    [bigButton]="true"
+                    [actionData]="feature.action"
+                    [featureIndex]="i"
+                    [develop]="true"
+                ></app-button-action>
             </div>
             <button
                 type="button"
-                class="
-                    btn btn-brand-primary btn-commit
-                    rounded-0
-                    d-flex
-                    justify-content-center
-                    align-items-center
-                    w-100
-                "
-
-                (click)="addFeature();"
+                class="btn btn-brand-primary btn-commit rounded-0 d-flex justify-content-center align-items-center w-100"
+                (click)="addFeature()"
             >
                 <fa-icon [icon]="addCommit"></fa-icon>
             </button>

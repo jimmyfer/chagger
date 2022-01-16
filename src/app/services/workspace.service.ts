@@ -130,6 +130,17 @@ export class WorkspaceService extends FirestoreGenericService<Workspace> {
      * @param workspaceDocumentId Workspace ID.
      * @returns Return an observable of the workspace releases data.
      */
+    async getWorkspaceFeaturesOnce(workspaceDocumentId: string): Promise<WorkspaceRelease[]> {
+        return await this.getFirestoreDocument(collectionPath, workspaceDocumentId).get().pipe(
+            map((user) => user.get('features'))
+        ).toPromise();
+    }
+
+    /**
+     * Get the releases of an espesific workspace once.
+     * @param workspaceDocumentId Workspace ID.
+     * @returns Return an observable of the workspace releases data.
+     */
     async getWorkspaceTagsOnce(workspaceDocumentId: string): Promise<WorkspaceTags[]> {
         return await this.getFirestoreDocument(collectionPath, workspaceDocumentId).get().pipe(
             map((user) => user.get('tags'))

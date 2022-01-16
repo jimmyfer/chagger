@@ -1,0 +1,25 @@
+<div class="share-changelog card">
+    <div class="card-header">
+        <div class="form-group d-flex mb-1">
+            <input type="text" readonly class="form-control" [value]="link" >
+            <button (click)="copyLink()" class="btn btn-gradient-primary copy-btn" >Copy</button>
+        </div>
+        <span class="openlink d-flex justify-content-end mx-3" >
+            <a href="#" (click)="openChangelogLink($event);" >
+                <fa-icon class="mx-1" [icon]="openLink"></fa-icon> Open in new tab
+            </a>
+        </span>
+    </div>
+    <div class="card-body">
+        <div class="options-bar" >
+            <ul class="d-flex">
+                <li [ngClass]="{ 'active': activeButton == 'Embed' }" (click)="getEmbedCode()" >Embed</li>
+                <li [ngClass]="{ 'active': activeButton == 'Button' }" (click)="buttonCode()" >Button</li>
+            </ul>
+        </div>
+        <div *ngIf="changelogCode" class="options-body" >
+            <textarea name="" class="form-control" [value]="changelogCode" readonly id="" cols="45" rows="5"></textarea>
+            <button (click)="copyChangelogCode()" class="btn btn-gradient-primary mt-2" >Copy code <fa-icon [icon]="copyCode"></fa-icon></button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,76 @@
+.logo_changelog {
+    width: 300px;
+    height: 160px;
+    background-color:#de4c36;
+    border-radius: 5px;
+}
+
+.changelog-title {
+    font-size: 3rem;
+}
+
+.release-changelog {
+    background-color: #F6F8FA;
+    width: 100%;
+    min-height: 100vh;
+    .release-changelog-body {
+        background-color: #EEE4E1;
+    }
+    .brand-logo {
+        img {
+            width: 150px;
+            height: 150px;
+        }
+        .title {
+            font-size: 3.5rem;
+        }
+    }
+}
+
+.changelog-release {
+    .changelog-release-data {
+        .release-emoji {
+            background-color: #E89488;
+            width: 80px;
+            height: 35px;
+            display: inline-block;
+            border-radius: 20px;
+            padding: 5px 10px;
+        }
+        .release-version {
+            font-size: 1rem;
+            font-weight: 600;
+            background-color: #96d3b1;
+            border-radius: 20px;
+            padding: 5px 10px;
+            height: 35px;
+        }
+
+        .release-description {
+            background-color: #FFFFFF;
+            height: 100px;
+            border-radius: 5px;
+            overflow-y: auto;
+        }
+    }
+}
+
+.changelog-features {
+    width: 90%;
+    .feature-emoji {
+        height: 35px;
+        padding: 5px 10px;
+    }
+
+    .feature-tag {
+        height: 35px;
+        padding: 5px 10px;
+        border-radius: 20px;
+    }
+    .feature-description {
+        background-color: #FFFFFF;
+        height: 100px;
+        border-radius: 5px;
+        overflow-y: auto;
+    }
+}

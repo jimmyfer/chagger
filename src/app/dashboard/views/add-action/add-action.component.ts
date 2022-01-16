@@ -1,6 +1,4 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
-import { Output, EventEmitter } from '@angular/core';
-import { Action } from 'src/app/models/action';
 import { AddActionService } from 'src/app/services/add-action.service';
 
 @Component({
@@ -16,6 +14,8 @@ export class AddActionComponent implements OnInit {
     
     @ViewChild('actionType', {static: false }) actionType: ElementRef = {} as ElementRef;
     actionTypeCheck = 'video';
+
+    featureIndex = this.addActionService.featureIndex;
 
     seconds: number[] = [];
     minutes: number[] = [];
@@ -53,37 +53,72 @@ export class AddActionComponent implements OnInit {
         e.preventDefault();
         switch (this.actionTypeCheck) {
             case 'video':
-                this.addActionService.addActionData = {
-                    type: this.actionType.nativeElement.value,
-                    link: this.link,
-                    options: {
-                        title: this.title,
-                        startOn: {
-                            hour: this.hour,
-                            minute: this.minute,
-                            second: this.second
-                        },
-                        autoplay: this.autoPlay,
-                        muted: this.muted
-                    }
-                };
+                if(this.featureIndex != null && this.featureIndex >= 0) {
+                    this.addActionService.updateFeatureActionData({
+                        type: this.actionType.nativeElement.value,
+                        link: this.link,
+                        options: {
+                            title: this.title,
+                            startOn: {
+                                hour: this.hour,
+                                minute: this.minute,
+                                second: this.second
+                            },
+                            autoplay: this.autoPlay,
+                            muted: this.muted
+                        }
+                    }, true , this.featureIndex);
+                }else {
+                    this.addActionService.updateReleaseActionData({
+                        type: this.actionType.nativeElement.value,
+                        link: this.link,
+                        options: {
+                            title: this.title,
+                            startOn: {
+                                hour: this.hour,
+                                minute: this.minute,
+                                second: this.second
+                            },
+                            autoplay: this.autoPlay,
+                            muted: this.muted
+                        }
+                    }, true);
+                }
                 break;
         
             case 'link':
-                this.addActionService.addActionData = {
-                    type: 'link',
-                    link: this.link,
-                    options: {
-                        title: '',
-                        autoplay: false,
-                        muted: false,
-                        startOn: {
-                            hour: 0,
-                            minute: 0,
-                            second: 0
+                if(this.featureIndex != null && this.featureIndex >= 0) {
+                    this.addActionService.updateFeatureActionData({
+                        type: 'link',
+                        link: this.link,
+                        options: {
+                            title: '',
+                            autoplay: false,
+                            muted: false,
+                            startOn: {
+                                hour: 0,
+                                minute: 0,
+                                second: 0
+                            }
                         }
-                    }
-                };
+                    }, true , this.featureIndex);
+                } else{
+                    this.addActionService.updateReleaseActionData({
+                        type: 'link',
+                        link: this.link,
+                        options: {
+                            title: '',
+                            autoplay: false,
+                            muted: false,
+                            startOn: {
+                                hour: 0,
+                                minute: 0,
+                                second: 0
+                            }
+                        }
+                    }, true);
+                }
+                
                 break;
         }
         this.addActionService.isAddActionVisible = false;

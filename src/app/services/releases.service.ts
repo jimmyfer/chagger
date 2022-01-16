@@ -5,6 +5,7 @@ import {
 } from '@angular/fire/compat/firestore';
 import { Observable } from 'rxjs';
 import { first, map } from 'rxjs/operators';
+import { Uploaded } from '../models/models';
 import { Releases } from '../models/releases.interface';
 import { Workspace, WorkspaceFeatures, WorkspaceRelease } from '../models/workspace.interface';
 import { FirestoreGenericService } from './firestore-generic.service';
@@ -53,7 +54,7 @@ export class ReleasesService extends FirestoreGenericService<Releases> {
      * @param releaseId Release ID.
      * @returns Return a release object.
      */
-    async getRelease(workspaceId: string, releaseId: string): Promise<Releases> {
+    async getRelease(workspaceId: string, releaseId: string): Promise<Uploaded<Releases>> {
         return this.getDocument(`workspaces/${workspaceId}/releases`, releaseId).pipe(first()).toPromise();
     }
 

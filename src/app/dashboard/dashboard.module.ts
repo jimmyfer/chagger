@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ConsoleComponent } from './views/console/console.component';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { DashboardRoutingModule } from './dashboard-routing.module';
 
 import { environment } from 'src/environments/environment';
@@ -17,11 +16,9 @@ import { FeaturesBoardComponent } from './views/features-board/features-board.co
 import { PickerModule } from '@ctrl/ngx-emoji-mart';
 import { EmojiModule } from '@ctrl/ngx-emoji-mart/ngx-emoji';
 import {ToastModule} from 'primeng/toast';
-import { ButtonActionComponent } from '../shared/button-action/button-action.component';
-import { VideoPlayerComponent } from '../shared/video-player/video-player.component';
 import { TagsBoardComponent } from './views/tags-board/tags-board.component';
-import { EmojiPickerComponent } from '../shared/emoji-picker/emoji-picker.component';
-import { NgbDropdownConfig, NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { DragDropModule } from '@angular/cdk/drag-drop';
+import { SharedModule } from '../shared/shared.module';
 
 @NgModule({
     declarations: [
@@ -29,24 +26,20 @@ import { NgbDropdownConfig, NgbModule } from '@ng-bootstrap/ng-bootstrap';
         AddActionComponent,
         ReleasesBoardComponent,
         FeaturesBoardComponent,
-        ButtonActionComponent,
-        VideoPlayerComponent,
-        TagsBoardComponent,
-        EmojiPickerComponent
+        TagsBoardComponent
     ],
     imports: [
         CommonModule,
-        FontAwesomeModule,
         DashboardRoutingModule,
         ReactiveFormsModule,
         FormsModule,
         AngularFireModule.initializeApp(environment.firebase),
         AngularFireAuthModule,
         ConfirmDialogModule,
-        PickerModule,
-        EmojiModule,
-        ToastModule,
-        NgbModule
+        DragDropModule,
+        SharedModule
+        
+        
     ],
     providers: [
         ConfirmationService,
@@ -55,6 +48,6 @@ import { NgbDropdownConfig, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 })
 
 /**
- * DashboardModule.
+ * 
  */
 export class DashboardModule {}

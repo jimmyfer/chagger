@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore, DocumentReference } from '@angular/fire/compat/firestore';
-import { first } from 'rxjs/operators';
+import { ActivatedRoute } from '@angular/router';
+import { Observable } from 'rxjs';
+import { filter, first, map, switchMap } from 'rxjs/operators';
 import { Tags } from '../models/tags.interface';
-import { Workspace } from '../models/workspace.interface';
+import { Workspace, WorkspaceTags } from '../models/workspace.interface';
 import { FirestoreGenericService } from './firestore-generic.service';
 import { WorkspaceService } from './workspace.service';
 
@@ -22,7 +24,7 @@ export class TagsService extends FirestoreGenericService<Tags> {
      * @param af  Angular helper of Firestore.
      * @param workspaceService Service to handle user workspaces collection in database.
      */
-    constructor(af: AngularFirestore, private workspaceService: WorkspaceService) {
+    constructor(af: AngularFirestore, private workspaceService: WorkspaceService, private route: ActivatedRoute) {
         super(af);
     }
 
@@ -83,6 +85,16 @@ export class TagsService extends FirestoreGenericService<Tags> {
     }
 
     /**
+     * Get all the tags from a worksapce document.
+     * @param worksapceId Workspace ID.
+     */
+    async getTags(worksapceId: string): Promise<Tags[]> {
+        return this.getDocument('workspaces', worksapceId).pipe(first()).toPromise().then((workspace) => {
+            return workspace.tags;
+        });
+    }
+
+    /**
      * Get a tag.
      * @param workspaceId Workspace ID.
      * @param tagId Tag ID.
@@ -90,5 +102,29 @@ export class TagsService extends FirestoreGenericService<Tags> {
      */
     async getTag(workspaceId: string, tagId: string): Promise<Tags> {
         return this.getDocument(`workspaces/${workspaceId}/tags`, tagId).pipe(first()).toPromise();
+    }
+
+    /**
+     * Get all tags document from a workspace.
+     * @param workspaceId Workspace ID.
+     * @returns Data from all tags documents.
+     */
+    async getTagsDocumentsData(
+        workspaceId: string
+    ): Promise<Tags[]> {
+        const snapshot = this.af.firestore
+            .collection(`workspaces/${workspaceId}/tags`)
+            .get();
+        const tags: Tags[] = [];
+        return snapshot.then((data) => {
+            data.docs.map((tag) => {
+                tags.push({
+                    name:  tag.data().name,
+                    emojiId: tag.data().emojiId,
+                    color: tag.data().color
+                });
+            });
+            return tags;
+        });
     }
 }

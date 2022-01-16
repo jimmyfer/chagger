@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, Output } from '@angular/core';
 import { faPlay, faPlus, faLink } from '@fortawesome/free-solid-svg-icons';
 import { Action } from 'src/app/models/action';
 import { AddActionService } from 'src/app/services/add-action.service';
@@ -14,9 +14,24 @@ import { VideoPlayerService } from 'src/app/services/video-player.service';
  * Button that show an action if exist or option to add an action if not.
  */
 export class ButtonActionComponent implements OnInit {
-    @Input() actionData: Action | null = {type: '', link: '', options: { title: '', autoplay: false, muted: false, startOn: { hour: 0, minute: 0, second: 0 } }};
+    
+    @Input() actionData: Action | null = null;
+    @Input() featureIndex: number | null = null;
 
-    @Input() type = 'big';
+    @Input() develop = false;
+
+    @Input() bigButton = false;
+    @Input() smallButton = false;
+
+    /**
+     * Get the action if exist.
+     */
+    get action(): Action {
+        if(this.actionData) {
+            return this.actionData;
+        }
+        return {type: '', link: '', options: { title: '', autoplay: false, muted: false, startOn: { hour: 0, minute: 0, second: 0 } }};
+    }
 
     actionPlay = faPlay;
     addNewAction = faPlus;
@@ -41,7 +56,7 @@ export class ButtonActionComponent implements OnInit {
      */
     callAddAction(e: Event): void {
         e.preventDefault();
-        this.addActionService.callAddAction();
+        this.addActionService.callAddAction( this.featureIndex );
     }
 
     /**
@@ -67,5 +82,16 @@ export class ButtonActionComponent implements OnInit {
             ],
         };
         this.videoPlayerService.isVideoPlayerVisible = true;
+    }
+
+    /**
+     * Open link.
+     * @param e Click event.
+     */
+    openLink(e: Event): void {
+        e.preventDefault();
+        if(this.actionData) {
+            window.open(this.actionData.link, '_blank')?.focus();
+        }
     }
 }

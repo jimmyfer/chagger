@@ -40,7 +40,6 @@ export class VideoPlayerComponent implements OnInit {
             this.videoPlayer.nativeElement,
             this.videoPlayerService.options
         );
-        console.log(this.videoPlayerService.setTime);
         this.player.currentTime(this.videoPlayerService.setTime);
     }
 

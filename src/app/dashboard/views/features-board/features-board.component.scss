@@ -25,17 +25,41 @@
         .console-commits-container {
             background-color: #eee4e1;
             .commits-feature {
+                background-color: #dac8c2;
                 .commits-feature-title {
                     font-size: 1.1rem;
                     font-weight: 600;
                 }
+                .commits-feature-selector{
+                    height: 100%;
+                    min-width: 160px;
+                    display: block;
+                    padding: 5px 5px;
+                }
+                .commits-feature-selector::after {
+                    text-decoration: none;
+                    border: 0;
+                }
+                .commits-feature-dropdown {
+                    width: 100%;
+                    margin: 0;
+                    border-radius: 0;
+                    border: 0;
+                    padding: 0;
+                    background-color: #dac8c2;
+                }
+                .commits-feature-dropdown:hover {
+                    background-color: #c9b7b1;
+                }
+            }
+            .commits-feature:hover {
+                background-color: #c9b7b1;
             }
             .commits-description {
-                max-height: 100px;
-                overflow-y: auto;
-                background-color: #ffffff63;
-                p {
-                    font-size: 0.6rem;
+                word-wrap: break-word;
+                .commits-description-body {
+                    font-size: 1rem;
+                    background-color: #FFFFFF;
                 }
             }
             .console-commits-embed {
@@ -60,4 +84,75 @@
 
 .updated-toast-show {
     opacity: 1;
+}
+
+
+.cdk-drag-preview {
+    background-color: #eee4e1;
+            .commits-feature {
+                background-color: #dac8c2;
+                .commits-feature-title {
+                    font-size: 1.1rem;
+                    font-weight: 600;
+                }
+                .commits-feature-selector{
+                    height: 100%;
+                    min-width: 160px;
+                    display: block;
+                    padding: 5px 5px;
+                }
+                .commits-feature-selector::after {
+                    text-decoration: none;
+                    border: 0;
+                }
+                .commits-feature-dropdown {
+                    width: 100%;
+                    margin: 0;
+                    border-radius: 0;
+                    border: 0;
+                    padding: 0;
+                    background-color: #dac8c2;
+                }
+                .commits-feature-dropdown:hover {
+                    background-color: #c9b7b1;
+                }
+            }
+            .commits-feature:hover {
+                background-color: #c9b7b1;
+            }
+            .commits-description {
+                word-wrap: break-word;
+                .commits-description-body {
+                    font-size: 1rem;
+                    background-color: #FFFFFF;
+                }
+            }
+            .console-commits-embed {
+                width: 100px;
+                height: 100px;
+                background-color: #de4c36;
+                .embed-content {
+                    color: #ffffff;
+                }
+            }
+  }
+  
+  .cdk-drag-placeholder {
+    opacity: 0;
+  }
+  
+  .cdk-drag-animating {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+  
+  .console-commits:last-child {
+    border: none;
+  }
+  
+  .console-commits-container.cdk-drop-list-dragging .console-commits:not(.cdk-drag-placeholder) {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+
+.draggables-items {
+    cursor: pointer;
 }

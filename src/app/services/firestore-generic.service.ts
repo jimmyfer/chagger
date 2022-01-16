@@ -55,7 +55,6 @@ export abstract class FirestoreGenericService<T> {
         queryFn?: QueryFn<Uploaded<T>>,
         ...paths: string[]
     ): AngularFirestoreCollection<Uploaded<T>> {
-        console.log(paths, paths.length, 'paths!!!-!');
         if (paths.length % 2 === 0) {
             console.log('yup! what u fear!');
             throw 'Document reference must have an odd number of paths';

@@ -15,6 +15,7 @@ import { provideFirestore,getFirestore } from '@angular/fire/firestore';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { PickerModule } from '@ctrl/ngx-emoji-mart';
 import { EmojiModule } from '@ctrl/ngx-emoji-mart/ngx-emoji';
+import { ChangelogModule } from './changelog/changelog.module';
 
 @NgModule({
     declarations: [
@@ -24,6 +25,7 @@ import { EmojiModule } from '@ctrl/ngx-emoji-mart/ngx-emoji';
         BrowserModule,
         AppRoutingModule,
         DashboardModule,
+        ChangelogModule,
         NgxPopper,
         NgbModule,
         FontAwesomeModule,

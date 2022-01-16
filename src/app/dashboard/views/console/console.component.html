@@ -217,12 +217,20 @@
                     <div
                         class="main-bar-footer d-flex align-items-end flex-grow-1"
                     >
-                        <button
+                        <div ngbDropdown>
+                            <button
                             type="button"
                             class="btn btn-gradient-primary btn-footer mx-4"
+                            id="share-changelog"
+                            ngbDropdownToggle
                         >
                             Share ChangeLog
                         </button>
+
+                        <div ngbDropdownMenu class="share-changelog-dropdown" aria-labelledby="share-changelog">
+                            <app-changelog-share></app-changelog-share>
+                        </div>
+                        </div>
                     </div>
                 </div>
                 <router-outlet></router-outlet>

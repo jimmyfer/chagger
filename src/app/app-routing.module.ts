@@ -20,6 +20,10 @@ const routes: Routes = [
         canActivate: [ IsLoggedInGuard ]
     },
     {
+        path: 'public',
+        loadChildren: () => import('./changelog/changelog.module').then( m => m.ChangelogModule)
+    },
+    {
         path: '**',
         redirectTo: 'auth'
     }
