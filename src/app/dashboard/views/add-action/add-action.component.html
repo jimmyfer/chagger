@@ -1,60 +1,167 @@
-<div id="add-action" class="d-flex justify-content-center align-items-center" >
+<div id="add-action" class="d-flex justify-content-center align-items-center">
     <div class="card">
         <div class="card-body">
-            <h1>Select Action</h1>second
+            <h1>Select Action</h1>
+            second
             <div class="form-group">
                 <div class="form-group">
-                    <select #actionType [(ngModel)]="actionTypeCheck" class="custom-select">
+                    <select
+                        #actionType
+                        [(ngModel)]="actionTypeCheck"
+                        (change)="resetData()"
+                        class="custom-select"
+                    >
                         <option selected value="video">Play video</option>
                         <option value="link">Link</option>
+                        <option value="file">File</option>
+                        <option value="gallery">Gallery</option>
                     </select>
                 </div>
                 <ng-container *ngIf="actionTypeCheck == 'video'">
-                    <div class="form-group" >
-                        <input type="text" [(ngModel)]="title" class="form-control" placeholder="Video Title">
+                    <div class="form-group">
+                        <input
+                            type="text"
+                            [(ngModel)]="title"
+                            class="form-control"
+                            placeholder="Video Title"
+                        />
                     </div>
-                    <div class="form-group" >
-                        <input type="text" [(ngModel)]="link" class="form-control" placeholder="Video Link">
+                    <div class="form-group">
+                        <input
+                            type="text"
+                            [(ngModel)]="link"
+                            class="form-control"
+                            placeholder="Video Link"
+                        />
                     </div>
                     <span>start on: </span>
                     <div class="form-group d-flex">
                         <div class="form-group mr-2">
                             <label for="hour">Hour:</label>
-                            <select #actionType name="hour" [(ngModel)]="hour" class="custom-select">
-                                <option *ngFor="let selectHour of hours;index as i" value="{{ selectHour }}" > {{ selectHour }} </option>
+                            <select
+                                #actionType
+                                name="hour"
+                                [(ngModel)]="hour"
+                                class="custom-select"
+                            >
+                                <option
+                                    *ngFor="let selectHour of hours; index as i"
+                                    value="{{ selectHour }}"
+                                >
+                                    {{ selectHour }}
+                                </option>
                             </select>
                         </div>
                         <div class="form-group mx-2">
                             <label for="minute">Minute:</label>
-                            <select #actionType name="minute" [(ngModel)]="minute" class="custom-select">
-                                <option *ngFor="let selectMinute of minutes" value="{{ selectMinute }}"> {{ selectMinute }} </option>
+                            <select
+                                #actionType
+                                name="minute"
+                                [(ngModel)]="minute"
+                                class="custom-select"
+                            >
+                                <option
+                                    *ngFor="let selectMinute of minutes"
+                                    value="{{ selectMinute }}"
+                                >
+                                    {{ selectMinute }}
+                                </option>
                             </select>
                         </div>
                         <div class="form-group ml-2">
                             <label for="second">Second:</label>
-                            <select #actionType name="second" [(ngModel)]="second" class="custom-select">
-                                <option *ngFor="let selectSecond of seconds" value="{{ selectSecond }}"> {{ selectSecond }} </option>
+                            <select
+                                #actionType
+                                name="second"
+                                [(ngModel)]="second"
+                                class="custom-select"
+                            >
+                                <option
+                                    *ngFor="let selectSecond of seconds"
+                                    value="{{ selectSecond }}"
+                                >
+                                    {{ selectSecond }}
+                                </option>
                             </select>
                         </div>
                     </div>
                     <div class="form-check">
-                        <input type="checkbox" [(ngModel)]="autoPlay" class="form-check-input" id="autoplayCheckbox">
-                        <label class="form-check-label" for="autoplayCheckbox">Autoplay</label>
+                        <input
+                            type="checkbox"
+                            [(ngModel)]="autoPlay"
+                            class="form-check-input"
+                            id="autoplayCheckbox"
+                        />
+                        <label class="form-check-label" for="autoplayCheckbox"
+                            >Autoplay</label
+                        >
                     </div>
                     <div class="form-check">
-                        <input type="checkbox" [(ngModel)]="muted" class="form-check-input" id="mutedCheckbox">
-                        <label class="form-check-label" for="mutedCheckbox">Muted</label>
+                        <input
+                            type="checkbox"
+                            [(ngModel)]="muted"
+                            class="form-check-input"
+                            id="mutedCheckbox"
+                        />
+                        <label class="form-check-label" for="mutedCheckbox"
+                            >Muted</label
+                        >
                     </div>
                 </ng-container>
                 <ng-container *ngIf="actionTypeCheck == 'link'">
-                    <div class="form-group" >
-                        <input type="text" [(ngModel)]="link" class="form-control" placeholder="Url Link">
+                    <div class="form-group">
+                        <input
+                            type="text"
+                            [(ngModel)]="link"
+                            class="form-control"
+                            placeholder="Url Link"
+                        />
                     </div>
+                </ng-container>
+                <ng-container *ngIf="actionTypeCheck == 'file'">
+                    <div class="form-group">
+                        <input type="file" #fileInput accept=".pdf, .zip" />
+                    </div>
+                    <p>
+                        <ngb-progressbar
+                            type="info"
+                            [value]="uploadPercent"
+                            [striped]="true"
+                            [animated]="true"
+                            ><i>{{ uploadPercent }}%</i></ngb-progressbar
+                        >
+                    </p>
+                </ng-container>
+                <ng-container *ngIf="actionTypeCheck == 'gallery'">
+                    <p-fileUpload
+                        #fileuploader
+                        name="myfile[]"
+                        [multiple]="true"
+                        accept="image/*"
+                        [maxFileSize]="10000000"
+                        [customUpload]="true"
+                        [showUploadButton]="false"
+                        (onSelect)="updateSelectedFiles($event)"
+                        (onProgress)="progressReport($event)"
+                    ></p-fileUpload>
                 </ng-container>
             </div>
         </div>
         <div class="card-footer">
-            <button type="submit" (click)="returnAction( $event );" class="btn btn-primary float-right">Save changes</button>
+            <button
+                type="submit"
+                (click)="closeAddAction()"
+                class="btn btn-primary float-left"
+            >
+                {{ uploadPercent == 100 ? "Close" : "Cancel" }}
+            </button>
+            <button
+                type="submit"
+                (click)="returnAction($event)"
+                class="btn btn-primary float-right"
+            >
+                {{ actionTypeCheck == "file" ? "Upload" : "Save Changes" }}
+            </button>
         </div>
     </div>
 </div>

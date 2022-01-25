@@ -19,6 +19,8 @@ import {ToastModule} from 'primeng/toast';
 import { TagsBoardComponent } from './views/tags-board/tags-board.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { SharedModule } from '../shared/shared.module';
+import { FileUploadModule } from 'primeng/fileupload';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
     declarations: [
@@ -37,7 +39,9 @@ import { SharedModule } from '../shared/shared.module';
         AngularFireAuthModule,
         ConfirmDialogModule,
         DragDropModule,
-        SharedModule
+        SharedModule,
+        FileUploadModule,
+        HttpClientModule
         
         
     ],

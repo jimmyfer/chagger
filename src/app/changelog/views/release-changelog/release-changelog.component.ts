@@ -1,14 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { FieldValue, Timestamp } from 'firebase/firestore';
+import { Timestamp } from 'firebase/firestore';
 import { Feature } from 'src/app/models/feature.interface';
-import { ModelMetadata } from 'src/app/models/models';
 import { Releases } from 'src/app/models/releases.interface';
 import { Tags } from 'src/app/models/tags.interface';
 import { FeaturesService } from 'src/app/services/features.service';
 import { ReleasesService } from 'src/app/services/releases.service';
 import { TagsService } from 'src/app/services/tags.service';
-import { VideoPlayerService } from 'src/app/services/video-player.service';
 
 @Component({
     selector: 'app-release-changelog',
@@ -20,6 +18,8 @@ import { VideoPlayerService } from 'src/app/services/video-player.service';
  * Release Changelog component.
  */
 export class ReleaseChangelogComponent implements OnInit {
+
+    Color = require('color');
 
     workspaceId = this.route.parent?.snapshot.paramMap.get('workspaceId');
     releaseId = this.route.snapshot.paramMap.get('releaseId');
@@ -55,9 +55,15 @@ export class ReleaseChangelogComponent implements OnInit {
                 if(this.workspaceId) {
                     this.featureService.getFeaturesDocumentsData({ features: this.release.features }, this.workspaceId).then(features => {
                         this.features = features;
+                        this.features.forEach((feature, index) => {
+                            if(!feature.tag) {
+                                this.features.push(feature);
+                                this.features.splice(index, 1);
+                            }
+                        });
+                        console.log(this.features);
                     });
                     this.tagsService.getTagsDocumentsData(this.workspaceId).then(tags => {
-                        console.log(tags);
                         this.tags = tags;
                     });
                 }
@@ -72,7 +78,8 @@ export class ReleaseChangelogComponent implements OnInit {
      */
     getTagColor(tagName: string): string {
         const tagIndex = this.tags.findIndex((tag) => tag.name == tagName);
-        return this.tags[tagIndex].color;
+        const color = this.Color(this.tags[tagIndex].color).lightness(70);
+        return color;
     }
 
     /**

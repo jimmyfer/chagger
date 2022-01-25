@@ -53,6 +53,7 @@ export class UserService extends FirestoreGenericService<User> {
      * @returns Return workspaces of an user in users collection.
      */
     getUserWorkspaces(userUid: string): Observable<UserWorkspaces[]> {
+        console.log(this.userUid);
         return this.getDocument(collectionPath, userUid).pipe(
             map((user) => user.workspaces)
         );

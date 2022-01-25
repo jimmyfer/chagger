@@ -18,6 +18,8 @@
             </ul>
         </div>
         <div *ngIf="changelogCode" class="options-body" >
+            <label for="buttonLabel">Button label</label>
+            <input id="buttonLabel" [(ngModel)]="buttonLabel" (ngModelChange)="buttonCode()" *ngIf="activeButton == 'Button'" type="text" class="form-control mb-1" placeholder="Chagger">
             <textarea name="" class="form-control" [value]="changelogCode" readonly id="" cols="45" rows="5"></textarea>
             <button (click)="copyChangelogCode()" class="btn btn-gradient-primary mt-2" >Copy code <fa-icon [icon]="copyCode"></fa-icon></button>
         </div>

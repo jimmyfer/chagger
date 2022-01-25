@@ -183,8 +183,8 @@ export class WorkspaceService extends FirestoreGenericService<Workspace> {
 
     /**
      * Edit the array releases in workspace.
-     * @param tagId FIXME
-     * @param tagData FIXME
+     * @param tagId Tag id.
+     * @param tagData Tag data.
      */
     editWorkspaceTag(
         tagId: string,

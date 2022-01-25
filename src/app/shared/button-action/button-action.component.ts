@@ -1,5 +1,5 @@
-import { Component, Input, OnInit, Output } from '@angular/core';
-import { faPlay, faPlus, faLink } from '@fortawesome/free-solid-svg-icons';
+import { Component, Input, OnInit } from '@angular/core';
+import { faPlay, faPlus, faLink, faDownload } from '@fortawesome/free-solid-svg-icons';
 import { Action } from 'src/app/models/action';
 import { AddActionService } from 'src/app/services/add-action.service';
 import { VideoPlayerService } from 'src/app/services/video-player.service';
@@ -36,6 +36,7 @@ export class ButtonActionComponent implements OnInit {
     actionPlay = faPlay;
     addNewAction = faPlus;
     actionLink = faLink;
+    actionDownload = faDownload;
 
     /**
      * Consturctor.
@@ -92,6 +93,20 @@ export class ButtonActionComponent implements OnInit {
         e.preventDefault();
         if(this.actionData) {
             window.open(this.actionData.link, '_blank')?.focus();
+        }
+    }
+
+    /**
+     * Download file.
+     * @param e Click event.
+     * @param filePath Filepath reference.
+     */
+    downloadAction(e: Event, filePath: string | undefined): void {
+        e.preventDefault();
+        if(filePath) {
+            this.addActionService.getDownloadLink(filePath).then(link => {
+                window.open(link);
+            });
         }
     }
 }

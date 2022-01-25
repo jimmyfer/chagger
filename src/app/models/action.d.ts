@@ -1,4 +1,3 @@
-
 export interface Action {
     type: string;
     link: string;
@@ -12,5 +11,7 @@ export interface Action {
             second: number;
         },
         thumbnail?: string
-    }
+    },
+    filesPath?: string[]
+    fileRef?: string
 }

@@ -16,6 +16,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { PickerModule } from '@ctrl/ngx-emoji-mart';
 import { EmojiModule } from '@ctrl/ngx-emoji-mart/ngx-emoji';
 import { ChangelogModule } from './changelog/changelog.module';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
     declarations: [
@@ -32,6 +33,7 @@ import { ChangelogModule } from './changelog/changelog.module';
         BrowserAnimationsModule,
         PickerModule,
         EmojiModule,
+        FormsModule,
         // +10: Using updated version of @angular/fire 👍
         provideFirebaseApp(() => initializeApp(environment.firebase)),
         provideAuth(() => getAuth()),

@@ -16,7 +16,7 @@
 >
 
 <ng-template #videoAction>
-    <ng-container *ngIf="action.type == 'video'; else addAction">
+    <ng-container *ngIf="action.type == 'video'; else fileAction">
         <div>
             <a
                 [ngClass]="{
@@ -29,6 +29,25 @@
             >
                 <fa-icon [icon]="actionPlay"></fa-icon>
                 <span class="px-2">Video</span>
+            </a>
+        </div>
+    </ng-container>
+</ng-template>
+
+<ng-template #fileAction>
+    <ng-container *ngIf="action.type == 'file'; else addAction">
+        <div>
+            <a
+                [ngClass]="{
+                    'buttom-big': bigButton,
+                    'buttom-small': smallButton
+                }"
+                class="px-2"
+                href="#"
+                (click)="!develop ? downloadAction($event, action.fileRef) : callAddAction($event)"
+            >
+                <fa-icon [icon]="actionDownload"></fa-icon>
+                <span class="px-2">Download</span>
             </a>
         </div>
     </ng-container>

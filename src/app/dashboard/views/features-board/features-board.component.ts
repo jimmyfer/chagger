@@ -192,6 +192,7 @@ export class FeaturesBoardComponent implements OnInit {
                     this.workspaceId
                 ) {
                     console.log(this.features[actionObserver.featureIndex].tag);
+                    console.log('hello, featurebpoard');
                     this.featureService.updateFeature(
                         {
                             tag: this.features[actionObserver.featureIndex].tag,

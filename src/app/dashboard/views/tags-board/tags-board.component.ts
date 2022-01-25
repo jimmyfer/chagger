@@ -147,7 +147,7 @@ export class TagsBoardComponent implements OnInit {
                 if (!this.editTagWorking) {
                     this.editTag[tagIndex] = false;
                     this.updateTag(
-                        this.editTagInput.nativeElement.value,
+                        '#' + this.editTagInput.nativeElement.value,
                         this.tags[tagIndex],
                         this.tags
                     );
@@ -158,7 +158,7 @@ export class TagsBoardComponent implements OnInit {
                 this.editTag[tagIndex] = false;
                 this.editTagWorking = true;
                 this.updateTag(
-                    this.editTagInput.nativeElement.value,
+                    '#' + this.editTagInput.nativeElement.value,
                     this.tags[tagIndex],
                     this.tags
                 );
@@ -254,7 +254,7 @@ export class TagsBoardComponent implements OnInit {
         if(this.workspaceId) {
             this.tagsService.addNewTag(
                 {
-                    name: tagName,
+                    name: '#' + tagName,
                     emojiId: 'label',
                     color: '#D3D3D3',
                 },

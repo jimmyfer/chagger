@@ -9,6 +9,7 @@ import { PickerModule } from '@ctrl/ngx-emoji-mart';
 import { EmojiModule } from '@ctrl/ngx-emoji-mart/ngx-emoji';
 import { ToastModule } from 'primeng/toast';
 import { ChangelogShareComponent } from './changelog-share/changelog-share.component';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
     declarations: [
@@ -24,7 +25,8 @@ import { ChangelogShareComponent } from './changelog-share/changelog-share.compo
         NgbModule,
         PickerModule,
         EmojiModule,
-        ToastModule
+        ToastModule,
+        FormsModule,
         
     ],
     exports: [

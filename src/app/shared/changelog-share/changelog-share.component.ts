@@ -21,6 +21,8 @@ export class ChangelogShareComponent implements OnInit {
 
     activeButton = '';
 
+    buttonLabel = 'Chagger';
+
     /**
      * Link.
      */
@@ -65,7 +67,7 @@ export class ChangelogShareComponent implements OnInit {
      * Change shared code to button code.
      */
     buttonCode(): void {
-        const code = `<a href="${ this.link }" style="background-color: #e28063; padding: 7px 15px;font-size: 18px;border: 1px solid #facfc2;color: #ffffff;cursor: pointer;border-radius: 5px;margin: 2px;text-decoration: none;" onmouseout='this.style.backgroundColor="#e28063"' > Changelog </a>`;
+        const code = `<a href="${this.link}" style="background-color: #e28063; padding: 7px 15px;font-size: 18px;border: 1px solid #facfc2;color: #ffffff;cursor: pointer;border-radius: 5px;margin: 2px;text-decoration: none;" onmouseover='this.style.backgroundColor="#de4c36"' onmouseout='this.style.backgroundColor="#e28063"' > ${this.buttonLabel} </a>`;
         this.activeButton = 'Button';
         this.changelogCode = code;
     }
