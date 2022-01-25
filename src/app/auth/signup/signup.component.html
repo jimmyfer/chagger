@@ -9,6 +9,10 @@
                     </div>
                 </div>
                 <div class="login-form card-body">
+                    <!--
+                    TODO: Fix signUpState functionality and add logInForm.touched to show this error
+                    only when the form is touched
+                     -->
                     <div class="alert alert-danger" role="alert" *ngIf="!signUpState">
                         <span>SignUp Failed, please try again</span>
                     </div>
@@ -38,6 +42,7 @@
                             <label for="password">Confirm Password</label>
                             <input id="passwordConfirm" class="form-control" type="password" formControlName="passwordConfirm" name="password" placeholder="Enter your Password">
                         </div>
+                        <!-- FIXME: Fix error displaying when no errors -->
                         <div class="alert alert-danger" role="alert" *ngIf="passwordConfirm.invalid && passwordConfirm.touched || signUpForm.errors?.['dontMatch']">
                             <span *ngIf="passwordConfirm.errors?.['required']" >Password is required</span>
                             <span *ngIf="signUpForm.errors?.['dontMatch'] && !passwordConfirm.invalid" >Password dont match</span>

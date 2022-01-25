@@ -1,5 +1,6 @@
 <p-toast></p-toast>
 <div id="console">
+    <!-- Feature Board: Release edit -->
     <div class="container">
         <div class="console-release m-1">
             <div class="console-release-title">
@@ -28,6 +29,9 @@
                     {{ release.version }}
                 </span>
                 <ng-template #editReleaseVersionInputTemp>
+                    <!-- Create component for touch-to-edit input
+                    e.g. https://stackoverflow.com/questions/50618050/how-to-create-custom-input-component-with-ngmodel-working-in-angular-6
+                     -->
                     <input
                         (blur)="editReleaseVersion($event)"
                         (keyup.enter)="editReleaseVersion($event)"

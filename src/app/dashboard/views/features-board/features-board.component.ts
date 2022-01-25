@@ -12,7 +12,7 @@ import { WorkspaceService } from 'src/app/services/workspace.service';
 import { EmojiID } from 'src/app/models/models';
 import { AddActionService } from 'src/app/services/add-action.service';
 import { Action } from 'src/app/models/action';
-import { filter, map, switchMap, takeUntil } from 'rxjs/operators';
+import {filter, map, switchMap, takeUntil} from 'rxjs/operators';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { WorkspaceFeatures } from 'src/app/models/workspace.interface';
 import { FeaturesService } from 'src/app/services/features.service';
@@ -38,15 +38,20 @@ export class FeaturesBoardComponent implements OnInit {
     tags: Tags[] = [];
 
     features$: Observable<WorkspaceFeatures[]> = this.route.paramMap.pipe(
+        // get release ID
         map((params) => params.get('releaseId')),
         filter((releaseId): releaseId is string => !!releaseId),
+        // get features
         switchMap((releaseId) => {
             if (this.workspaceId) {
                 return this.releaseService.getReleaseFeatures(
                     releaseId,
                     this.workspaceId
+                ).pipe(
+                    // TODO: startWith(null)
                 );
             } else {
+                // TODO: Throw error instead of string
                 throw 'Not getting the WorkspaceID';
             }
         })
@@ -83,7 +88,7 @@ export class FeaturesBoardComponent implements OnInit {
     workspaceId = this.route.parent?.parent?.snapshot.paramMap.get('workspaceId');
     releaseId = '';
 
-    releaseWatcher: Subscription | null = null;
+    releaseWatcher = new Subscription();
 
     releaseUpdatedToast = false;
 
@@ -117,32 +122,35 @@ export class FeaturesBoardComponent implements OnInit {
     ngOnInit(): void {
 
 
-        this.releaseWatcher = this.route.paramMap
-            .pipe(
-                map((params) => params.get('releaseId')),
-                filter((releaseId): releaseId is string => !!releaseId)
-            )
-            .subscribe((releaseId) => {
-                this.releaseId = releaseId;
-                this.sharedChangelog.link = `http://localhost:4200/public/${this.workspaceId}/changelog/${this.releaseId}`;
-                if (this.workspaceId) {
-                    this.releaseService
-                        .getRelease(this.workspaceId, this.releaseId)
-                        .then((release) => {
-                            this.release = release;
-                            release.action
-                                ? this.addActionService.updateReleaseActionData(
-                                    release.action,
-                                    false
-                                )
-                                : this.addActionService.updateReleaseActionData(
+        this.releaseWatcher.add(
+            this.route.paramMap
+                .pipe(
+                // get release ID
+                    map((params) => params.get('releaseId')),
+                    filter((releaseId): releaseId is string => !!releaseId)
+                )
+                .subscribe((releaseId) => {
+                    this.releaseId = releaseId;
+                    this.sharedChangelog.link = `${window.location.origin}/public/${this.workspaceId}/changelog/${this.releaseId}`;
+                    if (this.workspaceId) {
+                        this.releaseService
+                            .getRelease(this.workspaceId, this.releaseId)
+                            .then((release) => {
+                                this.release = release;
+                                release.action
+                                    ? this.addActionService.updateReleaseActionData(
+                                        release.action,
+                                        false
+                                    )
+                                    : this.addActionService.updateReleaseActionData(
                                       {} as Action,
                                       false
-                                );
-                            this.textareaCharacter = release.description;
-                        });
-                }
-            });
+                                    );
+                                this.textareaCharacter = release.description;
+                            });
+                    }
+                })
+        );
         this.features$.subscribe((features) => {
             this.features = features;
             if (this.workspaceId) {

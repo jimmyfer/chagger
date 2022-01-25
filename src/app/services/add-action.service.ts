@@ -1,12 +1,9 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, empty, Observable } from 'rxjs';
-import { first } from 'rxjs/operators';
-import { Action } from '../models/action';
-import {
-    AngularFireStorage,
-    AngularFireUploadTask,
-} from '@angular/fire/compat/storage';
-import { UploadTaskSnapshot } from '@angular/fire/compat/storage/interfaces';
+import {Injectable} from '@angular/core';
+import {BehaviorSubject, empty, Observable} from 'rxjs';
+import {first} from 'rxjs/operators';
+import {Action} from '../models/action';
+import {AngularFireStorage} from '@angular/fire/compat/storage';
+import {UploadTaskSnapshot} from '@angular/fire/compat/storage/interfaces';
 
 @Injectable({
     providedIn: 'root',
@@ -43,7 +40,8 @@ export class AddActionService {
     /**
      * Constructor.
      */
-    constructor(private storage: AngularFireStorage) {}
+    constructor(private storage: AngularFireStorage) {
+    }
 
     /**
      * Make addActionComponent visible.
@@ -113,8 +111,9 @@ export class AddActionService {
         const filePath = 'actions/action_' + Date.now();
         const task = this.storage.upload(filePath, file);
         this.uploadPercent$ = task.percentageChanges();
+        // TODO: add an unsubscribe somewhere
         this.uploadPercent$.subscribe(percent => {
-            if(percent) {
+            if (percent) {
                 this.uploadPercent = percent;
             }
         });
@@ -129,13 +128,16 @@ export class AddActionService {
         // const task = this.storage.upload(filePath, file);
         const uploadedFiles: string[] = [];
         return new Promise((resolve, reject) => {
+            // TODO: Promise.all([promiseA, promiseB, ...]);
+            // FIXME: Promise might resolve before all promises are resolved
             files.forEach((file, index) => {
+                // TODO: Add user ID to file path
                 const filePath = `image_${index}${Date.now()}`;
                 this.storage.upload(filePath, file).then(resp => {
                     console.log(resp.ref.fullPath);
                     uploadedFiles.push(resp.ref.fullPath);
                 });
-                if (index === files.length -1) resolve(uploadedFiles);
+                if (index === files.length - 1) resolve(uploadedFiles);
             });
         });
     }

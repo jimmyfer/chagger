@@ -1,14 +1,14 @@
-import { Injectable, OnInit } from '@angular/core';
-import { FirestoreGenericService } from './firestore-generic.service';
+import {Injectable} from '@angular/core';
+import {FirestoreGenericService} from './firestore-generic.service';
 
-import { User, UserWorkspaces } from '../models/user.interface';
+import {User, UserWorkspaces} from '../models/user.interface';
 import {
     AngularFirestore,
     DocumentReference,
 } from '@angular/fire/compat/firestore';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import {AngularFireAuth} from '@angular/fire/compat/auth';
+import {Observable} from 'rxjs';
+import {map} from 'rxjs/operators';
 
 const collectionPath = 'users';
 
@@ -21,9 +21,11 @@ const collectionPath = 'users';
  */
 export class UserService extends FirestoreGenericService<User> {
     //This variable is set when the workspaces$ observer is get at the workspace service.
+    // TODO: Handle this with an observable
     email = '';
 
     //This variable is set when the workspaces$ observer is get at the workspace service.
+    // TODO: Handle this with an observable
     userUid = '';
 
     user$ = this.afAuth.authState;
@@ -75,6 +77,7 @@ export class UserService extends FirestoreGenericService<User> {
      * @param workspaceData New workspace data to update.
      */
     editUsersWorkspaces(workspaceData: Partial<User>): void {
+        // TODO: Add await
         this.updateDocument(workspaceData, collectionPath, this.userUid);
     }
 }

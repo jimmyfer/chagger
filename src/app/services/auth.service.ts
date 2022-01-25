@@ -1,14 +1,14 @@
-import { Injectable } from '@angular/core';
-import { first } from 'rxjs/operators';
+import {Injectable} from '@angular/core';
+import {first} from 'rxjs/operators';
 import firebase from 'firebase/compat/app';
 
-import { Router } from '@angular/router';
+import {Router} from '@angular/router';
 
-import { AngularFireAuth } from '@angular/fire/compat/auth';
+import {AngularFireAuth} from '@angular/fire/compat/auth';
 import auth = firebase.auth;
-import { WorkspaceService } from './workspace.service';
-import { UserService } from './user.service';
-import { AngularFirestore, DocumentReference } from '@angular/fire/compat/firestore';
+import {WorkspaceService} from './workspace.service';
+import {UserService} from './user.service';
+import {AngularFirestore, DocumentReference} from '@angular/fire/compat/firestore';
 
 @Injectable({
     providedIn: 'root'
@@ -36,7 +36,8 @@ export class AuthService {
         private af: AngularFirestore,
         private workspaceService: WorkspaceService,
         private userService: UserService
-    ) { }
+    ) {
+    }
 
     /**
      * Create a new user with an email given.
@@ -53,8 +54,10 @@ export class AuthService {
         }
 
         if (result.user) {
+            // TODO: Add type to this variable
             let workspace;
             try {
+                // TODO: Add await
                 workspace = this.workspaceService.create({
                     name: result.user.email as string,
                     releases: [],
@@ -62,14 +65,20 @@ export class AuthService {
                     features: []
                 });
             } catch (e) {
+                // TODO: Move console.log above throw and then throw the error or handle it (ideally handle it)
                 throw console.log(e);
             }
             try {
+                // TODO: Add await
                 this.userService.createUser({
                     email: result.user.email as string,
-                    workspaces: [{ name: 'default', ref: this.af.doc(`workspaces/${(await workspace).id}`).ref as DocumentReference }]
+                    workspaces: [{
+                        name: 'default',
+                        ref: this.af.doc(`workspaces/${(await workspace).id}`).ref as DocumentReference
+                    }]
                 });
             } catch (e) {
+                // TODO: Move console.log above throw and then throw the error or handle it (ideally handle it)
                 throw console.log(e);
             }
         }
@@ -81,7 +90,7 @@ export class AuthService {
      * Login with an email given.
      * @param email User email account.
      * @param password User password.
-     * @returns Return boolan if sucess or not.
+     * @returns Return boolean if success or not.
      */
     async signInEmail(email: string, password: string): Promise<boolean> {
         let result;
@@ -113,6 +122,7 @@ export class AuthService {
             return false;
         }
 
+        // TODO: Missing await
         this.goToUserHome();
         return true;
     }
@@ -124,6 +134,8 @@ export class AuthService {
         try {
             await this.router.navigate(['/dashboard']);
         } catch {
+            // TODO: Throw error instead of string. e.g.
+            // throw new Error('No se ha podido alcanzar el dashboard, inténtalo de nuevo.');
             throw('No se ha podido alcanzar el dashboard, intentalo de nuevo.');
         }
     }
@@ -134,11 +146,13 @@ export class AuthService {
      */
     async isLoggedIn(): Promise<boolean> {
         const authStateResp = await this.afAuth.authState.pipe(first()).toPromise();
-        const isLogged =  authStateResp ? true : false;
-        return  isLogged;
+        // TODO: replace authStateResp ? true : false with !!authStateResp
+        const isLogged = authStateResp ? true : false;
+        return isLogged;
     }
 
     /**
+     * TODO: Replace return method to a boolean (in a promise)
      * Check if user exist.
      * @param email User email.
      * @returns Return an array with text data that validate if user exist.

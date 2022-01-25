@@ -5,6 +5,7 @@ import { AuthService } from '../services/auth.service';
 @Injectable({
     providedIn: 'root'
 })
+// TODO: Small documentation to explaining what this guard is doing
 export class IsLoggedInGuard implements CanActivate {
     constructor(
     private authService: AuthService,

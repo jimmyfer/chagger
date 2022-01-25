@@ -24,12 +24,13 @@ export class WorkspaceService extends FirestoreGenericService<Workspace> {
 
     workspaces$ = this.userService.user$.pipe(
         switchMap(user => {
+            // TODO: this.userService.email = user && user.email ? user.email : '';
             user && user.email ? this.userService.email = user.email : this.userService.email = '';
             user ? this.userService.userUid = user.uid : this.userService.userUid = '';
             return user ? this.userService.getUserWorkspaces(user.uid) : of([]) ;
         })
     );
-    
+
 
     /**
      *
@@ -85,6 +86,7 @@ export class WorkspaceService extends FirestoreGenericService<Workspace> {
                         .ref as DocumentReference,
                 },
             ];
+            // TODO: Add await
             this.userService.createUser(
                 { email: this.userService.email, workspaces: workspaces }
             );
@@ -165,6 +167,7 @@ export class WorkspaceService extends FirestoreGenericService<Workspace> {
         workspaceId: string,
         releaseData: Partial<Workspace>
     ): void {
+        // TODO: Add await and make this method async
         this.updateDocument(releaseData, collectionPath, workspaceId);
     }
 
@@ -178,6 +181,7 @@ export class WorkspaceService extends FirestoreGenericService<Workspace> {
         featureData: Partial<Workspace>
     ): void {
         console.log(featureData);
+        // TODO: Add await and make this method async
         this.updateDocument(featureData, collectionPath, workspaceId);
     }
 
@@ -190,6 +194,7 @@ export class WorkspaceService extends FirestoreGenericService<Workspace> {
         tagId: string,
         tagData: Partial<Workspace>
     ): void {
+        // TODO: Add await and make this method async
         this.updateDocument(tagData, collectionPath, tagId);
     }
 }

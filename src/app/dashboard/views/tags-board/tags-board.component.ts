@@ -1,16 +1,15 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { DocumentReference } from '@angular/fire/compat/firestore';
-import { ActivatedRoute } from '@angular/router';
-import { Observable } from 'rxjs';
-import { filter, map, switchMap } from 'rxjs/operators';
-import { WorkspaceTags } from 'src/app/models/workspace.interface';
-import { TagsService } from 'src/app/services/tags.service';
-import { WorkspaceService } from 'src/app/services/workspace.service';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {DocumentReference} from '@angular/fire/compat/firestore';
+import {ActivatedRoute} from '@angular/router';
+import {Observable} from 'rxjs';
+import {filter, map, switchMap} from 'rxjs/operators';
+import {WorkspaceTags} from 'src/app/models/workspace.interface';
+import {TagsService} from 'src/app/services/tags.service';
+import {WorkspaceService} from 'src/app/services/workspace.service';
 
-import { faPalette } from '@fortawesome/free-solid-svg-icons';
+import {faPalette} from '@fortawesome/free-solid-svg-icons';
 
-import { ConfirmationService } from 'primeng/api';
-import { Tags } from 'src/app/models/tags.interface';
+import {ConfirmationService} from 'primeng/api';
 
 @Component({
     selector: 'app-tags-board',
@@ -23,17 +22,19 @@ import { Tags } from 'src/app/models/tags.interface';
  */
 export class TagsBoardComponent implements OnInit {
     tags$: Observable<WorkspaceTags[]> = this.route.paramMap.pipe(
+        // get workspace ID
         map((params) => params.get('workspaceId')),
         filter((workspaceId): workspaceId is string => !!workspaceId),
+        // get workspace tags
         switchMap((workspaceId) =>
             this.workspaceService.getWorkspaceTags(workspaceId)
         )
     );
 
-    @ViewChild('addTagInput', { static: false })
+    @ViewChild('addTagInput', {static: false})
     addTagInput: ElementRef<HTMLInputElement> = {} as ElementRef;
 
-    @ViewChild('editTagInput', { static: false })
+    @ViewChild('editTagInput', {static: false})
     editTagInput: ElementRef<HTMLInputElement> = {} as ElementRef;
 
     pickColor = faPalette;
@@ -88,6 +89,7 @@ export class TagsBoardComponent implements OnInit {
     addTagWorking = false;
 
     tags: WorkspaceTags[] = [];
+
     /**
      * Get the actual workspace.
      */
@@ -118,7 +120,8 @@ export class TagsBoardComponent implements OnInit {
         private tagsService: TagsService,
         private confirmationService: ConfirmationService,
         private route: ActivatedRoute
-    ) {}
+    ) {
+    }
 
     /**
      * ngOnInit.
@@ -190,7 +193,7 @@ export class TagsBoardComponent implements OnInit {
             data.name,
             workspace.id,
             data.ref.id,
-            { tags: tags }
+            {tags: tags}
         );
     }
 
@@ -211,7 +214,7 @@ export class TagsBoardComponent implements OnInit {
                 this.tagsService.deleteTag(
                     this.tags[tagIndex].ref.path,
                     workspace.id,
-                    { tags: this.tags },
+                    {tags: this.tags},
                     this.tags[tagIndex].name
                 );
             },
@@ -251,7 +254,7 @@ export class TagsBoardComponent implements OnInit {
      * @param tagName Tag name.
      */
     addNewTag(tagName: string): void {
-        if(this.workspaceId) {
+        if (this.workspaceId) {
             this.tagsService.addNewTag(
                 {
                     name: '#' + tagName,
@@ -259,7 +262,7 @@ export class TagsBoardComponent implements OnInit {
                     color: '#D3D3D3',
                 },
                 this.workspaceId,
-                { tags: this.tags }
+                {tags: this.tags}
             );
         } else {
             console.warn('There is not any workspace ID');
@@ -286,7 +289,7 @@ export class TagsBoardComponent implements OnInit {
                     tags: this.tags,
                 }
             );
-        }else {
+        } else {
             console.warn('There is not any workspace ID.');
         }
     }
@@ -299,7 +302,7 @@ export class TagsBoardComponent implements OnInit {
      */
     pickTagColor(e: Event, tagColor: string, tagIndex: number): void {
         e.preventDefault();
-        if(this.workspaceId) {
+        if (this.workspaceId) {
             this.tagsService.updateTag(
                 {
                     name: this.tags[tagIndex].name,
@@ -313,7 +316,7 @@ export class TagsBoardComponent implements OnInit {
                     tags: this.tags,
                 }
             );
-        }else {
+        } else {
             console.warn('There is not any workspace ID');
         }
     }

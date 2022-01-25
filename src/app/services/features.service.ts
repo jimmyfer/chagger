@@ -1,14 +1,14 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {
     AngularFirestore,
     DocumentReference,
 } from '@angular/fire/compat/firestore';
-import { first } from 'rxjs/operators';
-import { Feature } from '../models/feature.interface';
-import { Workspace, WorkspaceFeatures } from '../models/workspace.interface';
-import { FirestoreGenericService } from './firestore-generic.service';
-import { ReleasesService } from './releases.service';
-import { WorkspaceService } from './workspace.service';
+import {first} from 'rxjs/operators';
+import {Feature} from '../models/feature.interface';
+import {Workspace} from '../models/workspace.interface';
+import {FirestoreGenericService} from './firestore-generic.service';
+import {ReleasesService} from './releases.service';
+import {WorkspaceService} from './workspace.service';
 
 const collectionPath = 'features';
 
@@ -56,7 +56,7 @@ export class FeaturesService extends FirestoreGenericService<Feature> {
                         title: '',
                         autoplay: false,
                         muted: false,
-                        startOn: { hour: 0, minute: 0, second: 0 },
+                        startOn: {hour: 0, minute: 0, second: 0},
                     },
                 },
             },
@@ -119,7 +119,7 @@ export class FeaturesService extends FirestoreGenericService<Feature> {
         if (workspace.features) {
             workspace.features[featureIndex].tag = data.tag;
             workspace.features[featureIndex].description = data.description;
-            
+
             this.workspaceService.editWorkspaceFeature(workspaceId, workspace);
             this.releasesService.editReleaseFeature(
                 workspaceId,

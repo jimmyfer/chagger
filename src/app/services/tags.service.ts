@@ -1,15 +1,14 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {
     AngularFirestore,
     DocumentReference,
 } from '@angular/fire/compat/firestore';
-import { ActivatedRoute } from '@angular/router';
-import { Observable } from 'rxjs';
-import { filter, first, map, switchMap } from 'rxjs/operators';
-import { Tags } from '../models/tags.interface';
-import { Workspace, WorkspaceTags } from '../models/workspace.interface';
-import { FirestoreGenericService } from './firestore-generic.service';
-import { WorkspaceService } from './workspace.service';
+import {ActivatedRoute} from '@angular/router';
+import {first} from 'rxjs/operators';
+import {Tags} from '../models/tags.interface';
+import {Workspace} from '../models/workspace.interface';
+import {FirestoreGenericService} from './firestore-generic.service';
+import {WorkspaceService} from './workspace.service';
 
 const collectionPath = 'tags';
 
@@ -49,6 +48,7 @@ export class TagsService extends FirestoreGenericService<Tags> {
         tagId: string,
         workspace: Partial<Workspace>
     ): void {
+        // TODO: Add await
         this.updateDocument(data, `workspaces/${workspaceId}/tags`, tagId);
 
         if (workspace.tags) {
@@ -80,6 +80,7 @@ export class TagsService extends FirestoreGenericService<Tags> {
         workspace: Partial<Workspace>,
         actualName: string
     ): void {
+        // TODO: Add await
         this.deleteDocument(
             `${tagPath.split('/')[0]}/${tagPath.split('/')[1]}/${
                 tagPath.split('/')[2]
@@ -92,6 +93,7 @@ export class TagsService extends FirestoreGenericService<Tags> {
             );
             workspace.tags?.splice(actualTagIndex, 1);
         } else {
+            // TODO: Throw error instead of string
             throw 'There is not Tags!';
         }
         this.workspaceService.editWorkspaceRelease(
@@ -124,6 +126,7 @@ export class TagsService extends FirestoreGenericService<Tags> {
                 emojiId: data.emojiId,
                 color: data.color,
             });
+            // TODO: Add await
             this.workspaceService.editWorkspaceRelease(workspaceId, workspace);
         } catch (e) {
             console.log(e);

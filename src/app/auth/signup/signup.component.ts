@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component} from '@angular/core';
 
 import {
     FormGroup,
@@ -9,7 +9,7 @@ import {
     AbstractControl,
     ValidatorFn,
 } from '@angular/forms';
-import { AuthService } from 'src/app/services/auth.service';
+import {AuthService} from 'src/app/services/auth.service';
 
 @Component({
     selector: 'app-signup',
@@ -40,10 +40,11 @@ export class SignupComponent {
     signUpState = true;
 
     /**
-     * 
+     *
      * @param authService The service to handle auth conections.
      */
-    constructor(private authService: AuthService) {}
+    constructor(private authService: AuthService) {
+    }
 
     /**
      * Check if password and confirm password match.
@@ -51,8 +52,8 @@ export class SignupComponent {
      */
     passwordMatch(): ValidatorFn {
         return (): ValidationErrors | null => {
-            if(this.password.value == this.passwordConfirm.value) {
-                return { dontMatch: true };
+            if (this.password.value == this.passwordConfirm.value) {
+                return {dontMatch: true};
             }
             return null;
         };
@@ -68,7 +69,7 @@ export class SignupComponent {
                 .checkUserExist(this.email.value)
                 .then((resp) => {
                     if (resp.length) {
-                        return { emailExist: true };
+                        return {emailExist: true};
                     }
                     return null;
                 });
@@ -80,7 +81,7 @@ export class SignupComponent {
      */
     async onSignUp(): Promise<void> {
         this.signUpState = true;
-        const { email, password } = this.signUpForm.value;
+        const {email, password} = this.signUpForm.value;
         this.signUpState = await this.authService.signUpEmail(email, password);
     }
 }

@@ -21,6 +21,8 @@
                                 {{ tag.name }}
                             </span>
 
+                            <!-- TODO: Move color picker to a new component for re-usability -->
+                            <!-- TODO: Allow click on the palette-color-block to select a new color too -->
                             <div [style.background-color]="tag.color" class="palette-color-block mr-1 ml-2" ></div>
                             <div class="mx-1" ngbDropdown>
                                 <a

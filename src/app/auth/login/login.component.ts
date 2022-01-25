@@ -26,6 +26,7 @@ export class LoginComponent implements OnInit {
       this.signInState = true;
       const { email, password } = this.logInForm.value;
       this.signInState = await this.authService.signInEmail(email, password);
+      // FIXME: missing navigation maybe?
   }
 
 }
