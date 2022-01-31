@@ -4,6 +4,11 @@
 }
 
 #console {
+    opacity: 0;
+    &.open {
+        opacity: 1;
+    }
+    transition: opacity 0.5s ease;
     .console-release {
         .console-release-title {
             padding: 5px;
@@ -14,6 +19,13 @@
             textarea {
                 width: 100%;
                 height: 100px;
+                resize: none;
+                padding: 12px 15px;
+                margin: 0;
+            }
+            .release-description-content {
+                background-color: #eee4e1;
+                padding: 20px 14px;
             }
         }
     }

@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ReleasesService } from 'src/app/services/releases.service';
 import { DocumentReference } from '@angular/fire/compat/firestore';
 
@@ -22,7 +22,9 @@ import { filter, map, switchMap } from 'rxjs/operators';
 /**
  *
  */
-export class ReleasesBoardComponent {
+export class ReleasesBoardComponent implements OnInit {
+    active = false;
+
     releases$: Observable<WorkspaceRelease[]> = this.route.paramMap.pipe(
         map((params) => params.get('workspaceId')),
         filter((workspaceId): workspaceId is string => !!workspaceId),
@@ -78,6 +80,15 @@ export class ReleasesBoardComponent {
         private confirmationService: ConfirmationService,
         private route: ActivatedRoute
     ) {}
+
+    /**
+     * ngOnInit.
+     */
+    ngOnInit(): void {
+        setTimeout(() => {
+            this.active = true;
+        }, 200);
+    }
 
     /**
      * New release interface toggler from link to input and vice versa.
@@ -259,7 +270,7 @@ export class ReleasesBoardComponent {
                 .getWorkspaceReleasesOnce(this.workspaceId)
                 .then((releases) => {
                     releases.map((release, index) => {
-                        if(release.version == newVersion) {
+                        if (release.version == newVersion) {
                             this.workspaceReleaseIndex = index;
                         }
                     });
@@ -270,16 +281,20 @@ export class ReleasesBoardComponent {
                                 'I know i am a good release, dont you think?',
                             emojiId: actualEmoji,
                             features: features,
-                            action: {type: '', link: '', options: {
-                                title: '',
-                                autoplay: false,
-                                muted: false,
-                                startOn: {
-                                    hour: 0,
-                                    minute: 0,
-                                    second: 0
-                                }
-                            }}
+                            action: {
+                                type: '',
+                                link: '',
+                                options: {
+                                    title: '',
+                                    autoplay: false,
+                                    muted: false,
+                                    startOn: {
+                                        hour: 0,
+                                        minute: 0,
+                                        second: 0,
+                                    },
+                                },
+                            },
                         },
                         this.workspaceReleaseIndex,
                         workspace.id,

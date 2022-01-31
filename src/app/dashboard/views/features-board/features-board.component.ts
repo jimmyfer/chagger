@@ -35,6 +35,9 @@ import { SharedChangelogService } from 'src/app/services/shared-changelog.servic
  *
  */
 export class FeaturesBoardComponent implements OnInit {
+
+    active = false;
+
     _releaseId = this.route.paramMap.pipe(
         map((params) => params.get('releaseId')),
         filter((releaseId): releaseId is string => !!releaseId)
@@ -63,6 +66,9 @@ export class FeaturesBoardComponent implements OnInit {
     workspaceReleaseIndex = 0;
 
     checkEditFeatureDescription: [{ toggle?: boolean }] = [{}];
+    checkEditReleaseDescription = false;
+
+    editReleaseDescriptionWorking = false;
     editFeatureWorking = false;
 
     // WORKING
@@ -74,6 +80,9 @@ export class FeaturesBoardComponent implements OnInit {
 
     @ViewChild('editFeatureDescriptionTextarea', { static: false })
     editFeatureDescriptionTextarea: ElementRef<HTMLTextAreaElement> = {} as ElementRef;
+
+    @ViewChild('editReleaseDescriptionTextarea', { static: false })
+    editReleaseDescriptionTextarea: ElementRef<HTMLTextAreaElement> = {} as ElementRef;
 
     actionPlay = faPlay;
     addCommit = faPlus;
@@ -103,76 +112,83 @@ export class FeaturesBoardComponent implements OnInit {
      * ngOnInit - Watch for parameters change and update the release data on featureBoardComponent.
      */
     ngOnInit(): void {
+        setTimeout(() => {
+            this.active = true;
+        }, 200);
+
         //Get workspaceId and ReleaseId from params.
-        Promise.all([
-            this._workspaceId.pipe(first()).toPromise(),
-            this._releaseId.pipe(first()).toPromise(),
-        ]).then((dataId) => {
-            [this.workspaceId, this.releaseId] = dataId;
-
-            // Set changelog link.
-            this.sharedChangelog.link = `${window.location.origin}/public/${this.workspaceId}/changelog/${this.releaseId}`;
-
-            // Get release.
-            this.releaseService
-                .getRelease(this.workspaceId, this.releaseId)
-                .then((release) => {
-                    this.release = release;
-                    this.textareaCharacter = this.release.description;
-                    release.features.map(() => {
-                        this.checkEditFeatureDescription.push({
-                            toggle: false,
+        this._releaseId.subscribe(() => {
+            Promise.all([
+                this._workspaceId.pipe(first()).toPromise(),
+                this._releaseId.pipe(first()).toPromise(),
+            ]).then((dataId) => {
+                [this.workspaceId, this.releaseId] = dataId;
+    
+                // Set changelog link.
+                this.sharedChangelog.link = `${window.location.origin}/public/${this.workspaceId}/changelog/${this.releaseId}`;
+    
+                // Get release.
+                this.releaseService
+                    .getRelease(this.workspaceId, this.releaseId)
+                    .then((release) => {
+                        this.release = release;
+                        this.textareaCharacter = this.release.description;
+                        release.features.map(() => {
+                            this.checkEditFeatureDescription.push({
+                                toggle: false,
+                            });
                         });
-                    });
-                    // Get the features array reference on workspace.
-                    this.workspaceService
-                        .getWorkspaceFeatures(this.workspaceId)
-                        .subscribe((workspaceFeatures) => {
-                            this.workspaceFeature = workspaceFeatures;
-                            // Gets all the features data.
-                            this.featureService
-                                .getFeaturesDocumentsData(
-                                    {
-                                        features: release.features,
-                                    },
-                                    this.workspaceId
-                                )
-                                .then((features) => {
-                                    this.features = features;
-                                    this.tagsService
-                                        .getTags(this.workspaceId)
-                                        .then((tags) => {
-                                            this.tags = tags;
-                                            // Get releases array from workspace.
-                                            this.workspaceService
-                                                .getWorkspaceReleases(
-                                                    this.workspaceId
-                                                )
-                                                .pipe(first())
-                                                .toPromise()
-                                                .then((workspaceReleases) => {
-                                                    this.workspaceReleases =
-                                                        workspaceReleases;
-                                                    this.workspaceReleases.map(
-                                                        (
-                                                            releaseData,
-                                                            index
-                                                        ) => {
-                                                            if (
-                                                                releaseData.version ==
-                                                                this.release
-                                                                    .version
-                                                            ) {
-                                                                this.workspaceReleaseIndex =
-                                                                    index;
+                        // Get the features array reference on workspace.
+                        this.releaseService
+                            .getReleaseFeatures(this.releaseId, this.workspaceId)
+                            .subscribe((workspaceFeatures) => {
+                                console.log(workspaceFeatures);
+                                this.workspaceFeature = workspaceFeatures;
+                                // Gets all the features data.
+                                this.featureService
+                                    .getFeaturesDocumentsData(
+                                        {
+                                            features: release.features,
+                                        },
+                                        this.workspaceId
+                                    )
+                                    .then((features) => {
+                                        this.features = features;
+                                        this.tagsService
+                                            .getTags(this.workspaceId)
+                                            .then((tags) => {
+                                                this.tags = tags;
+                                                // Get releases array from workspace.
+                                                this.workspaceService
+                                                    .getWorkspaceReleases(
+                                                        this.workspaceId
+                                                    )
+                                                    .pipe(first())
+                                                    .toPromise()
+                                                    .then((workspaceReleases) => {
+                                                        this.workspaceReleases =
+                                                            workspaceReleases;
+                                                        this.workspaceReleases.map(
+                                                            (
+                                                                releaseData,
+                                                                index
+                                                            ) => {
+                                                                if (
+                                                                    releaseData.version ==
+                                                                    this.release
+                                                                        .version
+                                                                ) {
+                                                                    this.workspaceReleaseIndex =
+                                                                        index;
+                                                                }
                                                             }
-                                                        }
-                                                    );
-                                                });
-                                        });
-                                });
-                        });
-                });
+                                                        );
+                                                    });
+                                            });
+                                    });
+                            });
+                    });
+            });
         });
         this.addActionService.currentFeatureActionData.subscribe(
             (actionData) => {
@@ -234,6 +250,40 @@ export class FeaturesBoardComponent implements OnInit {
                 this.editReleaseWorking = true;
                 this.release.version =
                     this.editReleaseVersionInput.nativeElement.value;
+                this.updateRelease();
+                break;
+        }
+    }
+
+    /**
+     * Release title toggler from text to input and edit the release version.
+     * @param e Click, Focus and Enter Key event handler.
+     */
+    editReleaseDescription(e: Event): void {
+        e.preventDefault();
+        console.log(e.type);
+        switch (e.type) {
+            case 'click':
+                this.checkEditReleaseDescription = true;
+                setTimeout(() => {
+                    this.editReleaseDescriptionTextarea.nativeElement.focus();
+                });
+                break;
+            case 'blur':
+                console.log('HELOOOOO!');
+                if (!this.editReleaseDescriptionWorking) {
+                    this.checkEditReleaseDescription = false;
+                    this.release.description =
+                        this.editReleaseDescriptionTextarea.nativeElement.value;
+                    this.updateRelease();
+                }
+                this.editReleaseDescriptionWorking = false;
+                break;
+            case 'keyup':
+                this.checkEditReleaseDescription = false;
+                this.editReleaseDescriptionWorking = true;
+                this.release.description =
+                    this.editReleaseDescriptionTextarea.nativeElement.value;
                 this.updateRelease();
                 break;
         }

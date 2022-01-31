@@ -1,5 +1,5 @@
-<div class="d-flex h-100">
-    <div id="release-bar">
+<div class="release d-flex h-100">
+    <div id="release-bar" [ngClass]="{'release-open': active}" >
         <div class="d-flex flex-column h-100">
             <div class="release-bar-header text-center p-2 mt-4">
                 <h1 class="bar-header-title">Active Releases</h1>
@@ -9,15 +9,16 @@
                     <li
                         *ngFor="let release of releases, index as i"
                         class="
-                            release-version release-version-active
+                            release-version
                             d-flex
                             justify-content-between
                             px-2
                         "
+                        routerLinkActive="release-version-active" [routerLinkActiveOptions]="{exact: true}"
                     >
-                        <div class="release-version-title d-flex">
-                            <a [routerLink]="[ '/workspaces', activeWorkspace.id, 'releases', release.ref.id ]">
-                                <ngx-emoji class="pr-1" [emoji]="release.emojiId" set="apple"></ngx-emoji>
+                        <div class="release-version-title flex-grow-1 d-flex">
+                            <a class="d-flex justify-content-center" [routerLink]="[ '/workspaces', activeWorkspace.id, 'releases', release.ref.id ]">
+                                <ngx-emoji class="px-2" [emoji]="release.emojiId" set="apple"></ngx-emoji>
                             
                             <span *ngIf="!editRelease[i]; else editReleaseVersionInputTemp">
                                 {{ release.version }}
@@ -47,7 +48,7 @@
                             </a>
     
                             <div
-                                class="dropdown-menu"
+                                class="dropdown-menu edit-release"
                                 aria-labelledby="releaseDropdownMenu"
                             >
                                 <a
@@ -87,12 +88,6 @@
                     flex-grow-1
                 "
             >
-                <button
-                    type="button"
-                    class="btn btn-gradient-primary btn-footer mx-4"
-                >
-                    New Release
-                </button>
             </div>
         </div>
     </div>

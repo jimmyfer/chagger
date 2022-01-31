@@ -53,28 +53,20 @@
                     color: #414141;
                 }
                 .release-title:hover {
-                    text-decoration: underline;
+                    color: #de4c36;
                 }
             }
         }
     }
     .main-bar-footer {
         .btn-footer {
-            width: 100%;
+            // width: 100%;
+            background-color: #de4c36;
+            background-image: none;
         }
-    }
-}
-
-/* Animations */
-
-@keyframes releaseBarSlide {
-    from {
-        transform: scaleX(0);
-        transform-origin: left;
-    }
-    to {
-        transform: scaleX(1);
-        transform-origin: left;
+        .btn-footer:hover {
+            background-color: #c7432f;
+        }
     }
 }
 

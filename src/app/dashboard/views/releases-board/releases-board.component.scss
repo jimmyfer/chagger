@@ -1,8 +1,16 @@
+.release {
+    overflow: hidden;
+}
 #release-bar {
     border-left: 1px solid #d0d7de;
     border-right: 1px solid #d0d7de;
-    animation-name: releaseBarSlide;
-    animation-duration: 0.5s;
+    transform: translateX(-100%);
+    opacity: 0;
+    &.release-open {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    transition: transform 0.5s ease;
     .release-bar-header {
         .bar-header-title {
             font-size: 2rem;
@@ -15,12 +23,12 @@
             padding: 0;
             margin: 0;
             .release-version {
+
                 .release-version-title,
                 .release-version-menu {
                     padding: 5px;
                     font-size: 1.2rem;
                     font-weight: 600;
-                    color: #414141;
                 }
 
                 .release-version-title {
@@ -40,16 +48,39 @@
                         outline: 0;
                     }
                 }
-
+                a {
+                    text-decoration: none;
+                    color: #de4c36;
+                    width: 100%;
+                }
                 .release-version-menu {
                     text-decoration: none;
                 }
                 .release-version-menu:hover {
-                    color: #999999;
+                    color: #de4c36;
+                }
+
+                &:hover {
+                    background-color: #de4c3694;
+                    a {
+                        color: #FFFFFF;
+                    }
+                }
+                .edit-release {
+                    a {
+                        color: #de4c36;
+                    }
+                    a:hover {
+                        background-color: #de4c36;
+                        color: #FFFFFF;
+                    }
                 }
             }
             .release-version-active {
                 background-color: #de4c3694;
+                    a {
+                        color: #FFFFFF;
+                    }
             }
         }
     }

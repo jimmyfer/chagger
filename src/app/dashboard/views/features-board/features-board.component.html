@@ -1,5 +1,5 @@
 <p-toast></p-toast>
-<div id="console">
+<div id="console" [ngClass]="{ open: active }">
     <!-- Feature Board: Release edit -->
     <div class="container">
         <div class="console-release m-1">
@@ -55,33 +55,41 @@
             </div>
             <div class="d-flex align-items-start">
                 <div class="console-release-description flex-grow-1">
-                    <textarea
-                        [(ngModel)]="textareaCharacter"
-                        name=""
-                        id=""
-                        cols="30"
-                        rows="10"
-                    >
- {{ release.description }} </textarea
-                    >
-                    <div class="d-flex justify-content-between">
-                        <span
-                            [ngClass]="
-                                textareaCharacter.length > 250
-                                    ? 'text-danger'
-                                    : ''
-                            "
-                        >
-                            {{ textareaCharacter.length }}/250</span
-                        >
-                        <button
-                            type="button"
-                            class="btn btn-gradient-primary btn-footer mx-4"
-                            (click)="updateRelease()"
-                        >
-                            Update
-                        </button>
+                    <div class="release-description-content" *ngIf="!checkEditReleaseDescription; else editReleaseDescriptionTemp" >
+                        <a href="#" (click)="editReleaseDescription($event)">
+                            <fa-icon
+                                [icon]="editInput"
+                                transform="shrink-4"
+                                class="float-right"
+                            ></fa-icon>
+                        </a>
+                        <textarea disabled readonly name="" id="" cols="30" rows="10">{{ release.description }}</textarea>
                     </div>
+                    <ng-template #editReleaseDescriptionTemp>
+                        <textarea
+                            #editReleaseDescriptionTextarea
+                            (blur)="editReleaseDescription($event)"
+                            (keyup.enter)="editReleaseDescription($event)"
+                            [(ngModel)]="textareaCharacter"
+                            name=""
+                            id=""
+                            cols="30"
+                            rows="10"
+                        >
+ {{ release.description }} </textarea
+                        >
+                        <div class="d-flex justify-content-between">
+                            <span
+                                [ngClass]="
+                                    textareaCharacter.length > 250
+                                        ? 'text-danger'
+                                        : ''
+                                "
+                            >
+                                {{ textareaCharacter.length }}/250</span
+                            >
+                        </div>
+                    </ng-template>
                 </div>
                 <div
                     class="console-release-embed d-flex flex-column justify-content-center align-items-center mx-4"
@@ -122,26 +130,23 @@
                     </div>
                 </div>
                 <a
-                                    id="emojiSearchToggle"
-                                    data-toggle="dropdown"
-                                    aria-haspopup="true"
-                                    aria-expanded="false"
-                                    href="#"
-                                >
-                                    <ngx-emoji
-                                        class="pr-1"
-                                        [emoji]="feature.emojiId"
-                                        set="apple"
-                                    ></ngx-emoji>
-                                </a>
-                                <div
-                                    class="dropdown-menu"
-                                    aria-labelledby="emojiSearchToggle"
-                                >
-                                    <emoji-mart
-                                        (emojiClick)="addFeatureEmoji($event, i)"
-                                    ></emoji-mart>
-                                </div>
+                    id="emojiSearchToggle"
+                    data-toggle="dropdown"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                    href="#"
+                >
+                    <ngx-emoji
+                        class="pr-1"
+                        [emoji]="feature.emojiId"
+                        set="apple"
+                    ></ngx-emoji>
+                </a>
+                <div class="dropdown-menu" aria-labelledby="emojiSearchToggle">
+                    <emoji-mart
+                        (emojiClick)="addFeatureEmoji($event, i)"
+                    ></emoji-mart>
+                </div>
                 <div class="commits-feature mx-2">
                     <div ngbDropdown>
                         <a
@@ -154,7 +159,10 @@
                             <span
                                 class="commits-feature-title dropdown-toggle m-4"
                                 >{{
-                                    this.workspaceFeature.length == 0 ? '#SetTag' : this.workspaceFeature[i].tag
+                                    !this.workspaceFeature[i].tag &&
+                                    this.workspaceFeature[i].tag == ""
+                                        ? "#SetTag"
+                                        : this.workspaceFeature[i].tag
                                 }}</span
                             >
                         </a>
