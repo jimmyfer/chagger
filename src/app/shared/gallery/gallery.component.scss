@@ -1,0 +1,22 @@
+#chagger-gallery {
+    width: 100vw;
+    height: 100vh;
+    background-color: #ffffff80;
+    position: fixed;
+    z-index: 1;
+    .close-gallery {
+        a {
+            color: #de4c36;
+            font-size: 2rem;
+        }
+        a:hover {
+            color: #a73827;
+        }
+    }
+    .gallery-title {
+        font-size: 2rem;
+    }
+    .spinner-border {
+        color: #de4c36;
+    }
+}

@@ -41,15 +41,15 @@ export class TagsService extends FirestoreGenericService<Tags> {
      * @param tagId Actual tag ID document.
      * @param workspace Tags array from the actual workspace.
      */
-    updateTag(
+    async updateTag(
         data: Tags,
         actualName: string,
         workspaceId: string,
         tagId: string,
         workspace: Partial<Workspace>
-    ): void {
-        // TODO: Add await
-        this.updateDocument(data, `workspaces/${workspaceId}/tags`, tagId);
+    ): Promise<void> {
+        
+        await this.updateDocument(data, `workspaces/${workspaceId}/tags`, tagId);
 
         if (workspace.tags) {
             const newTags = workspace.tags.map((tag) => {
@@ -74,14 +74,14 @@ export class TagsService extends FirestoreGenericService<Tags> {
      * @param workspace The actual tags array in the workspace.
      * @param actualName The actual name of the tag.
      */
-    deleteTag(
+    async deleteTag(
         tagPath: string,
         workspaceId: string,
         workspace: Partial<Workspace>,
         actualName: string
-    ): void {
-        // TODO: Add await
-        this.deleteDocument(
+    ): Promise<void> {
+        
+        await this.deleteDocument(
             `${tagPath.split('/')[0]}/${tagPath.split('/')[1]}/${
                 tagPath.split('/')[2]
             }`,
@@ -93,8 +93,7 @@ export class TagsService extends FirestoreGenericService<Tags> {
             );
             workspace.tags?.splice(actualTagIndex, 1);
         } else {
-            // TODO: Throw error instead of string
-            throw 'There is not Tags!';
+            throw new Error('There is not Tags!');
         }
         this.workspaceService.editWorkspaceRelease(
             tagPath.split('/')[1],
@@ -126,8 +125,8 @@ export class TagsService extends FirestoreGenericService<Tags> {
                 emojiId: data.emojiId,
                 color: data.color,
             });
-            // TODO: Add await
-            this.workspaceService.editWorkspaceRelease(workspaceId, workspace);
+            
+            await this.workspaceService.editWorkspaceRelease(workspaceId, workspace);
         } catch (e) {
             console.log(e);
             console.log('error!!');

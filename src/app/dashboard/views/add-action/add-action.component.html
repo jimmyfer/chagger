@@ -144,6 +144,13 @@
                         (onSelect)="updateSelectedFiles($event)"
                         (onProgress)="progressReport($event)"
                     ></p-fileUpload>
+                    <ngb-progressbar
+                            type="info"
+                            [value]="uploadFilesPercent"
+                            [striped]="true"
+                            [animated]="true"
+                            ><i>{{ uploadFilesPercent }}%</i></ngb-progressbar
+                        >
                 </ng-container>
             </div>
         </div>
@@ -153,14 +160,15 @@
                 (click)="closeAddAction()"
                 class="btn btn-primary float-left"
             >
-                {{ uploadPercent == 100 ? "Close" : "Cancel" }}
+                {{ uploadPercent == 100 || uploadFilesPercent == 100 ? "Close" : "Cancel" }}
             </button>
             <button
+            *ngIf="!(uploadPercent == 100 || uploadFilesPercent == 100)"
                 type="submit"
                 (click)="returnAction($event)"
                 class="btn btn-primary float-right"
             >
-                {{ actionTypeCheck == "file" ? "Upload" : "Save Changes" }}
+                {{ actionTypeCheck == "file" || actionTypeCheck == 'gallery' ? "Upload" : "Save Changes" }}
             </button>
         </div>
     </div>

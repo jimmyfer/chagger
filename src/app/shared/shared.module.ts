@@ -10,13 +10,19 @@ import { EmojiModule } from '@ctrl/ngx-emoji-mart/ngx-emoji';
 import { ToastModule } from 'primeng/toast';
 import { ChangelogShareComponent } from './changelog-share/changelog-share.component';
 import { FormsModule } from '@angular/forms';
+import { ColorPickerComponent } from './color-picker/color-picker.component';
+import { GalleryComponent } from './gallery/gallery.component';
+import {GalleriaModule} from 'primeng/galleria';
+
 
 @NgModule({
     declarations: [
         ButtonActionComponent,
         EmojiPickerComponent,
         VideoPlayerComponent,
-        ChangelogShareComponent
+        ChangelogShareComponent,
+        ColorPickerComponent,
+        GalleryComponent
 
     ],
     imports: [
@@ -27,6 +33,8 @@ import { FormsModule } from '@angular/forms';
         EmojiModule,
         ToastModule,
         FormsModule,
+        GalleriaModule
+        
         
     ],
     exports: [
@@ -38,7 +46,9 @@ import { FormsModule } from '@angular/forms';
         NgbModule,
         PickerModule,
         EmojiModule,
-        ToastModule
+        ToastModule,
+        ColorPickerComponent,
+        GalleryComponent
     ]
 })
 

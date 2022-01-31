@@ -11,10 +11,11 @@ import { ActivatedRoute } from '@angular/router';
 import { WorkspaceService } from 'src/app/services/workspace.service';
 import { EmojiID } from 'src/app/models/models';
 import { AddActionService } from 'src/app/services/add-action.service';
-import { Action } from 'src/app/models/action';
-import {filter, map, switchMap, takeUntil} from 'rxjs/operators';
-import { Observable, Subject, Subscription } from 'rxjs';
-import { WorkspaceFeatures } from 'src/app/models/workspace.interface';
+import { filter, first, map } from 'rxjs/operators';
+import {
+    WorkspaceFeatures,
+    WorkspaceRelease,
+} from 'src/app/models/workspace.interface';
 import { FeaturesService } from 'src/app/services/features.service';
 import { TagsService } from 'src/app/services/tags.service';
 import { Tags } from 'src/app/models/tags.interface';
@@ -34,32 +35,37 @@ import { SharedChangelogService } from 'src/app/services/shared-changelog.servic
  *
  */
 export class FeaturesBoardComponent implements OnInit {
+    _releaseId = this.route.paramMap.pipe(
+        map((params) => params.get('releaseId')),
+        filter((releaseId): releaseId is string => !!releaseId)
+    );
+
+    releaseId = '';
+
+    _workspaceId = this.route.paramMap.pipe(
+        map((params) => params.get('workspaceId')),
+        filter((releaseId): releaseId is string => !!releaseId)
+    );
+
+    workspaceId = '';
+
+    workspaceReleases: WorkspaceRelease[] = [];
+    workspaceFeature: WorkspaceFeatures[] = [];
+
+    release: Releases = {} as Releases;
+
+    features: Feature[] = [];
 
     tags: Tags[] = [];
 
-    features$: Observable<WorkspaceFeatures[]> = this.route.paramMap.pipe(
-        // get release ID
-        map((params) => params.get('releaseId')),
-        filter((releaseId): releaseId is string => !!releaseId),
-        // get features
-        switchMap((releaseId) => {
-            if (this.workspaceId) {
-                return this.releaseService.getReleaseFeatures(
-                    releaseId,
-                    this.workspaceId
-                ).pipe(
-                    // TODO: startWith(null)
-                );
-            } else {
-                // TODO: Throw error instead of string
-                throw 'Not getting the WorkspaceID';
-            }
-        })
-    );
+    releaseUpdatedToast = false;
 
-    features: WorkspaceFeatures[] = [];
+    workspaceReleaseIndex = 0;
 
-    featuresData: Feature[] = [];
+    checkEditFeatureDescription: [{ toggle?: boolean }] = [{}];
+    editFeatureWorking = false;
+
+    // WORKING
 
     textareaCharacter = '';
 
@@ -77,30 +83,7 @@ export class FeaturesBoardComponent implements OnInit {
     checkEditReleaseVersion = false;
     editReleaseWorking = false;
 
-    release: Releases = {
-        version: '',
-        description: '',
-        emojiId: '',
-        features: [],
-    };
-    oldReleaseVersion = '';
-
-    workspaceId = this.route.parent?.parent?.snapshot.paramMap.get('workspaceId');
-    releaseId = '';
-
-    releaseWatcher = new Subscription();
-
-    releaseUpdatedToast = false;
-
-    releaseActionData: Action | null = null;
-
-    featureEmojiId: string[] = [];
-    featureActionData: Action[] = [];
-
-    checkEditFeatureDescription: [{ toggle?: boolean }] = [{}];
-    editFeatureWorking = false;
-
-    unsubscribeSignal: Subject<void> = new Subject();
+    // unsubscribeSignal: Subject<void> = new Subject();
 
     /**
      * Constructor.
@@ -120,107 +103,108 @@ export class FeaturesBoardComponent implements OnInit {
      * ngOnInit - Watch for parameters change and update the release data on featureBoardComponent.
      */
     ngOnInit(): void {
+        //Get workspaceId and ReleaseId from params.
+        Promise.all([
+            this._workspaceId.pipe(first()).toPromise(),
+            this._releaseId.pipe(first()).toPromise(),
+        ]).then((dataId) => {
+            [this.workspaceId, this.releaseId] = dataId;
 
+            // Set changelog link.
+            this.sharedChangelog.link = `${window.location.origin}/public/${this.workspaceId}/changelog/${this.releaseId}`;
 
-        this.releaseWatcher.add(
-            this.route.paramMap
-                .pipe(
-                // get release ID
-                    map((params) => params.get('releaseId')),
-                    filter((releaseId): releaseId is string => !!releaseId)
-                )
-                .subscribe((releaseId) => {
-                    this.releaseId = releaseId;
-                    this.sharedChangelog.link = `${window.location.origin}/public/${this.workspaceId}/changelog/${this.releaseId}`;
-                    if (this.workspaceId) {
-                        this.releaseService
-                            .getRelease(this.workspaceId, this.releaseId)
-                            .then((release) => {
-                                this.release = release;
-                                release.action
-                                    ? this.addActionService.updateReleaseActionData(
-                                        release.action,
-                                        false
-                                    )
-                                    : this.addActionService.updateReleaseActionData(
-                                      {} as Action,
-                                      false
-                                    );
-                                this.textareaCharacter = release.description;
-                            });
-                    }
-                })
-        );
-        this.features$.subscribe((features) => {
-            this.features = features;
-            if (this.workspaceId) {
-                this.featureService
-                    .getFeaturesDocumentsData(
-                        { features: features },
-                        this.workspaceId
-                    )
-                    .then((features) => {
-                        this.featuresData = features;
+            // Get release.
+            this.releaseService
+                .getRelease(this.workspaceId, this.releaseId)
+                .then((release) => {
+                    this.release = release;
+                    this.textareaCharacter = this.release.description;
+                    release.features.map(() => {
+                        this.checkEditFeatureDescription.push({
+                            toggle: false,
+                        });
                     });
-            }
-
-            features.forEach((feature, index) => {
-                this.featureService.getFeature(feature.ref).then((feature) => {
-                    this.checkEditFeatureDescription.push({ toggle: false });
-                    this.addActionService.updateFeatureActionData(
-                        feature.action,
-                        false
-                    );
+                    // Get the features array reference on workspace.
+                    this.workspaceService
+                        .getWorkspaceFeatures(this.workspaceId)
+                        .subscribe((workspaceFeatures) => {
+                            this.workspaceFeature = workspaceFeatures;
+                            // Gets all the features data.
+                            this.featureService
+                                .getFeaturesDocumentsData(
+                                    {
+                                        features: release.features,
+                                    },
+                                    this.workspaceId
+                                )
+                                .then((features) => {
+                                    this.features = features;
+                                    this.tagsService
+                                        .getTags(this.workspaceId)
+                                        .then((tags) => {
+                                            this.tags = tags;
+                                            // Get releases array from workspace.
+                                            this.workspaceService
+                                                .getWorkspaceReleases(
+                                                    this.workspaceId
+                                                )
+                                                .pipe(first())
+                                                .toPromise()
+                                                .then((workspaceReleases) => {
+                                                    this.workspaceReleases =
+                                                        workspaceReleases;
+                                                    this.workspaceReleases.map(
+                                                        (
+                                                            releaseData,
+                                                            index
+                                                        ) => {
+                                                            if (
+                                                                releaseData.version ==
+                                                                this.release
+                                                                    .version
+                                                            ) {
+                                                                this.workspaceReleaseIndex =
+                                                                    index;
+                                                            }
+                                                        }
+                                                    );
+                                                });
+                                        });
+                                });
+                        });
                 });
-            });
         });
-        if (this.workspaceId) {
-            this.tagsService.getTags(this.workspaceId).then((tags) => {
-                this.tags = tags;
-            });
-        }
-
-        this.addActionService.currentReleaseActionData
-            .pipe(takeUntil(this.unsubscribeSignal.asObservable()))
-            .subscribe((actionObserver) => {
-                this.releaseActionData = actionObserver.action;
-                if (actionObserver.updateable) {
-                    this.updateRelease();
-                }
-            });
-
-        this.addActionService.currentFeatureActionData
-            .pipe(takeUntil(this.unsubscribeSignal.asObservable()))
-            .subscribe((actionObserver) => {
-                this.featureActionData = actionObserver.actions;
-                if (
-                    actionObserver.updateable &&
-                    actionObserver.featureIndex != null &&
-                    actionObserver.featureIndex >= 0 &&
-                    this.workspaceId
-                ) {
-                    console.log(this.features[actionObserver.featureIndex].tag);
-                    console.log('hello, featurebpoard');
+        this.addActionService.currentFeatureActionData.subscribe(
+            (actionData) => {
+                console.log(actionData);
+                if (actionData.updateable && actionData.featureIndex != null && actionData.featureIndex >= 0) {
+                    this.features[actionData.featureIndex].action =
+                        actionData.action;
+                    console.log(this.features);
                     this.featureService.updateFeature(
                         {
-                            tag: this.features[actionObserver.featureIndex].tag,
+                            tag: this.features[actionData.featureIndex].tag,
                             description:
-                                this.features[actionObserver.featureIndex]
-                                    .description,
-                            emojiId: this.featuresData[actionObserver.featureIndex].emojiId,
-                            action: this.featureActionData[
-                                actionObserver.featureIndex
-                            ],
+                                this.features[actionData.featureIndex].description,
+                            emojiId: this.features[actionData.featureIndex].emojiId,
+                            action: this.features[actionData.featureIndex].action,
                         },
-                        this.features[actionObserver.featureIndex].tag,
+                        this.features[actionData.featureIndex].tag,
                         this.workspaceId,
-                        this.features[actionObserver.featureIndex].ref.id,
+                        this.workspaceFeature[actionData.featureIndex].ref.id,
                         this.releaseId,
-                        { features: this.features },
-                        actionObserver.featureIndex
+                        { features: this.workspaceFeature },
+                        actionData.featureIndex
                     );
                 }
-            });
+            }
+        );
+        this.addActionService.currentReleaseActionData.subscribe(releaseData => {
+            if(releaseData.updateable) {
+                this.release.action = releaseData.action;
+                this.updateRelease();
+            }
+        });
     }
 
     /**
@@ -239,18 +223,18 @@ export class FeaturesBoardComponent implements OnInit {
             case 'blur':
                 if (!this.editReleaseWorking) {
                     this.checkEditReleaseVersion = false;
-                    this.oldReleaseVersion = this.release.version;
                     this.release.version =
                         this.editReleaseVersionInput.nativeElement.value;
+                    this.updateRelease();
                 }
                 this.editReleaseWorking = false;
                 break;
             case 'keyup':
                 this.checkEditReleaseVersion = false;
                 this.editReleaseWorking = true;
-                this.oldReleaseVersion = this.release.version;
                 this.release.version =
                     this.editReleaseVersionInput.nativeElement.value;
+                this.updateRelease();
                 break;
         }
     }
@@ -259,48 +243,47 @@ export class FeaturesBoardComponent implements OnInit {
      * Update the release.
      */
     updateRelease(): void {
-        if (this.workspaceId && this.releaseId) {
-            this.workspaceService
-                .getWorkspaceReleasesOnce(this.workspaceId)
-                .then((releases) => {
-                    this.releaseService.updateRelease(
-                        {
-                            version: this.release.version,
-                            description: this.textareaCharacter,
-                            action: this.releaseActionData
-                                ? this.releaseActionData
-                                : {
-                                    type: '',
-                                    link: '',
-                                    options: {
-                                        title: '',
-                                        autoplay: false,
-                                        muted: false,
-                                        startOn: {
-                                            hour: 0,
-                                            minute: 0,
-                                            second: 0,
-                                        },
-                                    },
-                                },
-                            emojiId: this.release.emojiId,
-                            features: this.release.features,
+        this.releaseService.updateRelease(
+            {
+                version: this.release.version,
+                description: this.textareaCharacter,
+                action: this.release.action
+                    ? this.release.action
+                    : {
+                        type: '',
+                        link: '',
+                        options: {
+                            title: '',
+                            autoplay: false,
+                            muted: false,
+                            startOn: {
+                                hour: 0,
+                                minute: 0,
+                                second: 0,
+                            },
                         },
-                        this.oldReleaseVersion,
-                        this.workspaceId as string,
-                        this.releaseId as string,
-                        {
-                            releases: releases,
-                        }
-                    );
-                });
-            this.releaseUpdatedToast = true;
-            setTimeout(() => {
-                this.releaseUpdatedToast = false;
-            }, 1000);
-        } else {
-            throw 'Workspace ID or Release ID dont exist!';
-        }
+                    },
+                emojiId: this.release.emojiId,
+                features: this.release.features,
+            },
+            this.workspaceReleaseIndex,
+            this.workspaceId as string,
+            this.releaseId as string,
+            {
+                releases: this.workspaceReleases,
+            }
+        );
+        this.releaseUpdateToast();
+    }
+
+    /**
+     * Trigger the update toast for 0.5 seconds.
+     */
+    releaseUpdateToast(): void {
+        this.releaseUpdatedToast = true;
+        setTimeout(() => {
+            this.releaseUpdatedToast = false;
+        }, 500);
     }
 
     /**
@@ -309,18 +292,15 @@ export class FeaturesBoardComponent implements OnInit {
      */
     addEmoji(data: EmojiID): void {
         this.release.emojiId = data.emoji.id;
+        this.updateRelease();
     }
 
     /**
      * Add new feature to Database.
      */
     addFeature(): void {
-        const workspaceId = this.workspaceId;
-        if (!workspaceId) {
-            return;
-        }
-        this.featureService.addNewFeature(workspaceId, this.releaseId, {
-            features: this.features,
+        this.featureService.addNewFeature(this.workspaceId, this.releaseId, {
+            features: this.release.features,
         });
     }
 
@@ -337,14 +317,14 @@ export class FeaturesBoardComponent implements OnInit {
                 {
                     tag: this.tags[tagIndex].name,
                     description: this.features[featureIndex].description,
-                    emojiId: this.featuresData[featureIndex].emojiId,
-                    action: this.featureActionData[featureIndex],
+                    emojiId: this.features[featureIndex].emojiId,
+                    action: this.features[featureIndex].action,
                 },
                 this.features[featureIndex].tag,
                 this.workspaceId,
-                this.features[featureIndex].ref.id,
+                this.workspaceFeature[featureIndex].ref.id,
                 this.releaseId,
-                { features: this.features },
+                { features: this.workspaceFeature },
                 featureIndex
             );
         }
@@ -391,14 +371,14 @@ export class FeaturesBoardComponent implements OnInit {
                                 description:
                                     this.editFeatureDescriptionTextarea
                                         .nativeElement.value,
-                                emojiId: this.featuresData[featureIndex].emojiId,
-                                action: this.featureActionData[featureIndex],
+                                emojiId: this.features[featureIndex].emojiId,
+                                action: this.features[featureIndex].action,
                             },
                             this.features[featureIndex].tag,
                             this.workspaceId,
-                            this.features[featureIndex].ref.id,
+                            this.workspaceFeature[featureIndex].ref.id,
                             this.releaseId,
-                            { features: this.features },
+                            { features: this.workspaceFeature },
                             featureIndex
                         );
                     } else {
@@ -417,14 +397,14 @@ export class FeaturesBoardComponent implements OnInit {
                             description:
                                 this.editFeatureDescriptionTextarea
                                     .nativeElement.value,
-                            emojiId: this.featuresData[featureIndex].emojiId,
-                            action: this.featureActionData[featureIndex],
+                            emojiId: this.features[featureIndex].emojiId,
+                            action: this.features[featureIndex].action,
                         },
                         this.features[featureIndex].tag,
                         this.workspaceId,
-                        this.features[featureIndex].ref.id,
+                        this.workspaceFeature[featureIndex].ref.id,
                         this.releaseId,
-                        { features: this.features },
+                        { features: this.workspaceFeature },
                         featureIndex
                     );
                 } else {
@@ -439,20 +419,16 @@ export class FeaturesBoardComponent implements OnInit {
      * @param event Draggable event.
      */
     updateFeaturePosition(event: CdkDragDrop<string[]>) {
-        if (this.workspaceId) {
-            moveItemInArray(
-                this.features,
-                event.previousIndex,
-                event.currentIndex
-            );
-            this.featureService.updateFeaturePosition(
-                this.workspaceId,
-                this.releaseId,
-                { features: this.features }
-            );
-        } else {
-            console.warn('There is not any workspace ID.');
-        }
+        moveItemInArray(
+            this.workspaceFeature,
+            event.previousIndex,
+            event.currentIndex
+        );
+        this.featureService.updateFeaturePosition(
+            this.workspaceId,
+            this.releaseId,
+            { features: this.workspaceFeature }
+        );
     }
 
     /**
@@ -461,23 +437,19 @@ export class FeaturesBoardComponent implements OnInit {
      * @param featureIndex Feature index.
      */
     addFeatureEmoji(data: EmojiID, featureIndex: number): void {
-        if(this.workspaceId) {
+        if (this.workspaceId) {
             this.featureService.updateFeature(
                 {
                     tag: this.features[featureIndex].tag,
-                    description:
-                        this.features[featureIndex]
-                            .description,
+                    description: this.features[featureIndex].description,
                     emojiId: data.emoji.id,
-                    action: this.featureActionData[
-                        featureIndex
-                    ],
+                    action: this.features[featureIndex].action,
                 },
                 this.features[featureIndex].tag,
                 this.workspaceId,
-                this.features[featureIndex].ref.id,
+                this.workspaceFeature[featureIndex].ref.id,
                 this.releaseId,
-                { features: this.features },
+                { features: this.workspaceFeature },
                 featureIndex
             );
         }
@@ -486,8 +458,5 @@ export class FeaturesBoardComponent implements OnInit {
     /**
      * When component get destroyed the release will stop watching for parameters change.
      */
-    ngOnDestroy(): void {
-        this.releaseWatcher?.unsubscribe();
-        this.unsubscribeSignal.unsubscribe();
-    }
+    ngOnDestroy(): void {}
 }

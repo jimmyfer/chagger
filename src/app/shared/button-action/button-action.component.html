@@ -35,7 +35,7 @@
 </ng-template>
 
 <ng-template #fileAction>
-    <ng-container *ngIf="action.type == 'file'; else addAction">
+    <ng-container *ngIf="action.type == 'file'; else galleryAction">
         <div>
             <a
                 [ngClass]="{
@@ -48,6 +48,25 @@
             >
                 <fa-icon [icon]="actionDownload"></fa-icon>
                 <span class="px-2">Download</span>
+            </a>
+        </div>
+    </ng-container>
+</ng-template>
+
+<ng-template #galleryAction>
+    <ng-container *ngIf="action.type == 'gallery'; else addAction">
+        <div>
+            <a
+                [ngClass]="{
+                    'buttom-big': bigButton,
+                    'buttom-small': smallButton
+                }"
+                class="px-2"
+                href="#"
+                (click)="!develop ? showGallery($event, action.filesPath) : callAddAction($event)"
+            >
+                <fa-icon [icon]="galleryImages"></fa-icon>
+                <span class="px-2">Gallery</span>
             </a>
         </div>
     </ng-container>

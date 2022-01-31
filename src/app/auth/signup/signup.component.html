@@ -9,21 +9,13 @@
                     </div>
                 </div>
                 <div class="login-form card-body">
-                    <!--
-                    TODO: Fix signUpState functionality and add logInForm.touched to show this error
-                    only when the form is touched
-                     -->
-                    <div class="alert alert-danger" role="alert" *ngIf="!signUpState">
+                    <div class="alert alert-danger" role="alert" *ngIf="signUpState">
                         <span>SignUp Failed, please try again</span>
                     </div>
                     <form [formGroup]="signUpForm" (ngSubmit)="onSignUp()">
                         <div class="form-group">
                             <label for="email">Email</label>
-                            <!--
-                            Here i tend to, instead of formControlName, to use the formControl directly, so it can be
-                            easily accessed from the template.
-                            -->
-                            <input id="email" class="form-control"  type="text" formControlName="email" name="email" placeholder="Enter your email">
+                            <input id="email" class="form-control"  type="text" [formControl]="email" name="email" placeholder="Enter your email">
                         </div>
                         <div class="alert alert-danger" role="alert" *ngIf="email.invalid && email.touched">
                             <span *ngIf="email.errors?.['required']" >Email is required</span>
@@ -42,8 +34,7 @@
                             <label for="password">Confirm Password</label>
                             <input id="passwordConfirm" class="form-control" type="password" formControlName="passwordConfirm" name="password" placeholder="Enter your Password">
                         </div>
-                        <!-- FIXME: Fix error displaying when no errors -->
-                        <div class="alert alert-danger" role="alert" *ngIf="passwordConfirm.invalid && passwordConfirm.touched || signUpForm.errors?.['dontMatch']">
+                        <div class="alert alert-danger" role="alert" *ngIf="passwordConfirm.invalid && passwordConfirm.touched || signUpForm.errors?.['dontMatch'] && passwordConfirm.touched">
                             <span *ngIf="passwordConfirm.errors?.['required']" >Password is required</span>
                             <span *ngIf="signUpForm.errors?.['dontMatch'] && !passwordConfirm.invalid" >Password dont match</span>
                         </div>

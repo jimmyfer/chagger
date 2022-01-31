@@ -39,49 +39,6 @@ export class TagsBoardComponent implements OnInit {
 
     pickColor = faPalette;
 
-    paletteColors = [
-        {
-            name: 'Light Gray',
-            color: '#D3D3D3',
-        },
-        {
-            name: 'Gray',
-            color: '#808080',
-        },
-        {
-            name: 'Brown',
-            color: '#964B00',
-        },
-        {
-            name: 'Orange',
-            color: '#FFA500',
-        },
-        {
-            name: 'Yellow',
-            color: '#FFFF00',
-        },
-        {
-            name: 'Green',
-            color: '#00FF00',
-        },
-        {
-            name: 'Blue',
-            color: '#0000FF',
-        },
-        {
-            name: 'Purple',
-            color: '#CC8899',
-        },
-        {
-            name: 'Pink',
-            color: '#FFC0CB',
-        },
-        {
-            name: 'Red',
-            color: '#FF0000',
-        },
-    ];
-
     editTag: boolean[] = [];
     editTagWorking = false;
 
@@ -296,18 +253,16 @@ export class TagsBoardComponent implements OnInit {
 
     /**
      * Tag color picker.
-     * @param e Click event.
-     * @param tagColor Tag color.
+     * @param color Color of the selected tag.
      * @param tagIndex Tag index.
      */
-    pickTagColor(e: Event, tagColor: string, tagIndex: number): void {
-        e.preventDefault();
+    pickTagColor(color: string, tagIndex: number): void {
         if (this.workspaceId) {
             this.tagsService.updateTag(
                 {
                     name: this.tags[tagIndex].name,
                     emojiId: this.tags[tagIndex].emojiId,
-                    color: tagColor,
+                    color: color,
                 },
                 this.tags[tagIndex].name,
                 this.workspaceId,

@@ -1,15 +1,15 @@
-import {Injectable} from '@angular/core';
+import { Injectable } from '@angular/core';
 import {
     AngularFirestore,
     DocumentReference,
 } from '@angular/fire/compat/firestore';
-import {Observable} from 'rxjs';
-import {first, map} from 'rxjs/operators';
-import {Uploaded} from '../models/models';
-import {Releases} from '../models/releases.interface';
-import {Workspace, WorkspaceFeatures} from '../models/workspace.interface';
-import {FirestoreGenericService} from './firestore-generic.service';
-import {WorkspaceService} from './workspace.service';
+import { Observable } from 'rxjs';
+import { first, map } from 'rxjs/operators';
+import { Uploaded } from '../models/models';
+import { Releases } from '../models/releases.interface';
+import { Workspace, WorkspaceFeatures } from '../models/workspace.interface';
+import { FirestoreGenericService } from './firestore-generic.service';
+import { WorkspaceService } from './workspace.service';
 
 const collectionPath = 'releases';
 
@@ -21,13 +21,15 @@ const collectionPath = 'releases';
  * This is the service that handle firestore conections with the releases.
  */
 export class ReleasesService extends FirestoreGenericService<Releases> {
-
     /**
      * Constructor.
      * @param af  Angular helper of Firestore.
      * @param workspaceService Service to handle user workspaces collection in database.
      */
-    constructor(af: AngularFirestore, private workspaceService: WorkspaceService) {
+    constructor(
+        af: AngularFirestore,
+        private workspaceService: WorkspaceService
+    ) {
         super(af);
     }
 
@@ -49,13 +51,18 @@ export class ReleasesService extends FirestoreGenericService<Releases> {
     }
 
     /**
-     * Get a release.
+     * Get a singular release.
      * @param workspaceId Workspace ID.
      * @param releaseId Release ID.
      * @returns Return a release object.
      */
-    async getRelease(workspaceId: string, releaseId: string): Promise<Uploaded<Releases>> {
-        return this.getDocument(`workspaces/${workspaceId}/releases`, releaseId).pipe(first()).toPromise();
+    async getRelease(
+        workspaceId: string,
+        releaseId: string
+    ): Promise<Uploaded<Releases>> {
+        return this.getDocument(`workspaces/${workspaceId}/releases`, releaseId)
+            .pipe(first())
+            .toPromise();
     }
 
     /**
@@ -64,13 +71,22 @@ export class ReleasesService extends FirestoreGenericService<Releases> {
      * @param workspaceId The actual workspace ID.
      * @param releases The actual releases array in the workspace.
      */
-    async addNewRelease(data: Releases, workspaceId: string, releases: Partial<Workspace>): Promise<void> {
-        const release = await this.createDocument(data, '', `workspaces/${workspaceId}/${collectionPath}`);
+    async addNewRelease(
+        data: Releases,
+        workspaceId: string,
+        releases: Partial<Workspace>
+    ): Promise<void> {
+        const release = await this.createDocument(
+            data,
+            '',
+            `workspaces/${workspaceId}/${collectionPath}`
+        );
         releases.releases?.push({
             version: data.version,
-            ref: this.af.doc(`workspaces/${workspaceId}/releases/${release.id}`).ref as DocumentReference,
+            ref: this.af.doc(`workspaces/${workspaceId}/releases/${release.id}`)
+                .ref as DocumentReference,
             emojiId: 'rocket',
-            features: []
+            features: [],
         });
         this.workspaceService.editWorkspaceRelease(workspaceId, releases);
     }
@@ -81,37 +97,48 @@ export class ReleasesService extends FirestoreGenericService<Releases> {
      * @param releaseId Release document ID.
      * @param featureData Workspace feature data.
      */
-    editReleaseFeature(
+    async editReleaseFeature(
         workspaceId: string,
         releaseId: string,
         featureData: Partial<Releases>
-    ): void {
-        // TODO: Add await
-        this.updateDocument(featureData, `workspaces/${workspaceId}/${collectionPath}`, releaseId);
+    ): Promise<void> {
+        await this.updateDocument(
+            featureData,
+            `workspaces/${workspaceId}/${collectionPath}`,
+            releaseId
+        );
     }
 
     /**
      * Update a release.
      * @param data New release data.
-     * @param actualVersion Actual release version.
+     * @param workspaceReleaseIndex Release index on workspace release array.
      * @param workspaceId Actual workspace ID.
      * @param releaseId Actual release ID.
      * @param releases Releases as Partial<Workspace>.
      */
-    updateRelease(data: Releases, actualVersion: string, workspaceId: string, releaseId: string, releases: Partial<Workspace>): void {
-
-        // TODO: Add await
-        this.updateDocument(data, `workspaces/${workspaceId}/releases`, releaseId);
-
+    async updateRelease(
+        data: Releases,
+        workspaceReleaseIndex: number,
+        workspaceId: string,
+        releaseId: string,
+        releases: Partial<Workspace>
+    ): Promise<void> {
+        await this.updateDocument(
+            data,
+            `workspaces/${workspaceId}/releases`,
+            releaseId
+        );
         if (releases.releases) {
-            const newReleases = releases.releases.map((release) => {
-                if (release.version == actualVersion) {
-                    release.version = data.version;
-                    return release;
-                }
-                return release;
+            releases.releases[workspaceReleaseIndex] = {
+                version: data.version,
+                ref: releases.releases[workspaceReleaseIndex].ref,
+                emojiId: data.emojiId,
+                features: data.features,
+            };
+            this.workspaceService.editWorkspaceRelease(workspaceId, {
+                releases: releases.releases,
             });
-            this.workspaceService.editWorkspaceRelease(workspaceId, {releases: newReleases});
         }
     }
 
@@ -122,16 +149,30 @@ export class ReleasesService extends FirestoreGenericService<Releases> {
      * @param releases The actual releases array in the workspace.
      * @param actualVersion The actual release version.
      */
-    deleteRelease(releasePath: string, workspaceId: string, releases: Partial<Workspace>, actualVersion: string): void {
-        // TODO: Add await
-        this.deleteDocument(`${releasePath.split('/')[0]}/${releasePath.split('/')[1]}/${releasePath.split('/')[2]}`, releasePath.split('/')[3]);
+    async deleteRelease(
+        releasePath: string,
+        workspaceId: string,
+        releases: Partial<Workspace>,
+        actualVersion: string
+    ): Promise<void> {
+        await this.deleteDocument(
+            `${releasePath.split('/')[0]}/${releasePath.split('/')[1]}/${
+                releasePath.split('/')[2]
+            }`,
+            releasePath.split('/')[3]
+        );
         if (releases.releases) {
-            const actualReleaseIndex = releases.releases?.findIndex(release => release.version == actualVersion);
+            const actualReleaseIndex = releases.releases?.findIndex(
+                (release) => release.version == actualVersion
+            );
             releases.releases?.splice(actualReleaseIndex, 1);
         } else {
             throw 'There is not Releases!';
         }
-        this.workspaceService.editWorkspaceRelease(releasePath.split('/')[1], releases);
+        this.workspaceService.editWorkspaceRelease(
+            releasePath.split('/')[1],
+            releases
+        );
     }
 
     /**
@@ -140,8 +181,13 @@ export class ReleasesService extends FirestoreGenericService<Releases> {
      * @param workspaceDocumentId Workspace ID.
      * @returns Return an observable of the features array on release document.
      */
-    getReleaseFeatures(releaseDocumentId: string, workspaceDocumentId: string): Observable<WorkspaceFeatures[]> {
-        return this.getDocument(`workspaces/${workspaceDocumentId}/${collectionPath}`, releaseDocumentId).pipe(
-            map(release => release.features));
+    getReleaseFeatures(
+        releaseDocumentId: string,
+        workspaceDocumentId: string
+    ): Observable<WorkspaceFeatures[]> {
+        return this.getDocument(
+            `workspaces/${workspaceDocumentId}/${collectionPath}`,
+            releaseDocumentId
+        ).pipe(map((release) => release.features));
     }
 }

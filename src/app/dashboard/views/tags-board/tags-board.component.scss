@@ -61,22 +61,3 @@
         }
     }
 }
-
-.color-picker::after {
-    margin: 0;
-    border: 0;
-    text-decoration: none;
-}
-
-.palette-color-block {
-    width: 15px;
-    height: 15px;
-    border: 1px solid black;
-}
-
-.color-picker-body {
-    padding: 10px;
-    ul {
-        list-style: none;
-    }
-}

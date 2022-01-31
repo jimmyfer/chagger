@@ -76,8 +76,7 @@ export class UserService extends FirestoreGenericService<User> {
      * Edit a workspace of a user.
      * @param workspaceData New workspace data to update.
      */
-    editUsersWorkspaces(workspaceData: Partial<User>): void {
-        // TODO: Add await
-        this.updateDocument(workspaceData, collectionPath, this.userUid);
+    async editUsersWorkspaces(workspaceData: Partial<User>): Promise<void> {
+        await this.updateDocument(workspaceData, collectionPath, this.userUid);
     }
 }

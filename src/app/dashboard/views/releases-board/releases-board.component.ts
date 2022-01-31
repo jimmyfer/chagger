@@ -42,6 +42,7 @@ export class ReleasesBoardComponent {
 
     addRelease = false;
     addReleaseWorking = false;
+    workspaceReleaseIndex = 0;
 
     /**
      * Get the actual workspace.
@@ -257,6 +258,11 @@ export class ReleasesBoardComponent {
             this.workspaceService
                 .getWorkspaceReleasesOnce(this.workspaceId)
                 .then((releases) => {
+                    releases.map((release, index) => {
+                        if(release.version == newVersion) {
+                            this.workspaceReleaseIndex = index;
+                        }
+                    });
                     this.releaseService.updateRelease(
                         {
                             version: newVersion,
@@ -264,8 +270,18 @@ export class ReleasesBoardComponent {
                                 'I know i am a good release, dont you think?',
                             emojiId: actualEmoji,
                             features: features,
+                            action: {type: '', link: '', options: {
+                                title: '',
+                                autoplay: false,
+                                muted: false,
+                                startOn: {
+                                    hour: 0,
+                                    minute: 0,
+                                    second: 0
+                                }
+                            }}
                         },
-                        actualVersion,
+                        this.workspaceReleaseIndex,
                         workspace.id,
                         releaseId.id,
                         { releases: releases }

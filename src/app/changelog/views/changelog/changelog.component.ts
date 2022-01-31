@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { GalleryService } from 'src/app/services/gallery.service';
 import { VideoPlayerService } from 'src/app/services/video-player.service';
 
 @Component({
@@ -20,9 +21,16 @@ export class ChangelogComponent implements OnInit {
     }
 
     /**
+     * Get the addActionService state - Visible or Not.
+     */
+    get isGalleryVisible(): boolean {
+        return this.galleryService.isGalleryVisible;
+    }
+
+    /**
      * Constructor.
      */
-    constructor(private videoPlayerService: VideoPlayerService) {}
+    constructor(private videoPlayerService: VideoPlayerService, private galleryService: GalleryService) {}
 
 
     /**

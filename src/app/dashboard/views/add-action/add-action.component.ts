@@ -1,7 +1,10 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { FileUpload } from 'primeng/fileupload';
 import { Subscription } from 'rxjs';
+import { filter, first, map } from 'rxjs/operators';
 import { AddActionService } from 'src/app/services/add-action.service';
+import { UserService } from 'src/app/services/user.service';
 
 @Component({
     selector: 'app-add-action',
@@ -14,9 +17,17 @@ import { AddActionService } from 'src/app/services/add-action.service';
  */
 export class AddActionComponent implements OnInit {
 
+    _workspaceId = this.route.firstChild?.paramMap.pipe(
+        map((params) => params.get('workspaceId')),
+        filter((releaseId): releaseId is string => !!releaseId)
+    );
+
+    workspaceId = '';
+
     @ViewChild('actionType', { static: false }) actionType: ElementRef =
         {} as ElementRef;
-    @ViewChild('fileuploader', {static: false}) fileuploader: FileUpload = {} as FileUpload;
+    @ViewChild('fileuploader', { static: false }) fileuploader: FileUpload =
+        {} as FileUpload;
     @ViewChild('fileInput', { static: false })
     fileInput: ElementRef<HTMLInputElement> = {} as ElementRef;
 
@@ -34,17 +45,17 @@ export class AddActionComponent implements OnInit {
      * Return the uploaded percent.
      */
     get uploadPercent(): number {
-        // if(this.addActionService.uploadPercent == 100){
-        //     this.addActionService.isAddActionVisible = false;
-        //     this.second = 0;
-        //     this.minute = 0;
-        //     this.hour = 0;
-        //     this.muted = false;
-        //     this.autoPlay = false;
-        //     this.link = '';
-        // }
         return Math.round(this.addActionService.uploadPercent);
     }
+
+    /**
+     * Return the uploaded percent.
+     */
+    get uploadFilesPercent(): number {
+        return Math.round(this.addActionService.uploadFilesPercent);
+    }
+
+
     uploadPercentWatcher: Subscription | null = null;
 
     second = 0;
@@ -58,7 +69,11 @@ export class AddActionComponent implements OnInit {
     /**
      * Constructor.
      */
-    constructor(private addActionService: AddActionService) {}
+    constructor(
+        private addActionService: AddActionService,
+        private userService: UserService,
+        private route: ActivatedRoute
+    ) {}
 
     /**
      * Angular OnInit.
@@ -73,6 +88,11 @@ export class AddActionComponent implements OnInit {
         this.hours = Array(11)
             .fill(1)
             .map((x, i) => i);
+        if(this._workspaceId) {
+            this._workspaceId.pipe(first()).toPromise().then(workspaceId => {
+                this.workspaceId = workspaceId;
+            });
+        }
     }
 
     /**
@@ -169,9 +189,12 @@ export class AddActionComponent implements OnInit {
                 if (this.featureIndex != null && this.featureIndex >= 0) {
                     if (this.fileInput.nativeElement.files) {
                         this.addActionService
-                            .uploadFile(this.fileInput.nativeElement.files)
-                            .then((fileData) => {
-                                if (this.featureIndex) {
+                            .uploadActionFile(this.fileInput.nativeElement.files, this.workspaceId)
+                            .then((refPath) => {
+                                if (
+                                    this.featureIndex != null &&
+                                    this.featureIndex >= 0
+                                ) {
                                     this.addActionService.updateFeatureActionData(
                                         {
                                             type: 'file',
@@ -186,7 +209,7 @@ export class AddActionComponent implements OnInit {
                                                     second: 0,
                                                 },
                                             },
-                                            fileRef: fileData.ref.fullPath,
+                                            fileRef: refPath,
                                         },
                                         true,
                                         this.featureIndex
@@ -197,8 +220,8 @@ export class AddActionComponent implements OnInit {
                 } else {
                     if (this.fileInput.nativeElement.files) {
                         this.addActionService
-                            .uploadFile(this.fileInput.nativeElement.files)
-                            .then((fileData) => {
+                            .uploadActionFile(this.fileInput.nativeElement.files, this.workspaceId)
+                            .then((refPath) => {
                                 this.addActionService.updateReleaseActionData(
                                     {
                                         type: 'file',
@@ -213,7 +236,7 @@ export class AddActionComponent implements OnInit {
                                                 second: 0,
                                             },
                                         },
-                                        fileRef: fileData.ref.fullPath,
+                                        fileRef: refPath,
                                     },
                                     true
                                 );
@@ -223,31 +246,74 @@ export class AddActionComponent implements OnInit {
                 break;
             case 'gallery':
                 console.log(this.selectedFiles);
-                this.addActionService
-                    .uploadFiles(this.selectedFiles)
-                    .then((files) => {
-                        this.addActionService.updateReleaseActionData(
-                            {
-                                type: 'gallery',
-                                link: '',
-                                options: {
-                                    title: '',
-                                    autoplay: false,
-                                    muted: false,
-                                    startOn: {
-                                        hour: 0,
-                                        minute: 0,
-                                        second: 0,
+                if (this.featureIndex != null && this.featureIndex >= 0) {
+                    this.addActionService
+                        .uploadFiles(
+                            this.selectedFiles,
+                            this.userService.userUid,
+                            this.workspaceId
+                        )
+                        .then((files) => {
+                            if (
+                                this.featureIndex != null &&
+                                this.featureIndex >= 0
+                            ) {
+                                this.addActionService.updateFeatureActionData(
+                                    {
+                                        type: 'gallery',
+                                        link: '',
+                                        options: {
+                                            title: '',
+                                            autoplay: false,
+                                            muted: false,
+                                            startOn: {
+                                                hour: 0,
+                                                minute: 0,
+                                                second: 0,
+                                            },
+                                        },
+                                        filesPath: files,
                                     },
+                                    true,
+                                    this.featureIndex
+                                );
+                            }
+                        });
+                } else {
+                    this.addActionService
+                        .uploadFiles(
+                            this.selectedFiles,
+                            this.userService.userUid,
+                            this.workspaceId
+                        )
+                        .then((files) => {
+                            console.log(files);
+                            this.addActionService.updateReleaseActionData(
+                                {
+                                    type: 'gallery',
+                                    link: '',
+                                    options: {
+                                        title: '',
+                                        autoplay: false,
+                                        muted: false,
+                                        startOn: {
+                                            hour: 0,
+                                            minute: 0,
+                                            second: 0,
+                                        },
+                                    },
+                                    filesPath: files,
                                 },
-                                filesPath: files,
-                            },
-                            true
-                        );
-                    });
+                                true
+                            );
+                        });
+                }
                 break;
         }
-        if (this.actionTypeCheck != 'file' && this.actionTypeCheck != 'gallery') {
+        if (
+            this.actionTypeCheck != 'file' &&
+            this.actionTypeCheck != 'gallery'
+        ) {
             this.addActionService.isAddActionVisible = false;
             this.second = 0;
             this.minute = 0;
@@ -276,21 +342,22 @@ export class AddActionComponent implements OnInit {
         this.autoPlay = false;
         this.link = '';
         this.addActionService.uploadPercent = 0;
+        this.addActionService.uploadFilesPercent = 0;
     }
 
     /**
      *
-     * @param e event
+     * @param e Select file event.
      */
     updateSelectedFiles({ currentFiles }: { currentFiles: File[] }) {
         this.selectedFiles = currentFiles;
     }
 
     /**
-     * 
-     * @param e e
+     *
+     * @param e Uplodad progress data.
      */
-    progressReport(e: any) {
+    progressReport(e: number) {
         this.fileuploader.progress = e;
     }
 

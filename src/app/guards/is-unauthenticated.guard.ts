@@ -5,14 +5,28 @@ import {AuthService} from '../services/auth.service';
 @Injectable({
     providedIn: 'root'
 })
-// TODO: Small documentation to explaining what this guard is doing
+/**
+ * Guard to check if user is logged in.
+ */
 export class IsUnauthenticatedGuard implements CanActivate {
+
+    /**
+     * Constructor.
+     * @param authService Auth service.
+     * @param router Router.
+     */
     constructor(
         private authService: AuthService,
         private router: Router,
     ) {
     }
 
+    /**
+     * If user is logged then redirect to the workspace board.
+     * @param route Router.
+     * @param state Auth state.
+     * @returns Return a boolean that represent if the user is logged in or not.
+     */
     async canActivate(
         route: ActivatedRouteSnapshot,
         state: RouterStateSnapshot): Promise<boolean | UrlTree> {

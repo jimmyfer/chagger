@@ -20,55 +20,7 @@
                             <span *ngIf="!editTag[i]; else editTagInputTemp">
                                 {{ tag.name }}
                             </span>
-
-                            <!-- TODO: Move color picker to a new component for re-usability -->
-                            <!-- TODO: Allow click on the palette-color-block to select a new color too -->
-                            <div [style.background-color]="tag.color" class="palette-color-block mr-1 ml-2" ></div>
-                            <div class="mx-1" ngbDropdown>
-                                <a
-                                    href="#"
-                                    class="color-picker"
-                                    ngbDropdownToggle
-                                    (click)="$event.preventDefault()"
-                                >
-                                    <fa-icon
-                                            [icon]="pickColor"
-                                            transform="shrink-2"
-                                        ></fa-icon>
-                                </a>
-                                <div
-                                    ngbDropdownMenu
-                                    aria-labelledby="pickTagColor"
-                                >
-                                    <div class="color-picker-body">
-                                        <span>Pick a color</span>
-                                        <ul class="p-0">
-                                            <li
-                                                *ngFor="
-                                                    let color of paletteColors
-                                                "
-                                            >
-                                                <a
-                                                    href="#"
-                                                    (click)="
-                                                        pickTagColor($event, color.color, i);
-                                                    "
-                                                    class="d-flex align-items-center"
-                                                >
-                                                    <div
-                                                        [style.background-color]="
-                                                            color.color
-                                                        "
-                                                        class="palette-color-block mx-2"
-                                                    ></div>
-                                                    {{ color.name }}
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-
+                            <app-color-picker [color]="tag.color" (setColor)="pickTagColor($event, i)" ></app-color-picker>
                             <ng-template #editTagInputTemp>
                                 <input
                                     (blur)="editTagName($event, i)"

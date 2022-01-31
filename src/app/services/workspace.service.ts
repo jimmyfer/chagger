@@ -6,7 +6,7 @@ import {
 import { FirestoreGenericService } from './firestore-generic.service';
 
 import { Observable, of } from 'rxjs';
-import { Workspace, WorkspaceRelease, WorkspaceTags } from '../models/workspace.interface';
+import { Workspace, WorkspaceFeatures, WorkspaceRelease, WorkspaceTags } from '../models/workspace.interface';
 import { UserService } from './user.service';
 import { User } from '../models/user.interface';
 import { map, switchMap } from 'rxjs/operators';
@@ -24,8 +24,7 @@ export class WorkspaceService extends FirestoreGenericService<Workspace> {
 
     workspaces$ = this.userService.user$.pipe(
         switchMap(user => {
-            // TODO: this.userService.email = user && user.email ? user.email : '';
-            user && user.email ? this.userService.email = user.email : this.userService.email = '';
+            this.userService.email = user && user.email ? user.email : '';
             user ? this.userService.userUid = user.uid : this.userService.userUid = '';
             return user ? this.userService.getUserWorkspaces(user.uid) : of([]) ;
         })
@@ -86,8 +85,7 @@ export class WorkspaceService extends FirestoreGenericService<Workspace> {
                         .ref as DocumentReference,
                 },
             ];
-            // TODO: Add await
-            this.userService.createUser(
+            await this.userService.createUser(
                 { email: this.userService.email, workspaces: workspaces }
             );
             return true;
@@ -104,6 +102,16 @@ export class WorkspaceService extends FirestoreGenericService<Workspace> {
     getWorkspaceReleases(workspaceDocumentId: string): Observable<WorkspaceRelease[]> {
         return this.getDocument(collectionPath, workspaceDocumentId).pipe(
             map(workspace => workspace.releases));
+    }
+
+    /**
+     * Get the features of an espesific workspace.
+     * @param workspaceDocumentId Workspace ID.
+     * @returns Return an observable of the workspace releases data.
+     */
+    getWorkspaceFeatures(workspaceDocumentId: string): Observable<WorkspaceFeatures[]> {
+        return this.getDocument(collectionPath, workspaceDocumentId).pipe(
+            map(workspace => workspace.features));
     }
 
     /**
@@ -163,12 +171,11 @@ export class WorkspaceService extends FirestoreGenericService<Workspace> {
      * @param workspaceId Workspace document ID.
      * @param releaseData Workspace feature data.
      */
-    editWorkspaceRelease(
+    async editWorkspaceRelease(
         workspaceId: string,
         releaseData: Partial<Workspace>
-    ): void {
-        // TODO: Add await and make this method async
-        this.updateDocument(releaseData, collectionPath, workspaceId);
+    ): Promise<void> {
+        await this.updateDocument(releaseData, collectionPath, workspaceId);
     }
 
     /**
@@ -176,13 +183,11 @@ export class WorkspaceService extends FirestoreGenericService<Workspace> {
      * @param workspaceId Workspace document ID.
      * @param featureData Workspace feature data.
      */
-    editWorkspaceFeature(
+    async editWorkspaceFeature(
         workspaceId: string,
         featureData: Partial<Workspace>
-    ): void {
-        console.log(featureData);
-        // TODO: Add await and make this method async
-        this.updateDocument(featureData, collectionPath, workspaceId);
+    ): Promise<void> {
+        await this.updateDocument(featureData, collectionPath, workspaceId);
     }
 
     /**
@@ -190,11 +195,10 @@ export class WorkspaceService extends FirestoreGenericService<Workspace> {
      * @param tagId Tag id.
      * @param tagData Tag data.
      */
-    editWorkspaceTag(
+    async editWorkspaceTag(
         tagId: string,
         tagData: Partial<Workspace>
-    ): void {
-        // TODO: Add await and make this method async
-        this.updateDocument(tagData, collectionPath, tagId);
+    ): Promise<void> {
+        await this.updateDocument(tagData, collectionPath, tagId);
     }
 }

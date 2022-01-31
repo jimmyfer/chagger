@@ -37,7 +37,7 @@ export class SignupComponent {
         },
         this.passwordMatch()
     );
-    signUpState = true;
+    signUpState = false;
 
     /**
      *
@@ -52,7 +52,7 @@ export class SignupComponent {
      */
     passwordMatch(): ValidatorFn {
         return (): ValidationErrors | null => {
-            if (this.password.value == this.passwordConfirm.value) {
+            if (this.password.value != this.passwordConfirm.value) {
                 return {dontMatch: true};
             }
             return null;
@@ -68,7 +68,7 @@ export class SignupComponent {
             return this.authService
                 .checkUserExist(this.email.value)
                 .then((resp) => {
-                    if (resp.length) {
+                    if (resp) {
                         return {emailExist: true};
                     }
                     return null;
@@ -80,7 +80,7 @@ export class SignupComponent {
      * Call the auth service to create a new user account with email given.
      */
     async onSignUp(): Promise<void> {
-        this.signUpState = true;
+        this.signUpState = false;
         const {email, password} = this.signUpForm.value;
         this.signUpState = await this.authService.signUpEmail(email, password);
     }

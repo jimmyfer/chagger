@@ -88,7 +88,7 @@
                 >
                     <app-button-action
                         [bigButton]="true"
-                        [actionData]="releaseActionData"
+                        [actionData]="release.action"
                         [develop]="true"
                     ></app-button-action>
                 </div>
@@ -102,7 +102,7 @@
             <h2 class="console-commits-title">Commits</h2>
             <div
                 class="console-commits-container d-flex align-items-center mb-4"
-                *ngFor="let feature of featuresData; index as i"
+                *ngFor="let feature of features; index as i"
                 cdkDrag
             >
                 <div class="mx-2 draggables-items">
@@ -154,7 +154,7 @@
                             <span
                                 class="commits-feature-title dropdown-toggle m-4"
                                 >{{
-                                    feature.tag == "" ? "#SetTag" : feature.tag
+                                    this.workspaceFeature.length == 0 ? '#SetTag' : this.workspaceFeature[i].tag
                                 }}</span
                             >
                         </a>

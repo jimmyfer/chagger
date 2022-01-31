@@ -4,6 +4,11 @@ import { Releases } from './releases.interface';
 import { User } from './user.interface';
 import { Workspace } from './workspace.interface';
 
+export interface ImagesGallery {
+    previewImageSrc: string,
+    thumbnailImageSrc: string
+}
+
 export interface ModelId {
     _docId: string;
 }

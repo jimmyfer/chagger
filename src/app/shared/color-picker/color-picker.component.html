@@ -1,0 +1,37 @@
+<div class="d-flex align-items-center" >
+    <div
+    [style.background-color]="color"
+    class="palette-color-block mr-1 ml-2"
+></div>
+<div class="mx-1" ngbDropdown>
+    <a
+        href="#"
+        class="color-picker"
+        ngbDropdownToggle
+        (click)="$event.preventDefault()"
+    >
+        <fa-icon [icon]="pickColor" transform="shrink-2"></fa-icon>
+    </a>
+    <div ngbDropdownMenu aria-labelledby="pickTagColor">
+        <div class="color-picker-body">
+            <span>Pick a color</span>
+            <ul class="p-0">
+                <li *ngFor="let color of paletteColors">
+                    <a
+                        href="#"
+                        (click)="pickTagColor($event, color.color)"
+                        class="d-flex align-items-center"
+                    >
+                        <div
+                            [style.background-color]="color.color"
+                            class="palette-color-block mx-2"
+                        ></div>
+                        {{ color.name }}
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+</div>

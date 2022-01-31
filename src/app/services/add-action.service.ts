@@ -1,9 +1,10 @@
-import {Injectable} from '@angular/core';
-import {BehaviorSubject, empty, Observable} from 'rxjs';
-import {first} from 'rxjs/operators';
-import {Action} from '../models/action';
-import {AngularFireStorage} from '@angular/fire/compat/storage';
-import {UploadTaskSnapshot} from '@angular/fire/compat/storage/interfaces';
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, empty, Observable } from 'rxjs';
+import { first, tap } from 'rxjs/operators';
+import { Action } from '../models/action';
+import { AngularFireStorage } from '@angular/fire/compat/storage';
+import { UploadTaskSnapshot } from '@angular/fire/compat/storage/interfaces';
+import { FirestoreStorageService } from './firestore-storage.service';
 
 @Injectable({
     providedIn: 'root',
@@ -13,9 +14,11 @@ import {UploadTaskSnapshot} from '@angular/fire/compat/storage/interfaces';
  * Service to connect to addActionComponent.
  */
 export class AddActionService {
-
     uploadPercent$: Observable<number | undefined> = empty();
     uploadPercent = 0;
+
+    uploadFilesPercent$: Observable<number | undefined> = empty();
+    uploadFilesPercent = 0;
 
     uploadGalleryPercent$: Observable<number | undefined> = empty();
 
@@ -31,7 +34,7 @@ export class AddActionService {
     currentReleaseActionData = this.releaseActionData.asObservable();
 
     private featureActionData = new BehaviorSubject({
-        actions: [] as Action[],
+        action: {} as Action,
         updateable: false,
         featureIndex: null as number | null,
     });
@@ -40,8 +43,7 @@ export class AddActionService {
     /**
      * Constructor.
      */
-    constructor(private storage: AngularFireStorage) {
-    }
+    constructor(private storage: AngularFireStorage, private firestoreStorage: FirestoreStorageService) {}
 
     /**
      * Make addActionComponent visible.
@@ -80,9 +82,9 @@ export class AddActionService {
                 .pipe(first())
                 .toPromise()
                 .then((features) => {
-                    features.actions[featureIndex] = action;
+                    features.action = action;
                     this.featureActionData.next({
-                        actions: features.actions,
+                        action: features.action,
                         updateable: updateable,
                         featureIndex: featureIndex,
                     });
@@ -92,9 +94,9 @@ export class AddActionService {
                 .pipe(first())
                 .toPromise()
                 .then((features) => {
-                    features.actions.push(action);
+                    features.action = action;
                     this.featureActionData.next({
-                        actions: features.actions,
+                        action: features.action,
                         updateable: updateable,
                         featureIndex: null,
                     });
@@ -105,41 +107,44 @@ export class AddActionService {
     /**
      * Upload a file to firestore.
      * @param dataFile File list.
+     * @param workspaceId The workspace ID.
      */
-    async uploadFile(dataFile: FileList): Promise<UploadTaskSnapshot> {
-        const file = dataFile[0];
-        const filePath = 'actions/action_' + Date.now();
-        const task = this.storage.upload(filePath, file);
-        this.uploadPercent$ = task.percentageChanges();
-        // TODO: add an unsubscribe somewhere
+    async uploadActionFile(dataFile: FileList, workspaceId: string): Promise<string> {
+        const [data, refPath] = (await this.firestoreStorage.uploadFile(dataFile, workspaceId));
+        this.uploadPercent$ = data;
+        // FIXME unsuscribe
         this.uploadPercent$.subscribe(percent => {
-            if (percent) {
+            if(percent) {
                 this.uploadPercent = percent;
             }
         });
-        return task;
+        return refPath;
     }
 
     /**
      * Upload multiples files to firestore.
      * @param files Files list.
+     * @param userUid User uid.
+     * @param workspaceId The workspace ID.
      */
-    async uploadFiles(files: File[]): Promise<string[]> {
-        // const task = this.storage.upload(filePath, file);
-        const uploadedFiles: string[] = [];
-        return new Promise((resolve, reject) => {
-            // TODO: Promise.all([promiseA, promiseB, ...]);
-            // FIXME: Promise might resolve before all promises are resolved
-            files.forEach((file, index) => {
-                // TODO: Add user ID to file path
-                const filePath = `image_${index}${Date.now()}`;
-                this.storage.upload(filePath, file).then(resp => {
-                    console.log(resp.ref.fullPath);
-                    uploadedFiles.push(resp.ref.fullPath);
-                });
-                if (index === files.length - 1) resolve(uploadedFiles);
+    async uploadFiles(files: File[], userUid: string, workspaceId: string): Promise<string[]> {
+        const promUploadpercent: number[] = [];
+        for (let index = 0; index < files.length; index++) {
+            promUploadpercent.push(0);
+        }
+
+        const [observables, paths] = (await this.firestoreStorage.uploadFiles(files, userUid, workspaceId));
+        observables.map((percentObs, index) => {
+            percentObs.subscribe(percent => {
+                if(percent) {
+                    let total = 0;
+                    promUploadpercent[index] = Math.round(percent) / observables.length;
+                    promUploadpercent.map(individualPercent => total += individualPercent);
+                    this.uploadFilesPercent = total;
+                }
             });
         });
+        return paths;
     }
 
     /**
@@ -148,6 +153,10 @@ export class AddActionService {
      * @returns Return a link.
      */
     async getDownloadLink(filePath: string): Promise<string> {
-        return this.storage.ref(filePath).getDownloadURL().pipe(first()).toPromise();
+        return this.storage
+            .ref(filePath)
+            .getDownloadURL()
+            .pipe(first())
+            .toPromise();
     }
 }
