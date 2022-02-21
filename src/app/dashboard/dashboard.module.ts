@@ -13,14 +13,15 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AddActionComponent } from './views/add-action/add-action.component';
 import { ReleasesBoardComponent } from './views/releases-board/releases-board.component';
 import { FeaturesBoardComponent } from './views/features-board/features-board.component';
-import { PickerModule } from '@ctrl/ngx-emoji-mart';
-import { EmojiModule } from '@ctrl/ngx-emoji-mart/ngx-emoji';
-import {ToastModule} from 'primeng/toast';
 import { TagsBoardComponent } from './views/tags-board/tags-board.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { SharedModule } from '../shared/shared.module';
 import { FileUploadModule } from 'primeng/fileupload';
 import { HttpClientModule } from '@angular/common/http';
+import {SplitButtonModule} from 'primeng/splitbutton';
+import { AddFeatureComponent } from './views/add-feature/add-feature.component';
+import {PaginatorModule} from 'primeng/paginator';
+
 
 @NgModule({
     declarations: [
@@ -28,7 +29,8 @@ import { HttpClientModule } from '@angular/common/http';
         AddActionComponent,
         ReleasesBoardComponent,
         FeaturesBoardComponent,
-        TagsBoardComponent
+        TagsBoardComponent,
+        AddFeatureComponent
     ],
     imports: [
         CommonModule,
@@ -41,7 +43,9 @@ import { HttpClientModule } from '@angular/common/http';
         DragDropModule,
         SharedModule,
         FileUploadModule,
-        HttpClientModule
+        SplitButtonModule,
+        HttpClientModule,
+        PaginatorModule
         
         
     ],

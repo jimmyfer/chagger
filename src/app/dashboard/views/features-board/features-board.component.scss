@@ -83,9 +83,6 @@
                 }
             }
         }
-        .btn-commit {
-            height: 50px;
-        }
     }
 }
 
@@ -167,4 +164,35 @@
 
 .draggables-items {
     cursor: pointer;
+}
+
+.add-feature {
+    display: block;
+    width: 100%;
+    
+}
+
+:host ::ng-deep .add-feature-btn {
+    display: flex;
+    width: 100%;
+    .p-button {
+        background-color: #de4c36;
+        border-color: #de4c36;
+        justify-content: center;
+        .p-button-label {
+            flex: none;
+        }
+        &:hover {
+            background-color: #c9442f;
+        }
+    }
+    .p-menu {
+        border: 1px solid lightgrey;
+        .p-menuitem-link {
+            justify-content: center;
+        }
+    }
+    .p-menu-overlay {
+        top: -50px !important;
+    }
 }

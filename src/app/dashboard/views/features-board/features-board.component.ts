@@ -23,6 +23,7 @@ import { MessageService } from 'primeng/api';
 import { Feature } from 'src/app/models/feature.interface';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { SharedChangelogService } from 'src/app/services/shared-changelog.service';
+import { AddFeatureService } from '../../services/add-feature.service';
 
 @Component({
     selector: 'app-features-board',
@@ -35,6 +36,12 @@ import { SharedChangelogService } from 'src/app/services/shared-changelog.servic
  *
  */
 export class FeaturesBoardComponent implements OnInit {
+
+    items = [
+        {label: 'From GitHub Issue', icon: 'pi pi-github', command: () => {
+            this.addFeatureFromGitHub();
+        }}
+    ];
 
     active = false;
 
@@ -101,6 +108,7 @@ export class FeaturesBoardComponent implements OnInit {
         private releaseService: ReleasesService,
         private workspaceService: WorkspaceService,
         private addActionService: AddActionService,
+        private addFeatureService: AddFeatureService,
         private featureService: FeaturesService,
         private tagsService: TagsService,
         private messageService: MessageService,
@@ -132,6 +140,7 @@ export class FeaturesBoardComponent implements OnInit {
                     .getRelease(this.workspaceId, this.releaseId)
                     .then((release) => {
                         this.release = release;
+                        this.featureService.release = release;
                         this.textareaCharacter = this.release.description;
                         release.features.map(() => {
                             this.checkEditFeatureDescription.push({
@@ -142,7 +151,6 @@ export class FeaturesBoardComponent implements OnInit {
                         this.releaseService
                             .getReleaseFeatures(this.releaseId, this.workspaceId)
                             .subscribe((workspaceFeatures) => {
-                                console.log(workspaceFeatures);
                                 this.workspaceFeature = workspaceFeatures;
                                 // Gets all the features data.
                                 this.featureService
@@ -192,11 +200,9 @@ export class FeaturesBoardComponent implements OnInit {
         });
         this.addActionService.currentFeatureActionData.subscribe(
             (actionData) => {
-                console.log(actionData);
                 if (actionData.updateable && actionData.featureIndex != null && actionData.featureIndex >= 0) {
                     this.features[actionData.featureIndex].action =
                         actionData.action;
-                    console.log(this.features);
                     this.featureService.updateFeature(
                         {
                             tag: this.features[actionData.featureIndex].tag,
@@ -261,7 +267,6 @@ export class FeaturesBoardComponent implements OnInit {
      */
     editReleaseDescription(e: Event): void {
         e.preventDefault();
-        console.log(e.type);
         switch (e.type) {
             case 'click':
                 this.checkEditReleaseDescription = true;
@@ -270,7 +275,6 @@ export class FeaturesBoardComponent implements OnInit {
                 });
                 break;
             case 'blur':
-                console.log('HELOOOOO!');
                 if (!this.editReleaseDescriptionWorking) {
                     this.checkEditReleaseDescription = false;
                     this.release.description =
@@ -352,6 +356,13 @@ export class FeaturesBoardComponent implements OnInit {
         this.featureService.addNewFeature(this.workspaceId, this.releaseId, {
             features: this.release.features,
         });
+    }
+
+    /**
+     * Add new feature from GitHub issue.
+     */
+    addFeatureFromGitHub(): void {
+        this.addFeatureService.isAddFeatureVisible = true;
     }
 
     /**

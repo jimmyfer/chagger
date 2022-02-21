@@ -1,0 +1,32 @@
+<div id="add-feature" class="d-flex justify-content-center align-items-center">
+    <div class="card">
+        <div class="card-header">
+            <h3>Add new feature</h3>
+        </div>
+        <div class="card-body d-flex flex-column align-items-center">
+            <ng-container *ngIf="!tokenExist" >
+                <div>
+                    You need to integrate GitHub to Chagger first
+                </div>
+                <div class="github-logo my-3">
+                    <img src="/assets/img/integrations/githublogo.png" alt="GitHub">
+                </div>
+                <a (click)="closeModal()" [routerLink]="['/workspaces', workspaceId, 'integrations', 'github']" class="btn btn-primary mt-2">
+                    GitHub Integration
+                </a>
+            </ng-container>
+            <ng-container *ngIf="tokenExist">
+                <div (click)="createNewFeature(issue.title, issue.body)" *ngFor="let issue of issues.slice(5*paginationindex, 5*paginationindex + 5)" class="issues" >
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h5>{{issue.title}}</h5>
+                        <div class="issues-tags">
+                            <span *ngFor="let tag of issue.labels" [style.background-color]="'#'+tag.color" >{{ tag.name }}</span>
+                        </div>
+                    </div>
+                    <p>{{issue.body}}</p>
+                </div>
+                <p-paginator  [rows]="5" [totalRecords]="issues.length" (onPageChange)="paginate($event)"></p-paginator>
+            </ng-container>
+        </div>
+    </div>
+</div>

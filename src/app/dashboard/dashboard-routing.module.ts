@@ -26,6 +26,10 @@ const routes: Routes = [
                     {
                         path: 'tags',
                         component: TagsBoardComponent
+                    },
+                    {
+                        path: 'integrations',
+                        loadChildren: () => import('./integrations/integrations.module').then( m => m.IntegrationsModule)
                     }
                 ]
             }

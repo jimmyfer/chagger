@@ -5,6 +5,7 @@ import {
 } from '@angular/fire/compat/firestore';
 import {first} from 'rxjs/operators';
 import {Feature} from '../models/feature.interface';
+import { Releases } from '../models/releases.interface';
 import {Workspace} from '../models/workspace.interface';
 import {FirestoreGenericService} from './firestore-generic.service';
 import {ReleasesService} from './releases.service';
@@ -20,6 +21,9 @@ const collectionPath = 'features';
  * Service that handle features conections in the database.
  */
 export class FeaturesService extends FirestoreGenericService<Feature> {
+
+    release: Releases = {} as Releases;
+
     /**
      * Constructor.
      * @param af  Angular helper of Firestore.
@@ -38,28 +42,34 @@ export class FeaturesService extends FirestoreGenericService<Feature> {
      * @param workspaceId Workspace ID.
      * @param releaseId Release ID.
      * @param features Features array from a workspace document.
+     * @param data Feature data.
      */
     async addNewFeature(
         workspaceId: string,
         releaseId: string,
-        features: Partial<Workspace>
+        features: Partial<Workspace>,
+        data?: Feature
     ): Promise<void> {
-        const feature = await this.createDocument(
-            {
-                tag: '',
-                description: 'Features are important part of an aplication!',
-                emojiId: 'santa',
-                action: {
-                    type: '',
-                    link: '',
-                    options: {
-                        title: '',
-                        autoplay: false,
-                        muted: false,
-                        startOn: {hour: 0, minute: 0, second: 0},
-                    },
+        let featureData = {
+            tag: '',
+            description: 'Features are important part of an aplication!',
+            emojiId: 'santa',
+            action: {
+                type: '',
+                link: '',
+                options: {
+                    title: '',
+                    autoplay: false,
+                    muted: false,
+                    startOn: {hour: 0, minute: 0, second: 0},
                 },
             },
+        };
+        if(data) {
+            featureData = data;
+        }
+        const feature = await this.createDocument(
+            featureData,
             '',
             `workspaces/${workspaceId}/${collectionPath}`
         );

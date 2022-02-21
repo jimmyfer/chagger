@@ -1,10 +1,19 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { FileUpload } from 'primeng/fileupload';
-import { Subscription } from 'rxjs';
-import { filter, first, map } from 'rxjs/operators';
+import { fromEvent, Subscription } from 'rxjs';
+import {
+    debounceTime,
+    distinctUntilChanged,
+    filter,
+    first,
+    map,
+} from 'rxjs/operators';
+import { VimeoVideoList } from 'src/app/models/vimeo';
 import { AddActionService } from 'src/app/services/add-action.service';
 import { UserService } from 'src/app/services/user.service';
+import { VimeoService } from 'src/app/services/vimeo.service';
 
 @Component({
     selector: 'app-add-action',
@@ -16,7 +25,6 @@ import { UserService } from 'src/app/services/user.service';
  * Add action modal.
  */
 export class AddActionComponent implements OnInit {
-
     _workspaceId = this.route.firstChild?.paramMap.pipe(
         map((params) => params.get('workspaceId')),
         filter((releaseId): releaseId is string => !!releaseId)
@@ -24,6 +32,8 @@ export class AddActionComponent implements OnInit {
 
     workspaceId = '';
 
+    @ViewChild('searchVideo', { static: false }) searchVideo: ElementRef =
+        {} as ElementRef;
     @ViewChild('actionType', { static: false }) actionType: ElementRef =
         {} as ElementRef;
     @ViewChild('fileuploader', { static: false }) fileuploader: FileUpload =
@@ -32,6 +42,10 @@ export class AddActionComponent implements OnInit {
     fileInput: ElementRef<HTMLInputElement> = {} as ElementRef;
 
     actionTypeCheck = 'video';
+    videoProvierCheck = 'vimeo';
+
+    searchingActive = false;
+    videoListExist = false;
 
     featureIndex = this.addActionService.featureIndex;
 
@@ -40,6 +54,8 @@ export class AddActionComponent implements OnInit {
     hours: number[] = [];
 
     selectedFiles: File[] = [];
+
+    uploadForm: SafeHtml = '';
 
     /**
      * Return the uploaded percent.
@@ -55,8 +71,12 @@ export class AddActionComponent implements OnInit {
         return Math.round(this.addActionService.uploadFilesPercent);
     }
 
+    videoList: VimeoVideoList = {} as VimeoVideoList;
 
     uploadPercentWatcher: Subscription | null = null;
+    searchVideoWatcher: Subscription | null = null;
+
+    vimeoLogin = false;
 
     second = 0;
     minute = 0;
@@ -72,13 +92,21 @@ export class AddActionComponent implements OnInit {
     constructor(
         private addActionService: AddActionService,
         private userService: UserService,
-        private route: ActivatedRoute
+        private vimeoService: VimeoService,
+        private route: ActivatedRoute,
+        private sanitizer: DomSanitizer
     ) {}
 
     /**
      * Angular OnInit.
      */
     ngOnInit(): void {
+        this.vimeoService.checkIfUserIsLogIn().then((resp) => {
+            if (resp) {
+                console.log(resp);
+                this.vimeoLogin = true;
+            }
+        });
         this.seconds = Array(60)
             .fill(1)
             .map((x, i) => i);
@@ -88,10 +116,13 @@ export class AddActionComponent implements OnInit {
         this.hours = Array(11)
             .fill(1)
             .map((x, i) => i);
-        if(this._workspaceId) {
-            this._workspaceId.pipe(first()).toPromise().then(workspaceId => {
-                this.workspaceId = workspaceId;
-            });
+        if (this._workspaceId) {
+            this._workspaceId
+                .pipe(first())
+                .toPromise()
+                .then((workspaceId) => {
+                    this.workspaceId = workspaceId;
+                });
         }
     }
 
@@ -189,7 +220,10 @@ export class AddActionComponent implements OnInit {
                 if (this.featureIndex != null && this.featureIndex >= 0) {
                     if (this.fileInput.nativeElement.files) {
                         this.addActionService
-                            .uploadActionFile(this.fileInput.nativeElement.files, this.workspaceId)
+                            .uploadActionFile(
+                                this.fileInput.nativeElement.files,
+                                this.workspaceId
+                            )
                             .then((refPath) => {
                                 if (
                                     this.featureIndex != null &&
@@ -220,7 +254,10 @@ export class AddActionComponent implements OnInit {
                 } else {
                     if (this.fileInput.nativeElement.files) {
                         this.addActionService
-                            .uploadActionFile(this.fileInput.nativeElement.files, this.workspaceId)
+                            .uploadActionFile(
+                                this.fileInput.nativeElement.files,
+                                this.workspaceId
+                            )
                             .then((refPath) => {
                                 this.addActionService.updateReleaseActionData(
                                     {
@@ -245,7 +282,6 @@ export class AddActionComponent implements OnInit {
                 }
                 break;
             case 'gallery':
-                console.log(this.selectedFiles);
                 if (this.featureIndex != null && this.featureIndex >= 0) {
                     this.addActionService
                         .uploadFiles(
@@ -287,7 +323,6 @@ export class AddActionComponent implements OnInit {
                             this.workspaceId
                         )
                         .then((files) => {
-                            console.log(files);
                             this.addActionService.updateReleaseActionData(
                                 {
                                     type: 'gallery',
@@ -335,6 +370,9 @@ export class AddActionComponent implements OnInit {
      * Reset add-action values.
      */
     resetData(): void {
+        if (this.actionTypeCheck == 'uploadVideo') {
+            this.getUploadForm();
+        }
         this.second = 0;
         this.minute = 0;
         this.hour = 0;
@@ -362,9 +400,79 @@ export class AddActionComponent implements OnInit {
     }
 
     /**
+     * Search vimeo video.
+     * @param data Data
+     */
+    searchVimeoVideo(data: string): void {
+        this.videoListExist = true;
+        this.searchingActive = true;
+        this.vimeoService.searchVideo(data).then((videoList) => {
+            this.searchingActive = false;
+            console.log(videoList);
+            this.videoList = videoList;
+        });
+    }
+
+    /**
+     * Select a vimeo video.
+     * @param link Vimeo video link
+     */
+    selectVideo(link: string) {
+        this.link = link;
+        this.videoListExist = false;
+        this.videoList = {} as VimeoVideoList;
+    }
+
+    /**
+     * ngAfterViewInit
+     */
+    ngAfterViewInit(): void {
+        this.searchVideoWatcher = fromEvent(
+            this.searchVideo.nativeElement,
+            'input'
+        )
+            .pipe(
+                map((event) => {
+                    const inputEvent = event as InputEvent;
+                    return (inputEvent.target as HTMLInputElement).value;
+                })
+            )
+            .pipe(debounceTime(1000))
+            .pipe(distinctUntilChanged())
+            .subscribe((data: string) => this.searchVimeoVideo(data));
+    }
+
+    /**
+     * Get upload form.
+     */
+    getUploadForm(): void {
+        this.vimeoService.getUploadForm().then((data) => {
+            if (data) {
+                console.log(data);
+
+                this.uploadForm = this.sanitizer.bypassSecurityTrustHtml(
+                    data.upload.form
+                );
+            }
+        });
+    }
+
+    /**
+     * Paginator
+     * @param e Event
+     */
+    paginate(e: { page: number }) {
+        console.log(e);
+        this.searchVimeoVideo(
+            `${this.searchVideo.nativeElement.value}&page=${e.page + 1}`
+        );
+    }
+
+    /**
      * ngOnDestroy.
      */
     ngOnDestroy(): void {
         this.uploadPercentWatcher?.unsubscribe();
+        this.searchVideoWatcher?.unsubscribe();
     }
 }

@@ -13,6 +13,7 @@ import { FormsModule } from '@angular/forms';
 import { ColorPickerComponent } from './color-picker/color-picker.component';
 import { GalleryComponent } from './gallery/gallery.component';
 import {GalleriaModule} from 'primeng/galleria';
+import { VimeoPlayerComponent } from './vimeo-player/vimeo-player.component';
 
 
 @NgModule({
@@ -22,7 +23,8 @@ import {GalleriaModule} from 'primeng/galleria';
         VideoPlayerComponent,
         ChangelogShareComponent,
         ColorPickerComponent,
-        GalleryComponent
+        GalleryComponent,
+        VimeoPlayerComponent
 
     ],
     imports: [
@@ -48,7 +50,8 @@ import {GalleriaModule} from 'primeng/galleria';
         EmojiModule,
         ToastModule,
         ColorPickerComponent,
-        GalleryComponent
+        GalleryComponent,
+        VimeoPlayerComponent
     ]
 })
 

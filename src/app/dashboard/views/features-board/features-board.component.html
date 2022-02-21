@@ -219,13 +219,7 @@
                     [develop]="true"
                 ></app-button-action>
             </div>
-            <button
-                type="button"
-                class="btn btn-brand-primary btn-commit rounded-0 d-flex justify-content-center align-items-center w-100"
-                (click)="addFeature()"
-            >
-                <fa-icon [icon]="addCommit"></fa-icon>
-            </button>
+            <p-splitButton class="add-feature" styleClass="add-feature-btn" label="Add Feature" icon="pi pi-plus" (onClick)="addFeature()" [model]="items"></p-splitButton>
         </div>
     </div>
 </div>

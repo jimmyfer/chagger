@@ -1,0 +1,24 @@
+<div id="integrations" class="d-flex h-100">
+    <div [ngClass]="{'menu-open': active}" class="integrations-menu" >
+        <h1 class="menu-title p-2 mt-4">Integrations</h1>
+        <div class="integrations-menu-item mt-4">
+            <a [routerLink]="[ './github' ]">
+                <div class="menu-logo">
+                    <img src="/assets/img/integrations/githublogo.png" alt="GitHub">
+                </div>
+                <span class="menu-item-title">
+                    GitHub
+                </span>
+            </a>
+            <a [routerLink]="[ './vimeo' ]">
+                <div class="menu-logo">
+                    <img src="/assets/img/integrations/vimeo-logo.png" alt="Vimeo">
+                </div>
+                <span class="menu-item-title">
+                    Vimeo
+                </span>
+            </a>
+        </div>
+    </div>
+    <router-outlet></router-outlet>
+</div>

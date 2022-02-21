@@ -6,6 +6,7 @@ export interface Workspace {
     releases: WorkspaceRelease[];
     tags: WorkspaceTags[];
     features: WorkspaceFeatures[];
+    githubRepo?: number;
 }
 
 export interface WorkspaceRelease {

@@ -37,8 +37,7 @@ export class VideoPlayerComponent implements OnInit {
     ngOnInit(): void {
         this.videoTitle = this.videoPlayerService.videoTitle;
         this.player = videojs(
-            this.videoPlayer.nativeElement,
-            this.videoPlayerService.options
+            this.videoPlayer.nativeElement
         );
         this.player.currentTime(this.videoPlayerService.setTime);
     }

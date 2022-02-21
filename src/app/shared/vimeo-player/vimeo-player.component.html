@@ -1,0 +1,33 @@
+<div
+    id="chagger-player"
+    class="d-flex align-items-center justify-content-center"
+>
+    <div class="card">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="player-title">title</h1>
+                <div class="d-flex video-controls">
+                    <a  class="mx-1" href="#">
+                        <fa-icon [icon]="playVideo"></fa-icon>
+                    </a>
+                    <a class="mx-1" href="#">
+                        <fa-icon [icon]="pauseVideo"></fa-icon>
+                    </a>
+                    <a  class="mx-1" href="#">
+                        <fa-icon [icon]="closeVideo"></fa-icon>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <video
+                #videoPlayer
+                class="video-js vjs-default-skin"
+                controls
+                width="640"
+                height="264"
+                data-setup='{ "techOrder": ["vimeo"], "sources": [{ "type": "video/vimeo", "src": "https://vimeo.com/148751763"}], "vimeo": { "color": "#fbc51b"} }'
+            ></video>
+        </div>
+    </div>
+</div>

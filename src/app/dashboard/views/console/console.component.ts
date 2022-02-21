@@ -1,7 +1,5 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import {
-    faFolder,
-} from '@fortawesome/free-solid-svg-icons';
+import { faFolder } from '@fortawesome/free-solid-svg-icons';
 import { MessageService } from 'primeng/api';
 import { AuthService } from 'src/app/services/auth.service';
 import { UserService } from 'src/app/services/user.service';
@@ -14,6 +12,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AddActionService } from 'src/app/services/add-action.service';
 import { VideoPlayerService } from 'src/app/services/video-player.service';
+import { AddFeatureService } from '../../services/add-feature.service';
 
 @Component({
     selector: 'app-console',
@@ -55,9 +54,12 @@ export class ConsoleComponent implements OnInit {
      * Get the actual workspaceId
      */
     get workspaceId(): string | null {
-        if(this.route.firstChild) {
-            const workspaceId = this.route.firstChild.snapshot.paramMap.get('workspaceId');
-            if(workspaceId) {
+        if (this.route.firstChild) {
+            const workspaceId =
+                this.route.firstChild.snapshot.paramMap.get('workspaceId');
+            if (workspaceId) {
+                // FIXME - Hay que remplazar este metodo de guardar el workspaceId por uno mas decente.
+                this.workspaceService.workspaceId = workspaceId;
                 return workspaceId;
             }
         }
@@ -79,6 +81,24 @@ export class ConsoleComponent implements OnInit {
     }
 
     /**
+     * Get the addFeatureService state - Visible or Not.
+     */
+    get isAddFeatureVisible(): boolean {
+        return this.addFeatureService.isAddFeatureVisible;
+    }
+
+    /**
+     * Get the actual workspaceId
+     */
+    get code(): string | null {
+        const code = this.route.snapshot.queryParamMap.get('code');
+        if (code) {
+            return code;
+        }
+        return null;
+    }
+
+    /**
      *
      * @param authService Service to handle auth conections.
      * @param userService Service to handle user collection in database.
@@ -92,6 +112,7 @@ export class ConsoleComponent implements OnInit {
         private messageService: MessageService,
         private addActionService: AddActionService,
         private videoPlayerService: VideoPlayerService,
+        private addFeatureService: AddFeatureService,
         private router: Router,
         private route: ActivatedRoute
     ) {}
@@ -100,26 +121,36 @@ export class ConsoleComponent implements OnInit {
      * ngOnInit - Load the dashboard if there is any workspace.
      */
     ngOnInit(): void {
-        this.workspaceExistChecker = this.workspaces.subscribe((workspaces) => {
-            if(workspaces) {
-                this.workspaceExist = true;
-                this.webLoading = false;
-                workspaces.forEach((workspace, index) => {
-                    if(workspace.ref.id == this.workspaceId) {
-                        this.activeWorkspaceIndex = index;
-                        this.activeWorkspace = true;
-                    }
-                });
-            } else {
-                this.webLoading = false;
+        if (localStorage.getItem('lastWorkspace') && this.code) {
+            this.router.navigate([
+                '../workspaces',
+                localStorage.getItem('lastWorkspace'),
+                'integrations',
+                'vimeo'
+            ], {queryParams: { code: this.code }});
+        }
+        this.workspaceExistChecker = this.workspaces.subscribe(
+            (workspaces) => {
+                if (workspaces) {
+                    this.workspaceExist = true;
+                    this.webLoading = false;
+                    workspaces.forEach((workspace, index) => {
+                        if (workspace.ref.id == this.workspaceId) {
+                            this.activeWorkspaceIndex = index;
+                            this.activeWorkspace = true;
+                        }
+                    });
+                } else {
+                    this.webLoading = false;
+                }
+            },
+            (err) => {
+                console.warn(err);
+                if (err == 'NOT FOUND!') {
+                    this.webLoading = false;
+                }
             }
-        },
-        (err) => {
-            console.warn(err);
-            if(err == 'NOT FOUND!'){
-                this.webLoading = false;
-            }
-        });
+        );
     }
 
     /**
@@ -145,7 +176,7 @@ export class ConsoleComponent implements OnInit {
             this.activeWorkspace = false;
             this.router.navigate(['/workspaces']);
         } else {
-            if(this.activeWorkspace) {
+            if (this.activeWorkspace) {
                 this.router.navigate(['/workspaces']);
             }
             this.activeWorkspaceIndex = workspaceIndex;
@@ -193,7 +224,7 @@ export class ConsoleComponent implements OnInit {
         this.userService.getUserWorkspacesOnce().then((workspaces) => {
             console.log(workspaces);
             this.workspaceService.addNewWorkspace(
-                { name: workspaceName, releases: [], tags: [] , features: []},
+                { name: workspaceName, releases: [], tags: [], features: [] },
                 { workspaces: workspaces }
             );
         });
@@ -208,7 +239,7 @@ export class ConsoleComponent implements OnInit {
             name: workspaceName,
             releases: [],
             tags: [],
-            features: []
+            features: [],
         });
         if (workspaceSucess) {
             this.webLoading = false;

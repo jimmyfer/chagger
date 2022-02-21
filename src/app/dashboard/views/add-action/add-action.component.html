@@ -2,7 +2,6 @@
     <div class="card">
         <div class="card-body">
             <h1>Select Action</h1>
-            second
             <div class="form-group">
                 <div class="form-group">
                     <select
@@ -15,19 +14,74 @@
                         <option value="link">Link</option>
                         <option value="file">File</option>
                         <option value="gallery">Gallery</option>
+                        <option value="uploadVideo">UploadVideo</option>
                     </select>
                 </div>
                 <ng-container *ngIf="actionTypeCheck == 'video'">
                     <div class="form-group">
-                        <input
-                            type="text"
-                            [(ngModel)]="title"
-                            class="form-control"
-                            placeholder="Video Title"
-                        />
+                        <label for="videoProvier">Select video provider</label>
+                        <select
+                            #videoProvier
+                            id="videoProvier"
+                            [(ngModel)]="videoProvierCheck"
+                            (change)="resetData()"
+                            class="custom-select"
+                        >
+                            <option selected value="vimeo">Vimeo</option>
+                            <option value="youtube">Youtube</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <input
+                            #searchVideo
+                            type="text"
+                            class="form-control"
+                            placeholder="Search Video"
+                        />
+                    </div>
+                    <div
+                        *ngIf="videoListExist"
+                        class="video-list d-flex flex-column"
+                    >
+                    <p-paginator  [rows]="10" [totalRecords]="videoList.total > 10000 ? 400 * 10 : videoList.total" (onPageChange)="paginate($event)"></p-paginator>
+                        <ng-container *ngIf="!searchingActive">
+                            <div class="d-flex flex-wrap">
+                                <div
+                                (click)="selectVideo(video.link)"
+                                class="video m-2 d-flex flex-column text-center"
+                                *ngFor="let video of videoList.data"
+                            >
+                                <span class="video-title">{{
+                                    video.name
+                                }}</span>
+                                <div class="video-thumbnail">
+                                    <img
+                                        src="{{
+                                            video.pictures.sizes[2]
+                                                .link
+                                        }}"
+                                        alt="{{ video.name }}"
+                                    />
+                                </div>
+                            </div>
+                            </div>
+                        </ng-container>
+                        <div
+                            *ngIf="searchingActive"
+                            class="w-100 h-100 d-flex justify-content-center align-items-center"
+                        >
+                            <div
+                                class="spinner-border"
+                                style="width: 3rem; height: 3rem"
+                                role="status"
+                            >
+                                <span class="sr-only">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <input
+                            #searchVideo
                             type="text"
                             [(ngModel)]="link"
                             class="form-control"
@@ -118,6 +172,44 @@
                         />
                     </div>
                 </ng-container>
+                <ng-container *ngIf="actionTypeCheck == 'uploadVideo'">
+                    <ng-container *ngIf="vimeoLogin">
+                        <div class="form-group">
+                            <label for="videoProvier"
+                                >Select video provider</label
+                            >
+                            <select
+                                #videoProvier
+                                id="videoProvier"
+                                [(ngModel)]="videoProvierCheck"
+                                (change)="resetData()"
+                                class="custom-select"
+                            >
+                                <option selected value="vimeo">Vimeo</option>
+                                <option value="youtube">Youtube</option>
+                            </select>
+
+                            <div [innerHTML]="uploadForm"></div>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="!vimeoLogin">
+                        <div class="d-flex flex-column">
+                            <h5 class="mb-2">
+                                You need integrate Vimeo to Chagger first!
+                            </h5>
+                            <a
+                                (click)="closeAddAction()"
+                                [routerLink]="[
+                                    '/workspaces',
+                                    workspaceId,
+                                    'integrations'
+                                ]"
+                                class="btn btn-primary"
+                                >Integrate Now</a
+                            >
+                        </div>
+                    </ng-container>
+                </ng-container>
                 <ng-container *ngIf="actionTypeCheck == 'file'">
                     <div class="form-group">
                         <input type="file" #fileInput accept=".pdf, .zip" />
@@ -145,12 +237,12 @@
                         (onProgress)="progressReport($event)"
                     ></p-fileUpload>
                     <ngb-progressbar
-                            type="info"
-                            [value]="uploadFilesPercent"
-                            [striped]="true"
-                            [animated]="true"
-                            ><i>{{ uploadFilesPercent }}%</i></ngb-progressbar
-                        >
+                        type="info"
+                        [value]="uploadFilesPercent"
+                        [striped]="true"
+                        [animated]="true"
+                        ><i>{{ uploadFilesPercent }}%</i></ngb-progressbar
+                    >
                 </ng-container>
             </div>
         </div>
@@ -160,15 +252,23 @@
                 (click)="closeAddAction()"
                 class="btn btn-primary float-left"
             >
-                {{ uploadPercent == 100 || uploadFilesPercent == 100 ? "Close" : "Cancel" }}
+                {{
+                    uploadPercent == 100 || uploadFilesPercent == 100
+                        ? "Close"
+                        : "Cancel"
+                }}
             </button>
             <button
-            *ngIf="!(uploadPercent == 100 || uploadFilesPercent == 100)"
+                *ngIf="!(uploadPercent == 100 || uploadFilesPercent == 100)"
                 type="submit"
                 (click)="returnAction($event)"
                 class="btn btn-primary float-right"
             >
-                {{ actionTypeCheck == "file" || actionTypeCheck == 'gallery' ? "Upload" : "Save Changes" }}
+                {{
+                    actionTypeCheck == "file" || actionTypeCheck == "gallery"
+                        ? "Upload"
+                        : "Save Changes"
+                }}
             </button>
         </div>
     </div>

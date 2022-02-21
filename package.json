@@ -23,6 +23,7 @@
     "@angular/platform-browser-dynamic": "~12.2.0",
     "@angular/router": "~12.2.0",
     "@ctrl/ngx-emoji-mart": "^6.1.1",
+    "@devmobiliza/videojs-vimeo": "github:capaths/videojs-vimeo",
     "@fortawesome/angular-fontawesome": "^0.10.1",
     "@fortawesome/fontawesome-svg-core": "~1.2.36",
     "@fortawesome/free-solid-svg-icons": "^5.15.4",
@@ -41,6 +42,7 @@
     "rxjs": "~6.6.0",
     "tslib": "^2.3.0",
     "videojs-youtube": "^2.6.1",
+    "vimeo": "^2.1.1",
     "zone.js": "~0.11.4"
   },
   "devDependencies": {
@@ -52,10 +54,12 @@
     "@angular-eslint/template-parser": "12.7.0",
     "@angular/cli": "~12.2.12",
     "@angular/compiler-cli": "~12.2.0",
+    "@devmobiliza/videojs-vimeo": "github:capaths/videojs-vimeo",
     "@types/jasmine": "~3.8.0",
     "@types/luxon": "^2.0.8",
     "@types/node": "^12.11.1",
     "@types/video.js": "^7.3.29",
+    "@types/vimeo": "^2.1.4",
     "@typescript-eslint/eslint-plugin": "^5.8.0",
     "@typescript-eslint/parser": "^5.8.0",
     "eslint": "^7.26.0",

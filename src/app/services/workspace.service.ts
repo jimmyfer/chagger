@@ -22,6 +22,8 @@ const collectionPath = 'workspaces';
  */
 export class WorkspaceService extends FirestoreGenericService<Workspace> {
 
+    workspaceId = '';
+
     workspaces$ = this.userService.user$.pipe(
         switchMap(user => {
             this.userService.email = user && user.email ? user.email : '';
@@ -65,6 +67,15 @@ export class WorkspaceService extends FirestoreGenericService<Workspace> {
                 .ref as DocumentReference,
         });
         this.userService.editUsersWorkspaces(workSpaces);
+    }
+
+    /**
+     * Get an workspace.
+     * @param workspaceId Workspace ID.
+     * @returns A Workspace Observable.
+     */
+    getWorkspace(workspaceId: string): Observable<Workspace> {
+        return this.getDocument(collectionPath, workspaceId);
     }
 
     /**
@@ -200,5 +211,14 @@ export class WorkspaceService extends FirestoreGenericService<Workspace> {
         tagData: Partial<Workspace>
     ): Promise<void> {
         await this.updateDocument(tagData, collectionPath, tagId);
+    }
+
+    /**
+     * Update the actual vinculate repository for the actual workspace.
+     * @param repoId Repository ID.
+     * @param workspaceId Actual workspace ID.
+     */
+    async updateRepo(repoId: number, workspaceId: string): Promise<void> {
+        this.updateDocument({githubRepo: repoId}, collectionPath, workspaceId);
     }
 }

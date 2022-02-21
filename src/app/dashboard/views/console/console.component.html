@@ -1,5 +1,7 @@
 <app-add-action *ngIf="isAddActionVisible"></app-add-action>
 <app-video-player *ngIf="isVideoPlayerVisible"></app-video-player>
+<app-add-feature *ngIf="isAddFeatureVisible" ></app-add-feature>
+<app-vimeo-player *ngIf="false" ></app-vimeo-player>
 <div class="console">
     <div
         *ngIf="webLoading; else console"
@@ -182,10 +184,18 @@
                                         Users
                                     </li>
                                     <li>
-                                        <fa-icon
+                                        <a [routerLink]="[
+                                        '/workspaces',
+                                        workspace.ref.id,
+                                        'integrations'
+                                    ]"
+                                    class="release-title"
+                                    >
+                                    <fa-icon
                                             [icon]="releaseFolder"
                                         ></fa-icon>
                                         Integrations
+                                </a>
                                     </li>
                                     <li>
                                         <fa-icon
